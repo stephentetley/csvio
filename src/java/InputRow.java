@@ -24,13 +24,13 @@ import java.math.BigInteger;
 /* This is a wrapper over Apache Commons CSVRecord with convenience
  * functions to read ints, bytes, etc. rather than just Strings.
  * Note the numbers formats will be whatever Java parses rather than
- * Flix's formats (which currently I believe are the same).
+ * Flix's formats.
  */
-public class CsvRowReader {
+public class InputRow {
 
     private CSVRecord wrappedRow;
 
-    public CsvRowReader(CSVRecord row) {
+    public InputRow(CSVRecord row) {
         this.wrappedRow = row;
     }
 

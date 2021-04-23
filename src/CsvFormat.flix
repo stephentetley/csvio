@@ -27,6 +27,8 @@ namespace CsvIO {
 
 namespace CsvIO/CsvFormat {
 
+    use CsvIO.CsvFormat;
+    use CsvIO.CsvFormat.{CsvFormat};
 
     pub enum QuoteMode {
         case All,

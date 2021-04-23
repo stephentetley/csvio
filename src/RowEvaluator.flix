@@ -17,7 +17,7 @@
 
 namespace CsvIO {
 
-    pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.CsvRowReader ~> Result[a, String]
+    pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.InputRow ~> Result[a, String]
 }
 
 
@@ -33,7 +33,7 @@ namespace CsvIO/RowEvaluator {
     pub def return(x: a): RowEvaluator[a] = 
         RowEvaluator(_ -> Ok(x) as & Impure)
 
-    def apply1(x: RowEvaluator[a], r: ##flix.runtime.spt.csvio.CsvRowReader): Result[a, String] & Impure =
+    def apply1(x: RowEvaluator[a], r: ##flix.runtime.spt.csvio.InputRow): Result[a, String] & Impure =
         let RowEvaluator(f) = x;
         f(r)
 
@@ -80,7 +80,7 @@ namespace CsvIO/RowEvaluator {
         )
 
 
-    def liftPrimRowReader(eval: ##flix.runtime.spt.csvio.CsvRowReader ~> Result[a, String]): RowEvaluator[a] =
+    def liftPrimRowReader(eval: ##flix.runtime.spt.csvio.InputRow ~> Result[a, String]): RowEvaluator[a] =
         RowEvaluator(r -> eval(r))
 
     pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[a] = match x {
@@ -100,7 +100,7 @@ namespace CsvIO/RowEvaluator {
     pub def choice(xs: List[RowEvaluator[a]]): RowEvaluator[a] =
         RowEvaluator(r -> choiceHelper(r, xs))
 
-    def choiceHelper(r: ##flix.runtime.spt.csvio.CsvRowReader, xs: List[RowEvaluator[a]]): Result[a, String] & Impure =
+    def choiceHelper(r: ##flix.runtime.spt.csvio.InputRow, xs: List[RowEvaluator[a]]): Result[a, String] & Impure =
         match xs {
             case Nil => Err("choice") as & Impure
             case x1 :: rs => match apply1(x1, r) {
@@ -112,7 +112,7 @@ namespace CsvIO/RowEvaluator {
     // Cell readers
 
     pub def getStringAt(ix: Int32): RowEvaluator[String] =
-        import flix.runtime.spt.csvio.CsvRowReader.getStringAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getStringAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getStringAt(ix);
@@ -126,7 +126,7 @@ namespace CsvIO/RowEvaluator {
     /// Get a string by its column name / label.
     ///
     pub def getStringNamed(label: String): RowEvaluator[String] =
-        import flix.runtime.spt.csvio.CsvRowReader.getStringNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getStringNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getStringNamed(label);
@@ -137,7 +137,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt8At(ix: Int32): RowEvaluator[Int8] =
-        import flix.runtime.spt.csvio.CsvRowReader.getByteAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getByteAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getByteAt(ix);
@@ -148,7 +148,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt8Named(label: String): RowEvaluator[Int8] =
-        import flix.runtime.spt.csvio.CsvRowReader.getByteNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getByteNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getByteNamed(label);
@@ -159,7 +159,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt16At(ix: Int32): RowEvaluator[Int16] =
-        import flix.runtime.spt.csvio.CsvRowReader.getShortAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getShortAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getShortAt(ix);
@@ -170,7 +170,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt16Named(label: String): RowEvaluator[Int16] =
-        import flix.runtime.spt.csvio.CsvRowReader.getShortNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getShortNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getShortNamed(label);
@@ -181,7 +181,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt32At(ix: Int32): RowEvaluator[Int32] =
-        import flix.runtime.spt.csvio.CsvRowReader.getIntAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getIntAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getIntAt(ix);
@@ -192,7 +192,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt32Named(label: String): RowEvaluator[Int32] =
-        import flix.runtime.spt.csvio.CsvRowReader.getIntNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getIntNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getIntNamed(label);
@@ -203,7 +203,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt64At(ix: Int32): RowEvaluator[Int64] =
-        import flix.runtime.spt.csvio.CsvRowReader.getLongAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getLongAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getLongAt(ix);
@@ -214,7 +214,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt64Named(label: String): RowEvaluator[Int64] =
-        import flix.runtime.spt.csvio.CsvRowReader.getLongNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getLongNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getLongNamed(label);
@@ -225,7 +225,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat32At(ix: Int32): RowEvaluator[Float32] =
-        import flix.runtime.spt.csvio.CsvRowReader.getFloatAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getFloatAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getFloatAt(ix);
@@ -236,7 +236,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat32Named(label: String): RowEvaluator[Float32] =
-        import flix.runtime.spt.csvio.CsvRowReader.getFloatNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getFloatNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getFloatNamed(label);
@@ -247,7 +247,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat64At(ix: Int32): RowEvaluator[Float64] =
-        import flix.runtime.spt.csvio.CsvRowReader.getDoubleAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getDoubleAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getDoubleAt(ix);
@@ -258,7 +258,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat64Named(label: String): RowEvaluator[Float64] =
-        import flix.runtime.spt.csvio.CsvRowReader.getDoubleNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getDoubleNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getDoubleNamed(label);
@@ -269,7 +269,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getBigIntAt(ix: Int32): RowEvaluator[BigInt] =
-        import flix.runtime.spt.csvio.CsvRowReader.getBigIntegerAt(Int32);
+        import flix.runtime.spt.csvio.InputRow.getBigIntegerAt(Int32);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getBigIntegerAt(ix);
@@ -280,7 +280,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getBigIntNamed(label: String): RowEvaluator[BigInt] =
-        import flix.runtime.spt.csvio.CsvRowReader.getBigIntegerNamed(String);
+        import flix.runtime.spt.csvio.InputRow.getBigIntegerNamed(String);
         liftPrimRowReader(row -> 
             try {
                 let a = row.getBigIntegerNamed(label);

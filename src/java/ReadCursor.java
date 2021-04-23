@@ -16,8 +16,6 @@
 
 package flix.runtime.spt.csvio;
 
-import flix.runtime.spt.factio.csv.CsvCursor;
-import flix.runtime.spt.factio.csv.CsvRow;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
@@ -27,7 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-public class CsvReadCursor {
+public class ReadCursor {
 
     private Reader inputReader;
     private Iterator<CSVRecord> csvIterator;
@@ -73,36 +71,36 @@ public class CsvReadCursor {
         }
     }
 
-    protected CsvReadCursor(Reader reader, CSVFormat format) throws Exception {
+    protected ReadCursor(Reader reader, CSVFormat format) throws Exception {
         inputReader = reader;
         Iterable<CSVRecord> iterable = format.parse(inputReader);
         csvIterator = iterable.iterator();
     }
 
 
-    public static CsvCursor createCursorForFile(Path path, CSVFormat format, Charset cs) throws Exception {
+    public static ReadCursor createCursorForFile(Path path, CSVFormat format, Charset cs) throws Exception {
         FileInputStream instream = new FileInputStream(path.toString());
         Reader reader = new InputStreamReader(instream, cs);
-        return new CsvCursor(reader, format);
+        return new ReadCursor(reader, format);
     }
 
     /// Call this factory method for Excel created files...
-    public static CsvCursor createCursorForBOMFile(Path path, CSVFormat format) throws Exception {
+    public static ReadCursor createCursorForBOMFile(Path path, CSVFormat format) throws Exception {
         InputStream instream = new FileInputStream(path.toString());
         BOMInputStream bomInstream = new BOMInputStream(instream);
         String csname = bomInstream.getBOMCharsetName();
         if (csname == null) csname = "UTF-16";
         Charset charset = Charset.forName(csname);
         Reader reader = new InputStreamReader(bomInstream, charset);
-        return new CsvCursor(reader, format);
+        return new ReadCursor(reader, format);
     }
 
     public boolean hasNext() {
         return csvIterator.hasNext();
     }
 
-    public CsvRow next() throws Exception {
-        CsvRow row = new CsvRow(csvIterator.next());
+    public InputRow next() throws Exception {
+        InputRow row = new InputRow(csvIterator.next());
         return row;
     }
 
