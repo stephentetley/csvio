@@ -37,6 +37,9 @@ namespace CsvIO/RowEvaluator {
         let RowEvaluator(f) = x;
         f(r)
 
+    pub def runRowEvaluator(x: RowEvaluator[a], r: ##flix.runtime.spt.csvio.InputRow): Result[a, String] & Impure = apply1(x, r)
+        
+
     pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] =
         RowEvaluator(r -> 
             match apply1(x, r) {

@@ -51,8 +51,8 @@ namespace CsvIO/CsvReader {
             };
             Cursor.makeCursor(cursorIter)
         } catch {
-            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvStream - file not found")
-            case _: ##java.io.IOException => Cursor.failure("IOException")
+            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvCursor - file not found")
+            case _: ##java.io.IOException => Cursor.failure("newCsvCursor")
         }
 
     ///
@@ -75,7 +75,7 @@ namespace CsvIO/CsvReader {
             };
             Cursor.makeCursor(cursorIter)
         } catch {
-            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvStream - file not found")
-            case _: ##java.io.IOException => Cursor.failure("newCsvStream - io exception")
+            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvCursorWithBOM - file not found")
+            case _: ##java.io.IOException => Cursor.failure("newCsvCursorWithBOM - io exception")
         }
 }

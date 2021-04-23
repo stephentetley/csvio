@@ -38,7 +38,7 @@ namespace CsvIO/CsvFormat {
         case NoQuote
     }
 
-    pub def default(): CsvFormat =
+    pub def defaultFormat(): CsvFormat =
         import get org.apache.commons.csv.CSVFormat:DEFAULT as get_DEFAULT;
         CsvFormat(get_DEFAULT()) as & Pure
 
