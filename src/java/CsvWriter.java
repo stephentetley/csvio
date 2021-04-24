@@ -25,8 +25,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Base64;
 
 public class CsvWriter {
 
@@ -49,13 +49,13 @@ public class CsvWriter {
         return;
     }
 
-    public static CsvWriter createCsvWriter(String filename, CSVFormat format, int cellCount, Charset cs) throws Exception {
-        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+    public static CsvWriter createCsvWriter(Path filepath, CSVFormat format, int cellCount, Charset cs) throws Exception {
+        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filepath.toFile()), cs);
         return new CsvWriter(outputw, format, cellCount);
     }
 
-    public static CsvWriter createCsvWriterWithBOM(String filename, CSVFormat format, int cellCount, Charset cs) throws Exception {
-        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+    public static CsvWriter createCsvWriterWithBOM(Path filepath, CSVFormat format, int cellCount, Charset cs) throws Exception {
+        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filepath.toFile()), cs);
         byte[] bom;
         String boms = "";
         if (cs == StandardCharsets.UTF_8) {

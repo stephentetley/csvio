@@ -22,6 +22,7 @@ namespace CsvIO/Internal {
 
 namespace CsvIO/Internal/OutputHandle {
 
+    use System.FilePath.{FilePath};
     use Text.Charset.{Charset};
 
     use CsvIO/Internal.OutputHandle;
@@ -31,11 +32,12 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle.
     ///
     pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter:createCsvWriter(String, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
+        import flix.runtime.spt.csvio.CsvWriter:createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
         use Result.flatMap;
         try {
+            let FilePath(path1) = path;
             let Charset(cs1) = cs;
-            let ans = OutputHandle(createCsvWriter(ToString.toString(path), format, columnCount, cs1));
+            let ans = OutputHandle(createCsvWriter(path1, format, columnCount, cs1));
             Ok(ans)
         } catch {
             case _: ##java.lang.Exception => Err("new")
@@ -45,11 +47,12 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
     ///
     pub def newWithBOM(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter:createCsvWriterWithBOM(String, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
+        import flix.runtime.spt.csvio.CsvWriter:createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
         use Result.flatMap;
         try {
+            let FilePath(path1) = path;
             let Charset(cs1) = cs;
-            let ans = OutputHandle(createCsvWriterWithBOM(ToString.toString(path), format, columnCount, cs1));
+            let ans = OutputHandle(createCsvWriterWithBOM(path1, format, columnCount, cs1));
             Ok(ans)
         } catch {
             case _: ##java.lang.Exception => Err("newWithBOM")

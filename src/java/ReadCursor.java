@@ -79,14 +79,14 @@ public class ReadCursor {
 
 
     public static ReadCursor createCursorForFile(Path path, CSVFormat format, Charset cs) throws Exception {
-        FileInputStream instream = new FileInputStream(path.toString());
+        FileInputStream instream = new FileInputStream(path.toFile());
         Reader reader = new InputStreamReader(instream, cs);
         return new ReadCursor(reader, format);
     }
 
     /// Call this factory method for Excel created files...
     public static ReadCursor createCursorForBOMFile(Path path, CSVFormat format) throws Exception {
-        InputStream instream = new FileInputStream(path.toString());
+        InputStream instream = new FileInputStream(path.toFile());
         BOMInputStream bomInstream = new BOMInputStream(instream);
         String csname = bomInstream.getBOMCharsetName();
         if (csname == null) csname = "UTF-16";
