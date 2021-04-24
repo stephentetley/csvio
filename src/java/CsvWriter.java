@@ -18,11 +18,13 @@ package flix.runtime.spt.csvio;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.ByteOrderMark;
 
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class CsvWriter {
@@ -38,11 +40,25 @@ public class CsvWriter {
     private final CSVPrinter printer;
     private final String[] row;
 
-    public CsvWriter(String filename, CSVFormat format, int cellcount, Charset cs) throws Exception {
-        outw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+    protected CsvWriter(Writer outputw, CSVFormat format, int cellcount) throws Exception {
+        // outw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+        outw = outputw;
         printer = format.print(outw);
         row = new String[cellcount];
         return;
+    }
+
+    public static CsvWriter createCsvWriter(String filename, CSVFormat format, int cellCount, Charset cs) throws Exception {
+        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+        return new CsvWriter(outputw, format, cellCount);
+    }
+
+    public static CsvWriter createCsvWriterUTF_8WithBOM(String filename, CSVFormat format, int cellCount) throws Exception {
+        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), StandardCharsets.UTF_8);
+        byte[] bom = ByteOrderMark.UTF_8.getBytes();
+        String boms = new String(bom, StandardCharsets.UTF_8);
+        outputw.write(boms);
+        return new CsvWriter(outputw, format, cellCount);
     }
 
     public void setCellString(int ix, String value) {

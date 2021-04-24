@@ -27,3 +27,5 @@ def test02(): Result[Unit, String] & Impure =
     let cursor  = CsvIO/CsvReader.newCsvCursor(withFirstRecordAsHeader(CsvIO/CsvFormat.defaultFormat()), Text/Charset.utf_8(), eval, path);
     let* _      = CsvIO/CsvWriter.outputColumnIndexedCsv!(CsvIO/CsvFormat.defaultFormat(), Text/Charset.utf_8(), outpath, 2, writer, cursor);
     Ok()    
+
+    
