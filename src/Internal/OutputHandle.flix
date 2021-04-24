@@ -42,6 +42,20 @@ namespace CsvIO/Internal/OutputHandle {
         }
 
     ///
+    /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
+    ///
+    pub def newWithBOM(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
+        import flix.runtime.spt.csvio.CsvWriter:createCsvWriterWithBOM(String, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
+        use Result.flatMap;
+        try {
+            let Charset(cs1) = cs;
+            let ans = OutputHandle(createCsvWriterWithBOM(ToString.toString(path), format, columnCount, cs1));
+            Ok(ans)
+        } catch {
+            case _: ##java.lang.Exception => Err("newWithBOM")
+        }
+
+    ///
     /// Close the CSV output stream.
     ///
     pub def close!(x: OutputHandle): Result[Unit, String] & Impure =

@@ -26,6 +26,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class CsvWriter {
 
@@ -53,10 +54,22 @@ public class CsvWriter {
         return new CsvWriter(outputw, format, cellCount);
     }
 
-    public static CsvWriter createCsvWriterUTF_8WithBOM(String filename, CSVFormat format, int cellCount) throws Exception {
-        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), StandardCharsets.UTF_8);
-        byte[] bom = ByteOrderMark.UTF_8.getBytes();
-        String boms = new String(bom, StandardCharsets.UTF_8);
+    public static CsvWriter createCsvWriterWithBOM(String filename, CSVFormat format, int cellCount, Charset cs) throws Exception {
+        OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+        byte[] bom;
+        String boms = "";
+        if (cs == StandardCharsets.UTF_8) {
+            bom = ByteOrderMark.UTF_8.getBytes();
+            boms = new String(bom, StandardCharsets.UTF_8);
+        } else if (cs == StandardCharsets.UTF_16LE) {
+            bom = ByteOrderMark.UTF_16LE.getBytes();
+            boms = new String(bom, StandardCharsets.UTF_16LE);
+        } else if (cs == StandardCharsets.UTF_16BE) {
+            bom = ByteOrderMark.UTF_16BE.getBytes();
+            boms = new String(bom, StandardCharsets.UTF_16BE);
+        } else {
+            bom = new byte[0];
+        }
         outputw.write(boms);
         return new CsvWriter(outputw, format, cellCount);
     }
