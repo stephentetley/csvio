@@ -21,6 +21,7 @@ namespace CsvIO/CsvReader {
     use Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
+    use CsvIO.RowEvaluator;
     use CsvIO.CsvFormat.{CsvFormat};
 
     ///
@@ -32,9 +33,10 @@ namespace CsvIO/CsvReader {
     ///
     /// Returns a new Csv Cursor.
     ///
-    pub def newCsvCursor(path: System.FilePath,
-                        format: CsvFormat,
-                        cs: Text.Charset): Cursor[String, CsvRow] & Impure =
+    pub def newCsvCursor(format: CsvFormat,
+                        cs: Text.Charset,
+                        eval: RowEvaluator[a], 
+                        path: System.FilePath): Cursor[String, a] & Impure =
         import flix.runtime.spt.csvio.ReadCursor:createCursorForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset);
         import flix.runtime.spt.csvio.ReadCursor.hasNext() as ffiHasNext;
         import flix.runtime.spt.csvio.ReadCursor.next() as ffiNext;
@@ -49,7 +51,7 @@ namespace CsvIO/CsvReader {
                 , next = Cursor.guardThunk(_ -> ffiNext(iter), "next failed")
                 , finalize = () -> ffiClose(iter)
             };
-            Cursor.makeCursor(cursorIter)
+            Cursor.makeCursor(cursorIter) |> Cursor.mapResult(CsvIO/RowEvaluator.runRowEvaluator(eval))
         } catch {
             case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvCursor - file not found")
             case _: ##java.io.IOException => Cursor.failure("newCsvCursor")

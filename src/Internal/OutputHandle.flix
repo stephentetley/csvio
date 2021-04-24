@@ -30,15 +30,15 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Returns a new Output handle.
     ///
-    pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Option[OutputHandle] & Impure =
+    pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
         import new flix.runtime.spt.csvio.CsvWriter(String, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset) as newCsvOutput;
         use Result.flatMap;
         try {
             let Charset(cs1) = cs;
             let ans = OutputHandle(newCsvOutput(ToString.toString(path), format, columnCount, cs1));
-            Some(ans)
+            Ok(ans)
         } catch {
-            case _: ##java.lang.Exception => None
+            case _: ##java.lang.Exception => Err("new")
         }
 
     ///

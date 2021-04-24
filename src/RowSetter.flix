@@ -35,9 +35,13 @@ namespace CsvIO/RowSetter {
     pub def return(x: a): RowSetter[a] =
         RowSetter(_ -> Ok(x) as & Impure)
 
+    /// TODO should this be called `apply!` ?
     def apply1(x: RowSetter[a], r: OutputHandle): Result[a, String] & Impure =
         let RowSetter(f) = x;
         f(r)
+    
+    pub def runRowSetter!(x: RowSetter[a], r: OutputHandle): Result[a, String] & Impure = apply1(x, r)
+     
 
     pub def map(f: a -> b & ef, x: RowSetter[a]): RowSetter[b] =
         RowSetter(r ->
