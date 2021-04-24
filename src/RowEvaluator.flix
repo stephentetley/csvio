@@ -20,6 +20,9 @@ namespace CsvIO {
     pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.InputRow ~> Result[a, String]
 }
 
+/// Note - the underlying library - Apache Commons Csv - supports both named 
+/// and indexed getters, so there isn't a compelling reason to have RowEvaluator 
+/// and NamedRowEvaluator modules.
 
 namespace CsvIO/RowEvaluator {
 
