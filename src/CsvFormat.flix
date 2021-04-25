@@ -38,53 +38,117 @@ namespace CsvIO/CsvFormat {
         case NoQuote
     }
 
-    pub def defaultFormat(): CsvFormat =
+
+    def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String]): CsvFormat & Impure = 
+        import new flix.runtime.spt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int) as newBuilder;
+        import flix.runtime.spt.csvio.FormatBuilder.setHeaderString(Int, String);
+        import flix.runtime.spt.csvio.FormatBuilder.getCSVFormat();
+        try {
+            let builder = newBuilder(format, Array.length(headers));
+            Array.foreachWithIndex((x, ix) -> setHeaderString(builder, ix, x),  headers);
+            CsvFormat(getCSVFormat(builder))
+        } catch {
+            case _: ##java.lang.Exception => bug!("CsvFormat.makeFormatWithHeaders should not fail...")
+        }
+
+
+    pub def defaultFormat(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:DEFAULT as get_DEFAULT;
-        CsvFormat(get_DEFAULT()) as & Pure
+        let javafmt = get_DEFAULT();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def excel(): CsvFormat =
+ 
+
+    pub def excel(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:EXCEL as get_EXCEL;
-        CsvFormat(get_EXCEL()) as & Pure
+        let javafmt = get_EXCEL();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def informix_unload(): CsvFormat =
+    pub def informix_unload(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:INFORMIX_UNLOAD as get_INFORMIX_UNLOAD;
-        CsvFormat(get_INFORMIX_UNLOAD()) as & Pure
+        let javafmt = get_INFORMIX_UNLOAD();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def informix_unload_csv(): CsvFormat =
+    pub def informix_unload_csv(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:INFORMIX_UNLOAD_CSV as get_INFORMIX_UNLOAD_CSV;
-        CsvFormat(get_INFORMIX_UNLOAD_CSV()) as & Pure
+        let javafmt = get_INFORMIX_UNLOAD_CSV();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def mongodb_csv(): CsvFormat =
+    pub def mongodb_csv(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:MONGODB_CSV as get_MONGODB_CSV;
-        CsvFormat(get_MONGODB_CSV()) as & Pure
+        let javafmt = get_MONGODB_CSV();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def mongodb_tsv(): CsvFormat =
+    pub def mongodb_tsv(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:MONGODB_TSV as get_MONGODB_TSV;
-        CsvFormat(get_MONGODB_TSV()) as & Pure
+        let javafmt = get_MONGODB_TSV();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def mysql(): CsvFormat =
+    pub def mysql(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:MYSQL as get_MYSQL;
-        CsvFormat(get_MYSQL()) as & Pure
+        let javafmt = get_MYSQL();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def oracle(): CsvFormat =
+    pub def oracle(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:ORACLE as get_ORACLE;
-        CsvFormat(get_ORACLE()) as & Pure
+        let javafmt = get_ORACLE();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def postgresql_csv(): CsvFormat =
+    pub def postgresql_csv(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:POSTGRESQL_CSV as get_POSTGRESQL_CSV;
-        CsvFormat(get_POSTGRESQL_CSV()) as & Pure
+        let javafmt = get_POSTGRESQL_CSV();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def postgresql_text(): CsvFormat =
+    pub def postgresql_text(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:POSTGRESQL_TEXT as get_POSTGRESQL_TEXT;
-        CsvFormat(get_POSTGRESQL_TEXT()) as & Pure
+        let javafmt = get_POSTGRESQL_TEXT();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def rfc4180(): CsvFormat =
+    pub def rfc4180(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:RFC4180 as get_RFC4180;
-        CsvFormat(get_RFC4180()) as & Pure
+        let javafmt = get_RFC4180();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
-    pub def tdf(): CsvFormat =
+    pub def tdf(headers: Option[Array[String]]): CsvFormat & Impure =
         import get org.apache.commons.csv.CSVFormat:TDF as get_TDF;
-        CsvFormat(get_TDF()) as & Pure
+        let javafmt = get_TDF();
+        match headers { 
+            case Some(arr) => makeFormatWithHeaders(javafmt, arr)
+            case None => CsvFormat(javafmt)
+        }
 
 
     pub def toString(x: CsvFormat): String =

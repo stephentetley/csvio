@@ -41,11 +41,10 @@ public class CsvWriter {
     private final CSVPrinter printer;
     private final String[] row;
 
-    protected CsvWriter(Writer outputw, CSVFormat format, int cellcount) throws Exception {
-        // outw = new OutputStreamWriter(new FileOutputStream(filename), cs);
+    protected CsvWriter(Writer outputw, CSVFormat format, int cellCount) throws Exception {
         outw = outputw;
         printer = format.print(outw);
-        row = new String[cellcount];
+        row = new String[cellCount];
         return;
     }
 
