@@ -230,7 +230,7 @@ namespace CsvIO/CsvFormat {
         let CsvFormat(x1) = x;
         CsvFormat(x1.withTrim(trim)) as & Pure
 
-    pub def withFirstRecordAsHeader(x: CsvFormat): CsvFormat =
+    pub def putFirstRecordAsHeader(x: CsvFormat): CsvFormat =
         import org.apache.commons.csv.CSVFormat.withFirstRecordAsHeader();
         let CsvFormat(x1) = x;
         CsvFormat(x1.withFirstRecordAsHeader()) as & Pure

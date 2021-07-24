@@ -17,6 +17,7 @@
 
 namespace CsvIO/CsvWriter {
     
+    use X.Cursor;
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
@@ -36,7 +37,7 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         let CsvFormat(format1) = format;
         let* handle = CsvIO/Internal/OutputHandle.new(format1, columnCount, cs, path);
-        let* _ = Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
+        let* _ = X/Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
         let* _ = CsvIO/Internal/OutputHandle.close!(handle);
         Ok()
 
@@ -56,7 +57,7 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         let CsvFormat(format1) = format;
         let* handle = CsvIO/Internal/OutputHandle.newWithBOM(format1, columnCount, cs, path);
-        let* _ = Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
+        let* _ = X/Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
         let* _ = CsvIO/Internal/OutputHandle.close!(handle);
         Ok()
 

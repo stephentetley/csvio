@@ -17,6 +17,7 @@
 
 namespace CsvIO/CsvReader {
     
+    use X.Cursor;
     use System.FilePath.{FilePath};
     use Text.Charset.{Charset};
 
@@ -48,13 +49,13 @@ namespace CsvIO/CsvReader {
             let iter = createCursorForFile(path1, fmt1, cs1);
             let cursorIter =  {
                   hasNext = () -> ffiHasNext(iter)
-                , next = Cursor.guardThunk(_ -> ffiNext(iter), "next failed")
+                , next = X/Cursor.guardThunk(_ -> ffiNext(iter), "next failed")
                 , finalize = () -> ffiClose(iter)
             };
-            Cursor.makeCursor(cursorIter) |> Cursor.mapResult(CsvIO/RowEvaluator.runRowEvaluator(eval))
+            X/Cursor.makeCursor(cursorIter) |> X/Cursor.mapResult(CsvIO/RowEvaluator.runRowEvaluator(eval))
         } catch {
-            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvCursor - file not found")
-            case _: ##java.io.IOException => Cursor.failure("newCsvCursor")
+            case _: ##java.io.FileNotFoundException => X/Cursor.failure("newCsvCursor - file not found")
+            case _: ##java.io.IOException => X/Cursor.failure("newCsvCursor")
         }
 
     ///
@@ -72,12 +73,12 @@ namespace CsvIO/CsvReader {
             let iter = createCursorForBOMFile(path1, fmt1);
             let cursorIter =  {
                   hasNext = () -> ffiHasNext(iter)
-                , next = Cursor.guardThunk(_ -> ffiNext(iter), "next failed")
+                , next = X/Cursor.guardThunk(_ -> ffiNext(iter), "next failed")
                 , finalize = () -> ffiClose(iter)
             };
-            Cursor.makeCursor(cursorIter)
+            X/Cursor.makeCursor(cursorIter)
         } catch {
-            case _: ##java.io.FileNotFoundException => Cursor.failure("newCsvCursorWithBOM - file not found")
-            case _: ##java.io.IOException => Cursor.failure("newCsvCursorWithBOM - io exception")
+            case _: ##java.io.FileNotFoundException => X/Cursor.failure("newCsvCursorWithBOM - file not found")
+            case _: ##java.io.IOException => X/Cursor.failure("newCsvCursorWithBOM - io exception")
         }
 }
