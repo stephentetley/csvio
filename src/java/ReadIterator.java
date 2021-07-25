@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-public class ReadCursor {
+public class ReadIterator {
 
     private Reader inputReader;
     private Iterator<CSVRecord> csvIterator;
@@ -71,28 +71,28 @@ public class ReadCursor {
         }
     }
 
-    protected ReadCursor(Reader reader, CSVFormat format) throws Exception {
+    protected ReadIterator(Reader reader, CSVFormat format) throws Exception {
         inputReader = reader;
         Iterable<CSVRecord> iterable = format.parse(inputReader);
         csvIterator = iterable.iterator();
     }
 
 
-    public static ReadCursor createCursorForFile(Path path, CSVFormat format, Charset cs) throws Exception {
+    public static ReadIterator createIterForFile(Path path, CSVFormat format, Charset cs) throws Exception {
         FileInputStream instream = new FileInputStream(path.toFile());
         Reader reader = new InputStreamReader(instream, cs);
-        return new ReadCursor(reader, format);
+        return new ReadIterator(reader, format);
     }
 
     /// Call this factory method for Excel created files...
-    public static ReadCursor createCursorForBOMFile(Path path, CSVFormat format) throws Exception {
+    public static ReadIterator createIterForBOMFile(Path path, CSVFormat format) throws Exception {
         InputStream instream = new FileInputStream(path.toFile());
         BOMInputStream bomInstream = new BOMInputStream(instream);
         String csname = bomInstream.getBOMCharsetName();
         if (csname == null) csname = "UTF-16";
         Charset charset = Charset.forName(csname);
         Reader reader = new InputStreamReader(bomInstream, charset);
-        return new ReadCursor(reader, format);
+        return new ReadIterator(reader, format);
     }
 
     public boolean hasNext() {
@@ -104,6 +104,7 @@ public class ReadCursor {
         return row;
     }
 
+    // NOTE - explicit close
     public void close() throws IOException {
         inputReader.close();
     }

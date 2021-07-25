@@ -17,12 +17,11 @@
 
 namespace CsvIO/CsvWriter {
     
-    use X.Cursor;
-
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
     use CsvIO.RowSetter;
     use CsvIO/Internal.OutputHandle;
+
 
     ///
     /// outputIndexedCsv.
@@ -33,12 +32,34 @@ namespace CsvIO/CsvWriter {
                         path: System.FilePath,
                         columnCount: Int32,
                         rowWriter: a -> RowSetter[b],
-                        rows: Cursor[String, a]): Result[Unit, String] & Impure =
+                        iter: Iterator[Result[a, String]]): Result[Unit, String] & Impure =
         use Result.flatMap;
         let CsvFormat(format1) = format;
         let* handle = CsvIO/Internal/OutputHandle.new(format1, columnCount, cs, path);
-        let* _ = X/Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
-        let* _ = CsvIO/Internal/OutputHandle.close!(handle);
+        let _       = 
+            Iterator.foreach(x1 -> match x1 {
+                case Err(_) => () as & Impure
+                case Ok(row) => writeRow(row, rowWriter, handle) |> constant(())
+            }, iter);
+        let* _      = CsvIO/Internal/OutputHandle.close!(handle);
+        Ok()
+
+
+    pub def outputColumnIndexedCsvWithBOM!(format: CsvFormat,
+                        cs: Text.Charset,
+                        path: System.FilePath,
+                        columnCount: Int32,
+                        rowWriter: a -> RowSetter[b],
+                        iter: Iterator[Result[a, String]]): Result[Unit, String] & Impure =
+        use Result.flatMap;
+        let CsvFormat(format1) = format;
+        let* handle = CsvIO/Internal/OutputHandle.newWithBOM(format1, columnCount, cs, path);
+        let _       = 
+            Iterator.foreach(x1 -> match x1 {
+                case Err(_) => () as & Impure
+                case Ok(row) => writeRow(row, rowWriter, handle) |> constant(())
+            }, iter);
+        let* _      = CsvIO/Internal/OutputHandle.close!(handle);
         Ok()
 
     def writeRow(row: a, rowWriter: a -> RowSetter[b], handle: OutputHandle): Result[Unit, String] & Impure = 
@@ -48,18 +69,8 @@ namespace CsvIO/CsvWriter {
         let* _ = CsvIO/Internal/OutputHandle.writeRow!(handle);
         Ok()
 
-    pub def outputColumnIndexedCsvWithBOM!(format: CsvFormat,
-                        cs: Text.Charset,
-                        path: System.FilePath,
-                        columnCount: Int32,
-                        rowWriter: a -> RowSetter[b],
-                        rows: Cursor[String, a]): Result[Unit, String] & Impure =
-        use Result.flatMap;
-        let CsvFormat(format1) = format;
-        let* handle = CsvIO/Internal/OutputHandle.newWithBOM(format1, columnCount, cs, path);
-        let* _ = X/Cursor.foreachResult!(row -> writeRow(row, rowWriter, handle), rows);
-        let* _ = CsvIO/Internal/OutputHandle.close!(handle);
-        Ok()
+
+
 
     /// TODO to N=15
     pub def row2(a: t1, b: t2): RowSetter[Unit] with ToString[t1], ToString[t2] = 
