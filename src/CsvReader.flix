@@ -31,7 +31,61 @@ namespace CsvIO/CsvReader {
     type alias CsvRow = ##flix.runtime.spt.csvio.InputRow
 
 
+    /// TODO 
+    /// To change to Flix's builtin iterator we need to retain a handle
+    /// so we can close it.
+
+    pub opaque type CsvReadHandle[a] = (##flix.runtime.spt.csvio.ReadCursor, Iterator[Result[a, String]])
+
+    pub def close(handle: CsvReadHandle[a]): Result[Unit, String] & Impure = 
+        import flix.runtime.spt.csvio.ReadCursor.close();
+        let CsvReadHandle((x1, _)) = handle;
+        try {
+            close(x1);
+            Ok()
+        } catch {
+            case _: ##java.lang.Exception => Err("close")
+        }
+
+    pub def getIterator(handle: CsvReadHandle[a]): Iterator[Result[a, String]] = 
+        let CsvReadHandle((_, i1)) = handle;
+        i1
+
+
+
     ///
+    /// Returns a new Csv Handle (iterator x close handle).
+    ///
+    pub def newCsvReadHandle(format: CsvFormat,
+                            cs: Text.Charset,
+                            eval: RowEvaluator[a], 
+                            path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =
+        import flix.runtime.spt.csvio.ReadCursor:createCursorForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset);
+        import flix.runtime.spt.csvio.ReadCursor.hasNext();
+        import flix.runtime.spt.csvio.ReadCursor.next();        
+        try {
+            let FilePath(path1) = path;
+            let CsvFormat(fmt1) = format;
+            let Charset(cs1) = cs;
+            let primIter = createCursorForFile(path1, fmt1, cs1);
+            let iterDone = () -> if (hasNext(primIter)) false else true;
+            let iterNext = () -> {
+                try {
+                    let row = next(primIter);
+                    CsvIO/RowEvaluator.runRowEvaluator(eval, row)
+                } catch {
+                    case _: ##java.lang.Exception => Err("csvReadIter[next]")
+                }
+            };
+            let iter1 = Iterator(iterDone, iterNext);
+            let hdl = CsvReadHandle((primIter, iter1));
+            Ok(hdl)
+        } catch {
+            case _: ##java.lang.Exception => Err("newCsvReadHandle")            
+        }
+
+    ///
+    /// DEPRECATED
     /// Returns a new Csv Cursor.
     ///
     pub def newCsvCursor(format: CsvFormat,
@@ -57,6 +111,7 @@ namespace CsvIO/CsvReader {
             case _: ##java.io.FileNotFoundException => X/Cursor.failure("newCsvCursor - file not found")
             case _: ##java.io.IOException => X/Cursor.failure("newCsvCursor")
         }
+
 
     ///
     /// Returns a new Csv Cursor from a file with a BOM.
