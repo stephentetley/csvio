@@ -22,6 +22,24 @@ namespace CsvIO {
 
     pub opaque type RowSetter[a] = OutputHandle -> Result[a, String] & Impure
 
+    instance Functor[RowSetter] {
+        pub def map(f: a -> b & ef, x: RowSetter[a]): RowSetter[b] & ef =
+            CsvIO/RowSetter.map(f, x)
+    }
+
+    instance Applicative[RowSetter] {
+        pub def point(x: a): RowSetter[a] = 
+            CsvIO/RowSetter.point(x)
+
+        pub def ap(mf: RowSetter[a -> b & ef], ma: RowSetter[a]): RowSetter[b] & ef =
+            CsvIO/RowSetter.ap(mf, ma)
+    }
+
+    instance Monad[RowSetter] {
+        pub def flatMap(k: a -> RowSetter[b] & ef, x: RowSetter[a]): RowSetter[b] & ef =
+            CsvIO/RowSetter.flatMap(k, x)
+    }    
+
 }
 
 namespace CsvIO/RowSetter {
@@ -32,7 +50,7 @@ namespace CsvIO/RowSetter {
     use CsvIO/Internal.OutputHandle;
     use CsvIO/Internal.OutputHandle.{OutputHandle}; 
 
-    pub def return(x: a): RowSetter[a] =
+    pub def point(x: a): RowSetter[a] =
         RowSetter(_ -> Ok(x) as & Impure)
 
     /// TODO should this be called `apply!` ?
@@ -43,7 +61,7 @@ namespace CsvIO/RowSetter {
     pub def runRowSetter!(x: RowSetter[a], r: OutputHandle): Result[a, String] & Impure = apply1(x, r)
      
 
-    pub def map(f: a -> b & ef, x: RowSetter[a]): RowSetter[b] =
+    pub def map(f: a -> b & ef, x: RowSetter[a]): RowSetter[b] & ef =
         RowSetter(r ->
             match apply1(x, r) {
                 case Ok(a) => {
@@ -52,9 +70,9 @@ namespace CsvIO/RowSetter {
                 }
                 case Err(e) => Err(e)
             }
-        )
+        ) as & ef
 
-    pub def ap(mf: RowSetter[a -> b & ef], ma: RowSetter[a]): RowSetter[b] =
+    pub def ap(mf: RowSetter[a -> b & ef], ma: RowSetter[a]): RowSetter[b] & ef =
         RowSetter(r ->
             match apply1(mf, r) {
                 case Ok(f) => {
@@ -65,17 +83,16 @@ namespace CsvIO/RowSetter {
                 }
                 case Err(e1) => Err(e1)
             }
-        )
+        ) as & ef
 
-    pub def bind(x: RowSetter[a], k: a -> RowSetter[b]): RowSetter[b] =
+
+    pub def flatMap(k: a -> RowSetter[b] & ef, x: RowSetter[a]): RowSetter[b] & ef =
         RowSetter(r ->
             match apply1(x, r) {
                 case Ok(a) => { let ans = k(a); apply1(ans, r) }
                 case Err(e) => Err(e)
             }
-        )
-
-    pub def flatMap(k: a -> RowSetter[b], x: RowSetter[a]): RowSetter[b] = bind(x, k)
+        ) as & ef
 
     def primWriteCell!(ix: Int32, value: String): RowSetter[Unit] =
         use CsvIO/Internal/OutputHandle.{setCellString!};

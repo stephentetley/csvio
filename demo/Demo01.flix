@@ -8,10 +8,10 @@ def main(_args: Array[String]): Int32 & Impure =
 
 def test01(): Result[Unit, String] & Impure = 
     use Result.flatMap;
-    use CsvIO/RowEvaluator.{tuple2, getStringNamed};
+    use CsvIO/RowEvaluator.{getStringNamed};
     use CsvIO/CsvFormat.{putFirstRecordAsHeader};
     let path    = System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
-    let eval    = tuple2(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
+    let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
     let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, Text/Charset.utf_8(), eval, path);
     let iter    = CsvIO/CsvReader.getIterator(hdl);
     let _       = Iterator.foreach(println, iter);
@@ -22,11 +22,11 @@ def test01(): Result[Unit, String] & Impure =
 /// TODO change to use iterator
 def test02(): Result[Unit, String] & Impure = 
     use Result.flatMap;
-    use CsvIO/RowEvaluator.{tuple2, getStringNamed};
+    use CsvIO/RowEvaluator.{getStringNamed};
     use CsvIO/CsvFormat.{putFirstRecordAsHeader};
     let path    = System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
     let outpath = System/FilePath.new("E://coding/flix/csvio/data/compass-out.csv");
-    let eval    = tuple2(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
+    let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
     let writer  = xy -> {let (x, y) = xy; CsvIO/CsvWriter.row2(y, x)};  /// Flip 
     let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, Text/Charset.utf_8(), eval, path);
     let iter    = CsvIO/CsvReader.getIterator(hdl);
@@ -38,11 +38,11 @@ def test02(): Result[Unit, String] & Impure =
 /// TODO change to use iterator
 def test03(): Result[Unit, String] & Impure = 
     use Result.flatMap;
-    use CsvIO/RowEvaluator.{tuple2, getStringNamed};
+    use CsvIO/RowEvaluator.{getStringNamed};
     use CsvIO/CsvFormat.{putFirstRecordAsHeader};
     let path    = System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
     let outpath = System/FilePath.new("E://coding/flix/csvio/data/compass-out-utf8-bom.csv");
-    let eval    = tuple2(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
+    let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
     let writer  = xy -> {let (x, y) = xy; CsvIO/CsvWriter.row2(y, x)};  /// Flip 
     let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, Text/Charset.utf_8(), eval, path);
     let iter    = CsvIO/CsvReader.getIterator(hdl);
