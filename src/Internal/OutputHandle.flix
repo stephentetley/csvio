@@ -32,7 +32,7 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle.
     ///
     pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter:createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
+        import static flix.runtime.spt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
         use Result.flatMap;
         try {
             let FilePath(path1) = path;
@@ -47,7 +47,7 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
     ///
     pub def newWithBOM(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter:createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
+        import static flix.runtime.spt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset);
         use Result.flatMap;
         try {
             let FilePath(path1) = path;

@@ -30,8 +30,7 @@ namespace CsvIO/CsvReader {
     type alias CsvRow = ##flix.runtime.spt.csvio.InputRow
 
 
-    /// TODO 
-    /// To change to Flix's builtin iterator we need to retain a handle
+    /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
 
     pub opaque type CsvReadHandle[a] = (##flix.runtime.spt.csvio.ReadIterator, Iterator[Result[a, String]])
@@ -53,13 +52,13 @@ namespace CsvIO/CsvReader {
 
 
     ///
-    /// Returns a new Csv Handle (iterator x close handle).
+    /// Returns a new Csv Handle (iterator x a "close" handle).
     ///
     pub def newCsvReadHandle(format: CsvFormat,
                             cs: Text.Charset,
                             eval: RowEvaluator[a], 
                             path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =
-        import flix.runtime.spt.csvio.ReadIterator:createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset);
+        import static flix.runtime.spt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset);
         import flix.runtime.spt.csvio.ReadIterator.hasNext();
         import flix.runtime.spt.csvio.ReadIterator.next();        
         try {
@@ -90,7 +89,7 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandleWithBOM(format: CsvFormat,
                                     eval: RowEvaluator[a], 
                                     path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =        
-        import flix.runtime.spt.csvio.ReadIterator:createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat);
+        import static flix.runtime.spt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat);
         import flix.runtime.spt.csvio.ReadIterator.hasNext();
         import flix.runtime.spt.csvio.ReadIterator.next();        
         try {

@@ -17,7 +17,7 @@
 
 namespace CsvIO {
 
-    pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.InputRow ~> Result[a, String]
+    pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.InputRow -> Result[a, String] & Impure
 }
 
 /// Note - the underlying library - Apache Commons Csv - supports both named 
@@ -86,7 +86,7 @@ namespace CsvIO/RowEvaluator {
         )
 
 
-    def liftPrimRowReader(eval: ##flix.runtime.spt.csvio.InputRow ~> Result[a, String]): RowEvaluator[a] =
+    def liftPrimRowReader(eval: ##flix.runtime.spt.csvio.InputRow -> Result[a, String] & Impure): RowEvaluator[a] =
         RowEvaluator(r -> eval(r))
 
     pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[a] = match x {
@@ -97,7 +97,7 @@ namespace CsvIO/RowEvaluator {
     pub def liftResult(x: Result[a, String]): RowEvaluator[a] = 
         RowEvaluator(_ -> x as & Impure)
 
-    pub def liftOperation(fn: Unit ~> Result[a, String]): RowEvaluator[a] =
+    pub def liftOperation(fn: Unit -> Result[a, String] & Impure): RowEvaluator[a] =
         RowEvaluator(_ -> fn())
 
     pub def throwError(err: String): RowEvaluator[a] =
@@ -121,7 +121,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getStringAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getStringAt(ix);
+                let a = getStringAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getStringAt('${ix}')")
@@ -135,7 +135,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getStringNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getStringNamed(label);
+                let a = getStringNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getStringNamed('${label}')")
@@ -146,7 +146,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getByteAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getByteAt(ix);
+                let a = getByteAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt8At(${ix})")
@@ -157,7 +157,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getByteNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getByteNamed(label);
+                let a = getByteNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt8Named('${label}')")
@@ -168,7 +168,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getShortAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getShortAt(ix);
+                let a = getShortAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt16At(${ix})")
@@ -179,7 +179,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getShortNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getShortNamed(label);
+                let a = getShortNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt16Named('${label}')")
@@ -190,7 +190,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getIntAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getIntAt(ix);
+                let a = getIntAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt32At(${ix})")
@@ -201,7 +201,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getIntNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getIntNamed(label);
+                let a = getIntNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt32Named('${label}')")
@@ -212,7 +212,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getLongAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getLongAt(ix);
+                let a = getLongAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt64At(${ix})")
@@ -223,7 +223,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getLongNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getLongNamed(label);
+                let a = getLongNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getInt64Named('${label}')")
@@ -234,7 +234,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getFloatAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getFloatAt(ix);
+                let a = getFloatAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getFloat32At(${ix})")
@@ -245,7 +245,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getFloatNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getFloatNamed(label);
+                let a = getFloatNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getFloat32Named('${label}')")
@@ -256,7 +256,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getDoubleAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getDoubleAt(ix);
+                let a = getDoubleAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getFloat64At(${ix})")
@@ -267,7 +267,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getDoubleNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getDoubleNamed(label);
+                let a = getDoubleNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getFloat64Named('${label}')")
@@ -278,7 +278,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getBigIntegerAt(Int32);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getBigIntegerAt(ix);
+                let a = getBigIntegerAt(row, ix);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getBigIntAt(${ix})")
@@ -289,7 +289,7 @@ namespace CsvIO/RowEvaluator {
         import flix.runtime.spt.csvio.InputRow.getBigIntegerNamed(String);
         liftPrimRowReader(row -> 
             try {
-                let a = row.getBigIntegerNamed(label);
+                let a = getBigIntegerNamed(row, label);
                 Ok(a)
             } catch {
                 case _: ##java.lang.Exception => Err("getBigIntNamed('${label}')")
@@ -298,52 +298,52 @@ namespace CsvIO/RowEvaluator {
 
     pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringAt(ix);
-        let* ans = liftOperation(_ -> Text/Regex.evalMatches(input, patt, eval));
+        let* ans = liftOperation(_ -> Text/Regex.evalMatches(patt, eval, input));
         return(ans)
 
     pub def evalMatchesNamed(label: String, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringNamed(label);
-        let* ans = liftOperation(_ -> Text/Regex.evalMatches(input, patt, eval));
+        let* ans = liftOperation(_ -> Text/Regex.evalMatches(patt, eval, input));
         return(ans)
 
     pub def evalContainsAt(ix: Int32, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringAt(ix);
-        let* ans = liftOperation(_ -> Text/Regex.evalContains(input, patt, eval));
+        let* ans = liftOperation(_ -> Text/Regex.evalContains(patt, eval, input));
         return(ans)
 
     pub def evalContainsNamed(label: String, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringNamed(label);
-        let* ans = liftOperation(_ -> Text/Regex.evalContains(input, patt, eval));
+        let* ans = liftOperation(_ -> Text/Regex.evalContains(patt, eval, input));
         return(ans)
 
     pub def getLocalDateAt(ix: Int32, formatter: Time/Format.DateFormatter): RowEvaluator[Time.LocalDate] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalDate.parse(input, formatter), "getLocalDateAt(${ix})");
+        let* ans = liftOption(Time/LocalDate.parse(formatter, input), "getLocalDateAt(${ix})");
         return(ans)
 
     pub def getLocalDateNamed(label: String, formatter: Time/Format.DateFormatter): RowEvaluator[Time.LocalDate] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalDate.parse(input, formatter), "getLocalDateNamed('${label}')");
+        let* ans = liftOption(Time/LocalDate.parse(formatter, input), "getLocalDateNamed('${label}')");
         return(ans)
 
     pub def getLocalDateTimeAt(ix: Int32, formatter: Time/Format.DateTimeFormatter): RowEvaluator[Time.LocalDateTime] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalDateTime.parse(input, formatter), "getLocalDateTimeAt(${ix})");
+        let* ans = liftOption(Time/LocalDateTime.parse(formatter, input), "getLocalDateTimeAt(${ix})");
         return(ans)
 
     pub def getLocalDateTimeNamed(label: String, formatter: Time/Format.DateTimeFormatter): RowEvaluator[Time.LocalDateTime] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalDateTime.parse(input, formatter), "getLocalDateTimeNamed('${label}')");
+        let* ans = liftOption(Time/LocalDateTime.parse(formatter, input), "getLocalDateTimeNamed('${label}')");
         return(ans)
 
     pub def getLocalTimeAt(ix: Int32, formatter: Time/Format.TimeFormatter): RowEvaluator[Time.LocalTime] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalTime.parse(input, formatter), "getLocalTimeAt(${ix})");
+        let* ans = liftOption(Time/LocalTime.parse(formatter, input), "getLocalTimeAt(${ix})");
         return(ans)
 
     pub def getLocalTimeNamed(label: String, formatter: Time/Format.TimeFormatter): RowEvaluator[Time.LocalTime] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalTime.parse(input, formatter), "getLocalTimeNamed('${label}')");
+        let* ans = liftOption(Time/LocalTime.parse(formatter, input), "getLocalTimeNamed('${label}')");
         return(ans)
 
     ///

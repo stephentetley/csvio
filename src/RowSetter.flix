@@ -20,7 +20,7 @@ namespace CsvIO {
 
     use CsvIO/Internal.OutputHandle;
 
-    pub opaque type RowSetter[a] = OutputHandle ~> Result[a, String]
+    pub opaque type RowSetter[a] = OutputHandle -> Result[a, String] & Impure
 
 }
 
@@ -98,129 +98,7 @@ namespace CsvIO/RowSetter {
     pub def putString!(ix: Int32, str: String): RowSetter[Unit] =
         primWriteCell!(ix, str)
 
-    ///
-    /// Applies the binary function `f` to the values in `o1` and `o2`.
-    ///
-    /// Returns an error if either `o1` or `o2` are errors.
-    ///
-    pub def lift2(f: (t1, t2) -> u & ef, o1: RowSetter[t1], o2: RowSetter[t2]): RowSetter[u] =
-        ap(map(f, o1), o2)
 
-    ///
-    /// Applies the ternary function `f` to the values in `o1`, `o2` and `o3`.
-    ///
-    /// Returns an error if any of `o1`, `o2` and `o3` are errors.
-    ///
-    pub def lift3(f: (t1, t2, t3) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3]): RowSetter[u] =
-        ap(lift2(f, o1, o2), o3)
-
-    ///
-    /// Applies the 4-ary function `f` to the values in `o1`, `o2`, `o3` and `o4`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, `o3` and `o4` are errors.
-    ///
-    pub def lift4(f: (t1, t2, t3, t4) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4]): RowSetter[u] =
-        ap(lift3(f, o1, o2, o3), o4)
-
-    ///
-    /// Applies the 5-ary function `f` to the values in `o1`, `o2`, ... `o5`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o5` are errors.
-    ///
-    pub def lift5(f: (t1, t2, t3, t4, t5) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4],
-                  o5: RowSetter[t5]): RowSetter[u] =
-        ap(lift4(f, o1, o2, o3, o4), o5)
-
-    ///
-    /// Applies the 6-ary function `f` to the values in `o1`, `o2`, ... `o6`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o6` are errors.
-    ///
-    pub def lift6(f: (t1, t2, t3, t4, t5, t6) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4],
-                  o5: RowSetter[t5],
-                  o6: RowSetter[t6]): RowSetter[u] =
-        ap(lift5(f, o1, o2, o3, o4, o5), o6)
-
-    ///
-    /// Applies the 7-ary function `f` to the values in `o1`, `o2`, ... `o7`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o7` are errors.
-    ///
-    pub def lift7(f: (t1, t2, t3, t4, t5, t6, t7) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4],
-                  o5: RowSetter[t5],
-                  o6: RowSetter[t6],
-                  o7: RowSetter[t7]): RowSetter[u] =
-        ap(lift6(f, o1, o2, o3, o4, o5, o6), o7)
-
-    ///
-    /// Applies the 8-ary function `f` to the values in `o1`, `o2`, ... `o8`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o8` are errors.
-    ///
-    pub def lift8(f: (t1, t2, t3, t4, t5, t6, t7, t8) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4],
-                  o5: RowSetter[t5],
-                  o6: RowSetter[t6],
-                  o7: RowSetter[t7],
-                  o8: RowSetter[t8]): RowSetter[u] =
-        ap(lift7(f, o1, o2, o3, o4, o5, o6, o7), o8)
-
-    ///
-    /// Applies the 9-ary function `f` to the values in `o1`, `o2`, ... `o9`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o9` are errors.
-    ///
-    pub def lift9(f: (t1, t2, t3, t4, t5, t6, t7, t8, t9) -> u & ef,
-                  o1: RowSetter[t1],
-                  o2: RowSetter[t2],
-                  o3: RowSetter[t3],
-                  o4: RowSetter[t4],
-                  o5: RowSetter[t5],
-                  o6: RowSetter[t6],
-                  o7: RowSetter[t7],
-                  o8: RowSetter[t8],
-                  o9: RowSetter[t9]): RowSetter[u] =
-        ap(lift8(f, o1, o2, o3, o4, o5, o6, o7, o8), o9)
-
-    ///
-    /// Applies the 10-ary function `f` to the values in `o1`, `o2`, ... `o10`.
-    ///
-    /// Returns an error if any of `o1`, `o2`, ... `o10` are errors.
-    ///
-    pub def lift10(f: (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10) -> u & ef,
-                   o1: RowSetter[t1],
-                   o2: RowSetter[t2],
-                   o3: RowSetter[t3],
-                   o4: RowSetter[t4],
-                   o5: RowSetter[t5],
-                   o6: RowSetter[t6],
-                   o7: RowSetter[t7],
-                   o8: RowSetter[t8],
-                   o9: RowSetter[t9],
-                   o10: RowSetter[t10]): RowSetter[u] =
-        ap(lift9(f, o1, o2, o3, o4, o5, o6, o7, o8, o9), o10)
 
     pub def foldM(mf: (b, a) -> RowSetter[b], start: b, xs: List[a]): RowSetter[b] =
         RowSetter(r ->

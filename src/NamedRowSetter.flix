@@ -20,7 +20,7 @@ namespace CsvIO {
 
     use CsvIO/Internal.OutputHandle;
 
-    pub opaque type NamedRowSetter[a] = (Map[String, Int32], OutputHandle) ~> Result[a, String]
+    pub opaque type NamedRowSetter[a] = (Map[String, Int32], OutputHandle) -> Result[a, String] & Impure
 
 }
 
