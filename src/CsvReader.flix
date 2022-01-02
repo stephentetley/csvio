@@ -112,4 +112,16 @@ namespace CsvIO/CsvReader {
             case _: ##java.lang.Exception => Err("newCsvReadHandleWithBOM")            
         }
 
+
+    pub def readCsv(format: CsvFormat,
+                    charset: Text.Charset,
+                    eval: RowEvaluator[a], 
+                    path: System.FilePath): Result[List[a], String] & Impure =
+        use Result.flatMap;
+        let* hdl    = newCsvReadHandle(format, charset, eval, path);
+        let iter    = getIterator(hdl);
+        let* xs     = Iterator.toList(iter) |> Result.sequence;
+        let* _      = close(hdl);
+        Ok(xs)
+
 }
