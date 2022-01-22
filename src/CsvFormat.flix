@@ -30,7 +30,7 @@ namespace CsvIO/CsvFormat {
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
 
-    pub enum QuoteMode {
+    pub enum QuoteMode with Eq, Order, ToString {
         case All,
         case AllNonNull,
         case Minimal,
@@ -40,8 +40,8 @@ namespace CsvIO/CsvFormat {
 
 
     def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String]): CsvFormat & Impure = 
-        import new flix.runtime.spt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int) as newBuilder;
-        import flix.runtime.spt.csvio.FormatBuilder.setHeaderString(Int, String);
+        import new flix.runtime.spt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32) as newBuilder;
+        import flix.runtime.spt.csvio.FormatBuilder.setHeaderString(Int32, String);
         import flix.runtime.spt.csvio.FormatBuilder.getCSVFormat();
         try {
             let builder = newBuilder(format, Array.length(headers));
