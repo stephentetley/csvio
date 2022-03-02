@@ -36,7 +36,7 @@ namespace CsvIO/CsvReader {
     pub opaque type CsvReadHandle[a] = (##flix.runtime.spt.csvio.ReadIterator, Iterator[Result[a, String]])
 
     pub def close(handle: CsvReadHandle[a]): Result[Unit, String] & Impure = 
-        import flix.runtime.spt.csvio.ReadIterator.close();
+        import flix.runtime.spt.csvio.ReadIterator.close(): Unit & Impure;
         let CsvReadHandle((x1, _)) = handle;
         try {
             close(x1);
@@ -58,9 +58,9 @@ namespace CsvIO/CsvReader {
                             cs: Text.Charset,
                             eval: RowEvaluator[a], 
                             path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =
-        import static flix.runtime.spt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset);
-        import flix.runtime.spt.csvio.ReadIterator.hasNext();
-        import flix.runtime.spt.csvio.ReadIterator.next();        
+        import static flix.runtime.spt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flix.runtime.spt.csvio.ReadIterator & Impure;
+        import flix.runtime.spt.csvio.ReadIterator.hasNext(): Bool & Impure;
+        import flix.runtime.spt.csvio.ReadIterator.next(): ##flix.runtime.spt.csvio.InputRow & Impure;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
@@ -89,9 +89,9 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandleWithBOM(format: CsvFormat,
                                     eval: RowEvaluator[a], 
                                     path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =        
-        import static flix.runtime.spt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat);
-        import flix.runtime.spt.csvio.ReadIterator.hasNext();
-        import flix.runtime.spt.csvio.ReadIterator.next();        
+        import static flix.runtime.spt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat): ##flix.runtime.spt.csvio.ReadIterator & Impure;
+        import flix.runtime.spt.csvio.ReadIterator.hasNext(): Bool & Impure;
+        import flix.runtime.spt.csvio.ReadIterator.next(): ##flix.runtime.spt.csvio.InputRow & Impure;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
