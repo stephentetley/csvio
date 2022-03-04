@@ -40,9 +40,9 @@ namespace CsvIO/CsvFormat {
 
 
     def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String]): CsvFormat & Impure = 
-        import new flix.runtime.spt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flix.runtime.spt.csvio.FormatBuilder & Impure as newBuilder;
-        import flix.runtime.spt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & Impure;
-        import flix.runtime.spt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & Impure;
+        import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & Impure as newBuilder;
+        import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & Impure;
+        import flixspt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & Impure;
         try {
             let builder = newBuilder(format, Array.length(headers));
             Array.foreachWithIndex((x, ix) -> setHeaderString(builder, ix, x),  headers);

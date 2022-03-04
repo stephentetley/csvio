@@ -17,7 +17,7 @@
 
 namespace CsvIO/Internal {
 
-    pub opaque type OutputHandle = ##flix.runtime.spt.csvio.CsvWriter
+    pub opaque type OutputHandle = ##flixspt.csvio.CsvWriter
 }
 
 namespace CsvIO/Internal/OutputHandle {
@@ -32,7 +32,7 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle.
     ///
     pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import static flix.runtime.spt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flix.runtime.spt.csvio.CsvWriter & Impure;
+        import static flixspt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
             let FilePath(path1) = path;
@@ -47,7 +47,7 @@ namespace CsvIO/Internal/OutputHandle {
     /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
     ///
     pub def newWithBOM(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: Text.Charset, path: System.FilePath): Result[OutputHandle, String] & Impure =
-        import static flix.runtime.spt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flix.runtime.spt.csvio.CsvWriter & Impure;
+        import static flixspt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
             let FilePath(path1) = path;
@@ -62,7 +62,7 @@ namespace CsvIO/Internal/OutputHandle {
     /// Close the CSV output stream.
     ///
     pub def close!(x: OutputHandle): Result[Unit, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter.close(): Unit & Impure;
+        import flixspt.csvio.CsvWriter.close(): Unit & Impure;
         try {
             let OutputHandle(x1) = x;
             close(x1);
@@ -73,7 +73,7 @@ namespace CsvIO/Internal/OutputHandle {
 
 
     pub def clearCells!(x: OutputHandle): Result[Unit, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter.clearCells(): Unit & Impure;
+        import flixspt.csvio.CsvWriter.clearCells(): Unit & Impure;
         try {
             let OutputHandle(x1) = x;
             let _ = clearCells(x1);
@@ -83,7 +83,7 @@ namespace CsvIO/Internal/OutputHandle {
         }
 
     pub def setCellString!(x: OutputHandle, ix: Int32, value: String): Result[Unit, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter.setCellString(Int32, String): Unit & Impure;
+        import flixspt.csvio.CsvWriter.setCellString(Int32, String): Unit & Impure;
         try {
             let OutputHandle(x1) = x;
             let _ = setCellString(x1, ix, value);
@@ -93,7 +93,7 @@ namespace CsvIO/Internal/OutputHandle {
         }
 
     pub def writeRow!(x: OutputHandle): Result[Unit, String] & Impure =
-        import flix.runtime.spt.csvio.CsvWriter.writeRow(): Unit & Impure;
+        import flixspt.csvio.CsvWriter.writeRow(): Unit & Impure;
         try {
             let OutputHandle(x1) = x;
             let _ = writeRow(x1);

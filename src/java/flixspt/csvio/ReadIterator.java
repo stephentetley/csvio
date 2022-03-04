@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package flix.runtime.spt.csvio;
+package flixspt.csvio;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;

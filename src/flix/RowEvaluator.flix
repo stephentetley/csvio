@@ -17,7 +17,7 @@
 
 namespace CsvIO {
 
-    pub opaque type RowEvaluator[a] = ##flix.runtime.spt.csvio.InputRow -> Result[a, String] & Impure
+    pub opaque type RowEvaluator[a] = ##flixspt.csvio.InputRow -> Result[a, String] & Impure
 
     instance Functor[RowEvaluator] {
         pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
@@ -55,11 +55,11 @@ namespace CsvIO/RowEvaluator {
     pub def point(x: a): RowEvaluator[a] = 
         RowEvaluator(_ -> Ok(x) as & Impure)
 
-    def apply1(x: RowEvaluator[a], r: ##flix.runtime.spt.csvio.InputRow): Result[a, String] & Impure =
+    def apply1(x: RowEvaluator[a], r: ##flixspt.csvio.InputRow): Result[a, String] & Impure =
         let RowEvaluator(f) = x;
         f(r)
 
-    pub def runRowEvaluator(x: RowEvaluator[a], r: ##flix.runtime.spt.csvio.InputRow): Result[a, String] & Impure = apply1(x, r)
+    pub def runRowEvaluator(x: RowEvaluator[a], r: ##flixspt.csvio.InputRow): Result[a, String] & Impure = apply1(x, r)
         
 
     pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
@@ -104,7 +104,7 @@ namespace CsvIO/RowEvaluator {
         )
 
 
-    def liftPrimRowReader(eval: ##flix.runtime.spt.csvio.InputRow -> Result[a, String] & Impure): RowEvaluator[a] =
+    def liftPrimRowReader(eval: ##flixspt.csvio.InputRow -> Result[a, String] & Impure): RowEvaluator[a] =
         RowEvaluator(r -> eval(r))
 
     pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[a] = match x {
@@ -124,7 +124,7 @@ namespace CsvIO/RowEvaluator {
     pub def choice(xs: List[RowEvaluator[a]]): RowEvaluator[a] =
         RowEvaluator(r -> choiceHelper(r, xs))
 
-    def choiceHelper(r: ##flix.runtime.spt.csvio.InputRow, xs: List[RowEvaluator[a]]): Result[a, String] & Impure =
+    def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[RowEvaluator[a]]): Result[a, String] & Impure =
         match xs {
             case Nil => Err("choice") as & Impure
             case x1 :: rs => match apply1(x1, r) {
@@ -136,7 +136,7 @@ namespace CsvIO/RowEvaluator {
     // Cell readers
 
     pub def getStringAt(ix: Int32): RowEvaluator[String] =
-        import flix.runtime.spt.csvio.InputRow.getStringAt(Int32): String & Impure;
+        import flixspt.csvio.InputRow.getStringAt(Int32): String & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getStringAt(row, ix);
@@ -150,7 +150,7 @@ namespace CsvIO/RowEvaluator {
     /// Get a string by its column name / label.
     ///
     pub def getStringNamed(label: String): RowEvaluator[String] =
-        import flix.runtime.spt.csvio.InputRow.getStringNamed(String): String & Impure;
+        import flixspt.csvio.InputRow.getStringNamed(String): String & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getStringNamed(row, label);
@@ -161,7 +161,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt8At(ix: Int32): RowEvaluator[Int8] =
-        import flix.runtime.spt.csvio.InputRow.getByteAt(Int32): Int8 & Impure;
+        import flixspt.csvio.InputRow.getByteAt(Int32): Int8 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getByteAt(row, ix);
@@ -172,7 +172,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt8Named(label: String): RowEvaluator[Int8] =
-        import flix.runtime.spt.csvio.InputRow.getByteNamed(String): Int8 & Impure;
+        import flixspt.csvio.InputRow.getByteNamed(String): Int8 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getByteNamed(row, label);
@@ -183,7 +183,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt16At(ix: Int32): RowEvaluator[Int16] =
-        import flix.runtime.spt.csvio.InputRow.getShortAt(Int32): Int16 & Impure;
+        import flixspt.csvio.InputRow.getShortAt(Int32): Int16 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getShortAt(row, ix);
@@ -194,7 +194,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt16Named(label: String): RowEvaluator[Int16] =
-        import flix.runtime.spt.csvio.InputRow.getShortNamed(String): Int16 & Impure;
+        import flixspt.csvio.InputRow.getShortNamed(String): Int16 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getShortNamed(row, label);
@@ -205,7 +205,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt32At(ix: Int32): RowEvaluator[Int32] =
-        import flix.runtime.spt.csvio.InputRow.getIntAt(Int32): Int32 & Impure;
+        import flixspt.csvio.InputRow.getIntAt(Int32): Int32 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getIntAt(row, ix);
@@ -216,7 +216,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt32Named(label: String): RowEvaluator[Int32] =
-        import flix.runtime.spt.csvio.InputRow.getIntNamed(String): Int32 & Impure;
+        import flixspt.csvio.InputRow.getIntNamed(String): Int32 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getIntNamed(row, label);
@@ -227,7 +227,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt64At(ix: Int32): RowEvaluator[Int64] =
-        import flix.runtime.spt.csvio.InputRow.getLongAt(Int32): Int64 & Impure;
+        import flixspt.csvio.InputRow.getLongAt(Int32): Int64 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getLongAt(row, ix);
@@ -238,7 +238,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getInt64Named(label: String): RowEvaluator[Int64] =
-        import flix.runtime.spt.csvio.InputRow.getLongNamed(String): Int64 & Impure;
+        import flixspt.csvio.InputRow.getLongNamed(String): Int64 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getLongNamed(row, label);
@@ -249,7 +249,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat32At(ix: Int32): RowEvaluator[Float32] =
-        import flix.runtime.spt.csvio.InputRow.getFloatAt(Int32): Float32 & Impure;
+        import flixspt.csvio.InputRow.getFloatAt(Int32): Float32 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getFloatAt(row, ix);
@@ -260,7 +260,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat32Named(label: String): RowEvaluator[Float32] =
-        import flix.runtime.spt.csvio.InputRow.getFloatNamed(String): Float32 & Impure;
+        import flixspt.csvio.InputRow.getFloatNamed(String): Float32 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getFloatNamed(row, label);
@@ -271,7 +271,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat64At(ix: Int32): RowEvaluator[Float64] =
-        import flix.runtime.spt.csvio.InputRow.getDoubleAt(Int32): Float64 & Impure;
+        import flixspt.csvio.InputRow.getDoubleAt(Int32): Float64 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getDoubleAt(row, ix);
@@ -282,7 +282,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getFloat64Named(label: String): RowEvaluator[Float64] =
-        import flix.runtime.spt.csvio.InputRow.getDoubleNamed(String): Float64 & Impure;
+        import flixspt.csvio.InputRow.getDoubleNamed(String): Float64 & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getDoubleNamed(row, label);
@@ -293,7 +293,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getBigIntAt(ix: Int32): RowEvaluator[BigInt] =
-        import flix.runtime.spt.csvio.InputRow.getBigIntegerAt(Int32): BigInt & Impure;
+        import flixspt.csvio.InputRow.getBigIntegerAt(Int32): BigInt & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getBigIntegerAt(row, ix);
@@ -304,7 +304,7 @@ namespace CsvIO/RowEvaluator {
         )
 
     pub def getBigIntNamed(label: String): RowEvaluator[BigInt] =
-        import flix.runtime.spt.csvio.InputRow.getBigIntegerNamed(String): BigInt & Impure;
+        import flixspt.csvio.InputRow.getBigIntegerNamed(String): BigInt & Impure;
         liftPrimRowReader(row -> 
             try {
                 let a = getBigIntegerNamed(row, label);
