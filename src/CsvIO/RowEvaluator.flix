@@ -45,8 +45,9 @@ namespace CsvIO {
 
 namespace CsvIO/RowEvaluator {
 
-
     use Text.Charset.{Charset};
+
+    use Text/RegexEval.MatchEvaluator;
 
     use CsvIO.CsvFormat;
     use CsvIO.RowEvaluator;
@@ -314,24 +315,24 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringAt(ix);
-        let* ans = liftOperation(_ -> Text/Regex.evalMatches(patt, eval, input));
+        let* ans = liftOperation(_ -> Text/RegexEval/Regex.matches(patt, eval, input));
         point(ans)
 
-    pub def evalMatchesNamed(label: String, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalMatchesNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringNamed(label);
-        let* ans = liftOperation(_ -> Text/Regex.evalMatches(patt, eval, input));
+        let* ans = liftOperation(_ -> Text/RegexEval/Regex.matches(patt, eval, input));
         point(ans)
 
-    pub def evalContainsAt(ix: Int32, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalContainsAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringAt(ix);
-        let* ans = liftOperation(_ -> Text/Regex.evalContains(patt, eval, input));
+        let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
 
-    pub def evalContainsNamed(label: String, patt: Text/Regex.Pattern, eval: Text/Regex.MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalContainsNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringNamed(label);
-        let* ans = liftOperation(_ -> Text/Regex.evalContains(patt, eval, input));
+        let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
 
     pub def getLocalDateAt(ix: Int32, formatter: Time/Format.DateFormatter): RowEvaluator[Time.LocalDate] =
