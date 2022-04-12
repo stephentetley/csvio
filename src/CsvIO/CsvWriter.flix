@@ -28,8 +28,8 @@ namespace CsvIO/CsvWriter {
     /// TODO add optional headings 
     ///
     pub def outputColumnIndexedCsv!(format: CsvFormat,
-                        cs: Text.Charset,
-                        path: System.FilePath,
+                        cs: FlixSandbox/Text.Charset,
+                        path: FlixSandbox/System.FilePath,
                         columnCount: Int32,
                         rowWriter: a -> RowSetter[b],
                         iter: Iterator[Result[a, String]]): Result[Unit, String] & Impure =
@@ -46,8 +46,8 @@ namespace CsvIO/CsvWriter {
 
 
     pub def outputColumnIndexedCsvWithBOM!(format: CsvFormat,
-                        cs: Text.Charset,
-                        path: System.FilePath,
+                        cs: FlixSandbox/Text.Charset,
+                        path: FlixSandbox/System.FilePath,
                         columnCount: Int32,
                         rowWriter: a -> RowSetter[b],
                         iter: Iterator[Result[a, String]]): Result[Unit, String] & Impure =

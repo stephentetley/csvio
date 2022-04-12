@@ -17,8 +17,8 @@
 
 namespace CsvIO/CsvReader {
     
-    use System.FilePath.{FilePath};
-    use Text.Charset.{Charset};
+    use FlixSandbox/System.FilePath.{FilePath};
+    use FlixSandbox/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.RowEvaluator;
@@ -55,9 +55,9 @@ namespace CsvIO/CsvReader {
     /// Returns a new Csv Handle (iterator x a "close" handle).
     ///
     pub def newCsvReadHandle(format: CsvFormat,
-                            cs: Text.Charset,
+                            cs: FlixSandbox/Text.Charset,
                             eval: RowEvaluator[a], 
-                            path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =
+                            path: FlixSandbox/System.FilePath): Result[CsvReadHandle[a], String] & Impure =
         import static flixspt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.ReadIterator & Impure;
         import flixspt.csvio.ReadIterator.hasNext(): Bool & Impure;
         import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & Impure;
@@ -88,7 +88,7 @@ namespace CsvIO/CsvReader {
     ///
     pub def newCsvReadHandleWithBOM(format: CsvFormat,
                                     eval: RowEvaluator[a], 
-                                    path: System.FilePath): Result[CsvReadHandle[a], String] & Impure =        
+                                    path: FlixSandbox/System.FilePath): Result[CsvReadHandle[a], String] & Impure =        
         import static flixspt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat): ##flixspt.csvio.ReadIterator & Impure;
         import flixspt.csvio.ReadIterator.hasNext(): Bool & Impure;
         import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & Impure;
@@ -114,9 +114,9 @@ namespace CsvIO/CsvReader {
 
 
     pub def readCsv(format: CsvFormat,
-                    charset: Text.Charset,
+                    charset: FlixSandbox/Text.Charset,
                     eval: RowEvaluator[a], 
-                    path: System.FilePath): Result[List[a], String] & Impure =
+                    path: FlixSandbox/System.FilePath): Result[List[a], String] & Impure =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(format, charset, eval, path);
         let iter    = getIterator(hdl);
