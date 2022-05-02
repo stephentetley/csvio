@@ -45,7 +45,9 @@ namespace CsvIO {
 
 namespace CsvIO/RowEvaluator {
 
-    use Text.Charset.{Charset};
+    use FlixSandbox/Text.Charset.{Charset};
+    
+    use Time/Format.DateTimeFormatter;
 
     use Text/RegexEval.MatchEvaluator;
 
@@ -335,34 +337,34 @@ namespace CsvIO/RowEvaluator {
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
 
-    pub def getLocalDateAt(ix: Int32, formatter: Time/Format.DateFormatter): RowEvaluator[Time.LocalDate] =
+    pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[Time.LocalDate] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalDate.parse(formatter, input), "getLocalDateAt(${ix})");
+        let* ans = liftResult(Time/LocalDate.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateNamed(label: String, formatter: Time/Format.DateFormatter): RowEvaluator[Time.LocalDate] =
+    pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[Time.LocalDate] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalDate.parse(formatter, input), "getLocalDateNamed('${label}')");
+        let* ans = liftResult(Time/LocalDate.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateTimeAt(ix: Int32, formatter: Time/Format.DateTimeFormatter): RowEvaluator[Time.LocalDateTime] =
+    pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[Time.LocalDateTime] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalDateTime.parse(formatter, input), "getLocalDateTimeAt(${ix})");
+        let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateTimeNamed(label: String, formatter: Time/Format.DateTimeFormatter): RowEvaluator[Time.LocalDateTime] =
+    pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[Time.LocalDateTime] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalDateTime.parse(formatter, input), "getLocalDateTimeNamed('${label}')");
+        let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalTimeAt(ix: Int32, formatter: Time/Format.TimeFormatter): RowEvaluator[Time.LocalTime] =
+    pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[Time.LocalTime] =
         let* input = getStringAt(ix);
-        let* ans = liftOption(Time/LocalTime.parse(formatter, input), "getLocalTimeAt(${ix})");
+        let* ans = liftResult(Time/LocalTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalTimeNamed(label: String, formatter: Time/Format.TimeFormatter): RowEvaluator[Time.LocalTime] =
+    pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[Time.LocalTime] =
         let* input = getStringNamed(label);
-        let* ans = liftOption(Time/LocalTime.parse(formatter, input), "getLocalTimeNamed('${label}')");
+        let* ans = liftResult(Time/LocalTime.parse(formatter, input));
         point(ans)
 
 }

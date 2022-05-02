@@ -7,7 +7,7 @@ namespace Test01 {
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.{putFirstRecordAsHeader};
-        let path    = FlixSandbox/System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
+        let path    = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
         let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
         let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, FlixSandbox/Text/Charset.utf_8(), eval, path);
         let iter    = CsvIO/CsvReader.getIterator(hdl);
@@ -21,8 +21,8 @@ namespace Test01 {
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.{putFirstRecordAsHeader};
-        let path    = FlixSandbox/System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
-        let outpath = FlixSandbox/System/FilePath.new("E://coding/flix/csvio/data/compass-out.csv");
+        let path    = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
+        let outpath = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass-out.csv");
         let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
         let writer  = xy -> {let (x, y) = xy; CsvIO/CsvWriter.row2(y, x)};  /// Flip 
         let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, FlixSandbox/Text/Charset.utf_8(), eval, path);
@@ -37,8 +37,8 @@ namespace Test01 {
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.{putFirstRecordAsHeader};
-        let path    = FlixSandbox/System/FilePath.new("E://coding/flix/csvio/data/compass.csv");
-        let outpath = FlixSandbox/System/FilePath.new("E://coding/flix/csvio/data/compass-out-utf8-bom.csv");
+        let path    = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
+        let outpath = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass-out-utf8-bom.csv");
         let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
         let writer  = xy -> {let (x, y) = xy; CsvIO/CsvWriter.row2(y, x)};  /// Flip 
         let* hdl    = CsvIO/CsvReader.newCsvReadHandle(CsvIO/CsvFormat.defaultFormat(None) |> putFirstRecordAsHeader, FlixSandbox/Text/Charset.utf_8(), eval, path);
