@@ -39,6 +39,10 @@ namespace CsvIO/CsvFormat {
     }
 
 
+    pub def getCsvFormat(f: CsvFormat): ##org.apache.commons.csv.CSVFormat = 
+        let CsvFormat(f1) = f;
+        f1
+
     def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String]): CsvFormat & Impure = 
         import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & Impure as newBuilder;
         import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & Impure;
