@@ -30,13 +30,50 @@ namespace CsvIO/CsvFormat {
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
 
-    pub enum QuoteMode with Eq, Order, ToString {
-        case All,
-        case AllNonNull,
-        case Minimal,
-        case NonNumeric,
+    pub enum QuoteMode with Eq, Order, ToString, Boxable, Hash {
+        case All
+        case AllNonNull
+        case Minimal
+        case NonNumeric
         case NoQuote
     }
+
+
+
+    pub def marshalQuoteMode(x: QuoteMode): ##org.apache.commons.csv.QuoteMode = 
+        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL;
+        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL_NON_NULL;
+        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode & Pure as get_MINIMAL;
+        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode & Pure as get_NON_NUMERIC;
+        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode & Pure as get_NONE;
+        match x {
+            case All            => get_ALL()
+            case AllNonNull     => get_ALL_NON_NULL()
+            case Minimal        => get_MINIMAL()
+            case NonNumeric     => get_NON_NUMERIC()
+            case NoQuote        => get_NONE()
+        }
+
+
+    def primEqualsQuoteMode(x: ##org.apache.commons.csv.QuoteMode, y: ##org.apache.commons.csv.QuoteMode): Bool =
+        import java.lang.Enum.equals(##java.lang.Object): Bool & Pure;
+        let x1 = x as ##java.lang.Enum;
+        let y1 = y as ##java.lang.Object;
+        equals(x1, y1)
+
+    pub def unmarshalQuoteMode(x: ##org.apache.commons.csv.QuoteMode): QuoteMode = 
+        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL;
+        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL_NON_NULL;
+        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode & Pure as get_MINIMAL;
+        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode & Pure as get_NON_NUMERIC;
+        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode & Pure as get_NONE;
+        match x {
+            case x1 if primEqualsQuoteMode(x1, get_ALL())          => All            
+            case x1 if primEqualsQuoteMode(x1, get_ALL_NON_NULL()) => AllNonNull
+            case x1 if primEqualsQuoteMode(x1, get_MINIMAL())      => Minimal
+            case x1 if primEqualsQuoteMode(x1, get_NON_NUMERIC())  => NonNumeric
+            case x1 if primEqualsQuoteMode(x1, get_NONE())         => NoQuote
+        }
 
 
     pub def getCsvFormat(f: CsvFormat): ##org.apache.commons.csv.CSVFormat = 

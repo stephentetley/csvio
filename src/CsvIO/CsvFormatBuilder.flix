@@ -52,6 +52,8 @@ namespace CsvIO/CsvFormatBuilder {
     use CsvIO.CsvFormatBuilder.{CsvFormatBuilder};
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
+    use CsvIO/CsvFormat.QuoteMode;
+
     ///
     /// Helper function for the implementation of `map` and `ap` etc.
     ///
@@ -171,9 +173,61 @@ namespace CsvIO/CsvFormatBuilder {
         liftJavaBuilderPrim(flip(setEscape, c))
 
 
-    /// pub def setHeader(l: List[String]): CsvFormatBuilder[ka, Unit] = 
-    ///     import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[##java.lang.Object]): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
-    ///     liftJavaBuilderPrim(x -> {let arr = FlixSandbox/Marshal.marshalListToArray(s -> s as ##java.lang.Object, l); setHeader(x, arr)})
+    pub def setHeaders(l: List[String]): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String]): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(x -> FlixSandbox/Marshal.runVaragsOfString(l, setHeader(x)))
 
+
+    pub def setHeaderComments(l: List[String]): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setHeaderComments(Array[String]): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(x -> FlixSandbox/Marshal.runVaragsOfString(l, setHeaderComments(x)))
+
+    
+    pub def setIgnoreEmptyLines(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setIgnoreEmptyLines(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setIgnoreEmptyLines, b))
+
+    pub def setIgnoreHeaderCase(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setIgnoreHeaderCase(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setIgnoreHeaderCase, b))
+
+    pub def setIgnoreSurroundingSpaces(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setIgnoreSurroundingSpaces(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setIgnoreSurroundingSpaces, b))   
+
+    pub def setNullString(s: String): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setNullString(String): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setNullString, s))  
+
+    pub def setQuote(c: Char): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setQuote(Char): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setQuote, c))
+
+    /// setQuoteMode        
+    pub def setQuoteMode(m: QuoteMode): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setQuoteMode(##org.apache.commons.csv.QuoteMode): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        let m1 = CsvIO/CsvFormat.marshalQuoteMode(m);
+        liftJavaBuilderPrim(flip(setQuoteMode, m1))
+
+
+    pub def setRecordSeparator(c: Char): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(Char): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setRecordSeparator, c))
+
+    pub def setRecordSeparatorString(s: String): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(String): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setRecordSeparator, s))
+
+    pub def setSkipHeaderRecord(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setSkipHeaderRecord(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setSkipHeaderRecord, b))  
+
+    pub def setTrailingDelimiter(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setTrailingDelimiter(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setTrailingDelimiter, b))  
+
+    pub def setTrim(b: Bool): CsvFormatBuilder[ka, Unit] = 
+        import org.apache.commons.csv.CSVFormat$Builder.setTrim(Bool): ##org.apache.commons.csv.CSVFormat$Builder & Impure;
+        liftJavaBuilderPrim(flip(setTrim, b))  
 
 }
