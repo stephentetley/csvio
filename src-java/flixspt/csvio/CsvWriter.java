@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class CsvWriter {
 
     /// This is a nested writer "handle".
-    /// There are two levels - at the `row` we set individual cells;
+    /// There are two levels - at the `row` level we set individual cells;
     /// at the `printer` level we write a row to the output stream.
     /// The handle `outw` is at class level so we can close it manually.
     /// The decision not to move a row represented as Array[String] from

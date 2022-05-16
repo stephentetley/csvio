@@ -39,7 +39,7 @@ public class FormatBuilder {
         }
     }
 
-
+    /// TODO this calls deprecated API...
     public CSVFormat getCSVFormat() {
         if (headers.length > 0) {
             return format.withHeader(headers);
