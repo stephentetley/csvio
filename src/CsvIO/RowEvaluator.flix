@@ -49,7 +49,7 @@ namespace CsvIO/RowEvaluator {
     
     use Time/Format.DateTimeFormatter;
 
-    use Text/RegexEval.MatchEvaluator;
+    /// use Text/RegexEval.MatchEvaluator;
 
     use CsvIO.CsvFormat;
     use CsvIO.RowEvaluator;
@@ -317,6 +317,9 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
+/*
+    /// June 2022 - stubbed out due to regex changes...
+
     pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
         let* input = getStringAt(ix);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.matches(patt, eval, input));
@@ -336,6 +339,7 @@ namespace CsvIO/RowEvaluator {
         let* input = getStringNamed(label);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
+*/
 
     pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[Time.LocalDate] =
         let* input = getStringAt(ix);
