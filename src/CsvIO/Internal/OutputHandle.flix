@@ -17,7 +17,7 @@
 
 namespace CsvIO/Internal {
 
-    pub opaque type OutputHandle = ##flixspt.csvio.CsvWriter
+    pub enum OutputHandle(##flixspt.csvio.CsvWriter)
 }
 
 namespace CsvIO/Internal/OutputHandle {

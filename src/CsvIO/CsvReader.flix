@@ -33,7 +33,7 @@ namespace CsvIO/CsvReader {
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
 
-    pub opaque type CsvReadHandle[a] = (##flixspt.csvio.ReadIterator, Iterator[Result[a, String]])
+    pub enum CsvReadHandle[a]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String]]))
 
     pub def close(handle: CsvReadHandle[a]): Result[Unit, String] & Impure = 
         import flixspt.csvio.ReadIterator.close(): Unit & Impure;

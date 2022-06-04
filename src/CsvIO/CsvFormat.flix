@@ -20,7 +20,7 @@ namespace CsvIO {
     ///
     /// Represents a CSVFormat.
     ///
-    pub opaque type CsvFormat = ##org.apache.commons.csv.CSVFormat
+    pub enum CsvFormat(##org.apache.commons.csv.CSVFormat)
 
 }
 

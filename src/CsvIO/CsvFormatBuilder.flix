@@ -23,8 +23,8 @@ namespace CsvIO {
     /// 
     /// `ka` is the continuation answer type
     ///
-    pub opaque type CsvFormatBuilder[ka, a] = 
-            ##org.apache.commons.csv.CSVFormat$Builder -> (a -> ##org.apache.commons.csv.CSVFormat$Builder -> Result[ka, String] & Impure) -> Result[ka, String] & Impure
+    pub enum CsvFormatBuilder[ka, a](
+        ##org.apache.commons.csv.CSVFormat$Builder -> (a -> ##org.apache.commons.csv.CSVFormat$Builder -> Result[ka, String] & Impure) -> Result[ka, String] & Impure)
 
 
     instance Functor[CsvFormatBuilder[ka]] {

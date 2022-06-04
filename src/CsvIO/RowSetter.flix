@@ -20,7 +20,7 @@ namespace CsvIO {
 
     use CsvIO/Internal.OutputHandle;
 
-    pub opaque type RowSetter[a] = OutputHandle -> Result[a, String] & Impure
+    pub enum RowSetter[a](OutputHandle -> Result[a, String] & Impure)
 
     instance Functor[RowSetter] {
         pub def map(f: a -> b & ef, x: RowSetter[a]): RowSetter[b] & ef =

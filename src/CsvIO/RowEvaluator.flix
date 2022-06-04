@@ -17,7 +17,7 @@
 
 namespace CsvIO {
 
-    pub opaque type RowEvaluator[a] = ##flixspt.csvio.InputRow -> Result[a, String] & Impure
+    pub enum RowEvaluator[a](##flixspt.csvio.InputRow -> Result[a, String] & Impure)
 
     instance Functor[RowEvaluator] {
         pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
