@@ -1,7 +1,7 @@
 
 namespace Test01 {
 
-    
+
     @test
     def test01(): Result[Unit, String] & Impure = 
         use Result.flatMap;

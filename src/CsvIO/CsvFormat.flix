@@ -80,10 +80,10 @@ namespace CsvIO/CsvFormat {
         let CsvFormat(f1) = f;
         f1
 
-    def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String]): CsvFormat & Impure = 
-        import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & Impure as newBuilder;
-        import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & Impure;
-        import flixspt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & Impure;
+    def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String, r]): CsvFormat \ Read(r) = 
+        import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & r as newBuilder;
+        import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & r;
+        import flixspt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & r;
         try {
             let builder = newBuilder(format, Array.length(headers));
             Array.foreachWithIndex((x, ix) -> setHeaderString(builder, ix, x),  headers);
@@ -92,8 +92,7 @@ namespace CsvIO/CsvFormat {
             case _: ##java.lang.Exception => bug!("CsvFormat.makeFormatWithHeaders should not fail...")
         }
 
-
-    pub def defaultFormat(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def defaultFormat(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.DEFAULT: ##org.apache.commons.csv.CSVFormat & Pure as get_DEFAULT;
         let javafmt = get_DEFAULT();
         match headers { 
@@ -101,9 +100,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
- 
-
-    pub def excel(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def excel(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.EXCEL: ##org.apache.commons.csv.CSVFormat & Pure as get_EXCEL;
         let javafmt = get_EXCEL();
         match headers { 
@@ -111,7 +108,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def informix_unload(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def informix_unload(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD;
         let javafmt = get_INFORMIX_UNLOAD();
         match headers { 
@@ -119,7 +116,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def informix_unload_csv(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def informix_unload_csv(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD_CSV;
         let javafmt = get_INFORMIX_UNLOAD_CSV();
         match headers { 
@@ -127,7 +124,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def mongodb_csv(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def mongodb_csv(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.MONGODB_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_CSV;
         let javafmt = get_MONGODB_CSV();
         match headers { 
@@ -135,7 +132,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def mongodb_tsv(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def mongodb_tsv(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.MONGODB_TSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_TSV;
         let javafmt = get_MONGODB_TSV();
         match headers { 
@@ -143,7 +140,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def mysql(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def mysql(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.MYSQL: ##org.apache.commons.csv.CSVFormat & Pure as get_MYSQL;
         let javafmt = get_MYSQL();
         match headers { 
@@ -151,7 +148,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def oracle(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def oracle(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.ORACLE: ##org.apache.commons.csv.CSVFormat & Pure as get_ORACLE;
         let javafmt = get_ORACLE();
         match headers { 
@@ -159,7 +156,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def postgresql_csv(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def postgresql_csv(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_CSV;
         let javafmt = get_POSTGRESQL_CSV();
         match headers { 
@@ -167,7 +164,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def postgresql_text(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def postgresql_text(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_TEXT: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_TEXT;
         let javafmt = get_POSTGRESQL_TEXT();
         match headers { 
@@ -175,7 +172,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def rfc4180(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def rfc4180(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.RFC4180: ##org.apache.commons.csv.CSVFormat & Pure as get_RFC4180;
         let javafmt = get_RFC4180();
         match headers { 
@@ -183,7 +180,7 @@ namespace CsvIO/CsvFormat {
             case None => CsvFormat(javafmt)
         }
 
-    pub def tdf(headers: Option[Array[String]]): CsvFormat & Impure =
+    pub def tdf(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.TDF: ##org.apache.commons.csv.CSVFormat & Pure as get_TDF;
         let javafmt = get_TDF();
         match headers { 
@@ -196,6 +193,9 @@ namespace CsvIO/CsvFormat {
         import org.apache.commons.csv.CSVFormat.toString(): String & Pure;
         let CsvFormat(x1) = x;
         toString(x1)
+
+
+    //// TODO - these should be done via builder...
 
     pub def getAllowMissingColumnNames(x: CsvFormat): Bool =
         import org.apache.commons.csv.CSVFormat.getAllowMissingColumnNames(): Bool & Pure;
