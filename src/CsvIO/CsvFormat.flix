@@ -80,18 +80,98 @@ namespace CsvIO/CsvFormat {
         let CsvFormat(f1) = f;
         f1
 
-    def makeFormatWithHeaders(format: ##org.apache.commons.csv.CSVFormat, headers: Array[String, r]): CsvFormat \ Read(r) = 
-        import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & r as newBuilder;
-        import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & r;
-        import flixspt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & r;
-        try {
-            let builder = newBuilder(format, Array.length(headers));
-            Array.foreachWithIndex((x, ix) -> setHeaderString(builder, ix, x),  headers);
-            CsvFormat(getCSVFormat(builder))
-        } catch {
-            case _: ##java.lang.Exception => bug!("CsvFormat.makeFormatWithHeaders should not fail...")
+
+    pub enum PredefinedFormat with Eq, Order, ToString, Boxable, Hash {
+        case DEFAULT
+        case EXCEL
+        case INFORMIX_UNLOAD
+        case INFORMIX_UNLOAD_CSV
+        case MONGODB_CSV
+        case MONGODB_TSV
+        case MYSQL
+        case ORACLE
+        case RFC4180
+        case POSTGRESQL_CSV
+        case POSTGRESQL_TEXT
+        case TDF
+    }
+
+
+    pub def makeFormat(format: PredefinedFormat): CsvFormat = 
+        match format {
+            case DEFAULT                => {
+                import static get org.apache.commons.csv.CSVFormat.DEFAULT: ##org.apache.commons.csv.CSVFormat & Pure as get_DEFAULT;
+                get_DEFAULT()
+            }
+            case EXCEL                  => {
+                import static get org.apache.commons.csv.CSVFormat.EXCEL: ##org.apache.commons.csv.CSVFormat & Pure as get_EXCEL;
+                get_EXCEL()
+            }
+            case INFORMIX_UNLOAD        => {
+                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD;
+                get_INFORMIX_UNLOAD()
+            }
+            case INFORMIX_UNLOAD_CSV    => {
+                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD_CSV;
+                get_INFORMIX_UNLOAD_CSV()
+            }
+            case MONGODB_CSV            => {
+                import static get org.apache.commons.csv.CSVFormat.MONGODB_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_CSV;
+                get_MONGODB_CSV()
+            }
+            case MONGODB_TSV            => {
+                import static get org.apache.commons.csv.CSVFormat.MONGODB_TSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_TSV;
+                get_MONGODB_TSV()
+            }        
+            case MYSQL                  => {
+                import static get org.apache.commons.csv.CSVFormat.MYSQL: ##org.apache.commons.csv.CSVFormat & Pure as get_MYSQL;
+                get_MYSQL()
+            }
+            case ORACLE     => {
+                import static get org.apache.commons.csv.CSVFormat.ORACLE: ##org.apache.commons.csv.CSVFormat & Pure as get_ORACLE;
+                get_ORACLE()        
+            }
+            case POSTGRESQL_CSV => {
+                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_CSV;
+                get_POSTGRESQL_CSV()
+            }
+            case POSTGRESQL_TEXT => {
+                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_TEXT: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_TEXT;
+                get_POSTGRESQL_TEXT()
+            }
+            case RFC4180    => {
+                import static get org.apache.commons.csv.CSVFormat.RFC4180: ##org.apache.commons.csv.CSVFormat & Pure as get_RFC4180;
+                get_RFC4180()
+            }
+            case TDF    => {
+                import static get org.apache.commons.csv.CSVFormat.TDF: ##org.apache.commons.csv.CSVFormat & Pure as get_TDF;
+                get_TDF()
+            }
+        
+        
+        } |> CsvFormat
+        
+        
+
+
+
+    pub def makeFormatWithHeaders(format: PredefinedFormat, headers: List[String]): Result[CsvFormat, String] = 
+        region r1 {
+            CsvIO/CsvFormatBuilder.toCsvFormatWithCsvFormat(makeFormat(format), CsvIO/CsvFormatBuilder.setHeaders(headers), r1)
         }
 
+        /// import new flixspt.csvio.FormatBuilder(##org.apache.commons.csv.CSVFormat, Int32): ##flixspt.csvio.FormatBuilder & r as newBuilder;
+        /// import flixspt.csvio.FormatBuilder.setHeaderString(Int32, String): Unit & r;
+        /// import flixspt.csvio.FormatBuilder.getCSVFormat(): ##org.apache.commons.csv.CSVFormat & r;
+        /// try {
+        ///     let builder = newBuilder(format, Array.length(headers));
+        ///     Array.foreachWithIndex((x, ix) -> setHeaderString(builder, ix, x),  headers);
+        ///     CsvFormat(getCSVFormat(builder))
+        /// } catch {
+        ///     case _: ##java.lang.Exception => bug!("CsvFormat.makeFormatWithHeaders should not fail...")
+        /// }
+
+/*
     pub def defaultFormat(headers: Option[Array[String, r]]): CsvFormat \ Read(r) =
         import static get org.apache.commons.csv.CSVFormat.DEFAULT: ##org.apache.commons.csv.CSVFormat & Pure as get_DEFAULT;
         let javafmt = get_DEFAULT();
@@ -276,5 +356,6 @@ namespace CsvIO/CsvFormat {
         import org.apache.commons.csv.CSVFormat.withFirstRecordAsHeader(): ##org.apache.commons.csv.CSVFormat & Pure;
         let CsvFormat(x1) = x;
         CsvFormat(withFirstRecordAsHeader(x1))
+*/
 
 }
