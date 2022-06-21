@@ -181,6 +181,13 @@ namespace CsvIO/CsvFormatBuilder {
         import org.apache.commons.csv.CSVFormat$Builder.setEscape(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
         liftJavaBuilderPrim(flip(setEscape, c))
 
+    pub def setHeaderAuto(): CsvFormatBuilder[ka, r, Unit] =         
+        liftJavaBuilderPrim(x -> 
+            region r1 {
+                import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String, r1]): ##org.apache.commons.csv.CSVFormat$Builder & r1;
+                FlixSandbox/Marshal.runVaragsOfString(Nil, setHeader(x), r1)
+            } as \ Write(r)
+        )
 
     pub def setHeaders(l: List[String]): CsvFormatBuilder[ka, r, Unit] =         
         liftJavaBuilderPrim(x -> 
