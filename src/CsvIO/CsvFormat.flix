@@ -147,8 +147,6 @@ namespace CsvIO/CsvFormat {
                 import static get org.apache.commons.csv.CSVFormat.TDF: ##org.apache.commons.csv.CSVFormat & Pure as get_TDF;
                 get_TDF()
             }
-        
-        
         } |> CsvFormat
         
         

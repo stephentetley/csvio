@@ -5,5 +5,5 @@ javac -cp "../lib/commons-csv-1.9.0.jar;../lib/commons-io-2.6.jar" -Xlint:deprec
 
 cd build 
 
-jar cf csviojava-1.1.jar ./flixspt/csvio/*.class
+jar cf csviojava-1.2.jar ./flixspt/csvio/*.class
 

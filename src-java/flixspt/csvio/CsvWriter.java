@@ -16,44 +16,35 @@
 
 package flixspt.csvio;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.io.ByteOrderMark;
-
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.ByteOrderMark;
+
 
 public class CsvWriter {
 
-    /// This is a nested writer "handle".
-    /// There are two levels - at the `row` level we set individual cells;
-    /// at the `printer` level we write a row to the output stream.
-    /// The handle `outw` is at class level so we can close it manually.
-    /// The decision not to move a row represented as Array[String] from
-    /// Flix to Java was due to a runtime errors in the (automatic)
-    /// marshalling which might not still be present.
-    private final Writer outw;
-    private final CSVPrinter printer;
-    private final String[] row;
+    private final Writer outputHandle;
+    private final CSVPrinter rowPrinter;
 
-    protected CsvWriter(Writer outputw, CSVFormat format, int cellCount) throws Exception {
-        outw = outputw;
-        printer = format.print(outw);
-        row = new String[cellCount];
+    protected CsvWriter(Writer outputw, CSVFormat format) throws Exception {
+        outputHandle = outputw;
+        rowPrinter = format.print(outputw);
         return;
     }
-
-    public static CsvWriter createCsvWriter(Path filepath, CSVFormat format, int cellCount, Charset cs) throws Exception {
+    public static CsvWriter createCsvWriter(Path filepath, CSVFormat format, Charset cs) throws Exception {
         OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filepath.toFile()), cs);
-        return new CsvWriter(outputw, format, cellCount);
+        return new CsvWriter(outputw, format);
     }
 
-    public static CsvWriter createCsvWriterWithBOM(Path filepath, CSVFormat format, int cellCount, Charset cs) throws Exception {
+    public static CsvWriter createCsvWriterWithBOM(Path filepath, CSVFormat format, Charset cs) throws Exception {
         OutputStreamWriter outputw = new OutputStreamWriter(new FileOutputStream(filepath.toFile()), cs);
         byte[] bom;
         String boms = "";
@@ -70,24 +61,18 @@ public class CsvWriter {
             bom = new byte[0];
         }
         outputw.write(boms);
-        return new CsvWriter(outputw, format, cellCount);
-    }
-
-    public void setCellString(int ix, String value) {
-        row[ix] = value;
-    }
-
-    public void writeRow() throws Exception {
-        Iterable<String> cells = Arrays.asList(row);
-        printer.printRecord(cells);
-    }
-
-    public void clearCells() throws Exception {
-        Arrays.fill(row, "");
+        return new CsvWriter(outputw, format);
     }
 
     public void close() throws Exception {
-        outw.close();
+        outputHandle.close();
     }
+
+    /// ArrayList easy to marshal
+    public void writeRowOfObjects(ArrayList<Object> row) throws Exception {
+        Object[] cells = row.toArray(new Object[0]);
+        rowPrinter.printRecord(cells);
+    }
+
 
 }

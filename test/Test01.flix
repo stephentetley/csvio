@@ -2,7 +2,7 @@
 namespace Test01 {
 
     use Applicative.{*>};
-
+/*
     @test
     def test01(): Result[Unit, String] & Impure = 
         use Result.flatMap;
@@ -66,5 +66,5 @@ namespace Test01 {
         let* _      = CsvIO/CsvReader.close(hdl);
         Ok() 
         
-
+*/
 }

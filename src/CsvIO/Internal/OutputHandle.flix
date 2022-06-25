@@ -17,8 +17,16 @@
 
 namespace CsvIO/Internal {
 
-    pub enum OutputHandle(##flixspt.csvio.CsvWriter)
+    /// TODO Add a region...
+    pub enum OutputHandle[_: Region](##flixspt.csvio.CsvWriter)
+
+    instance Scoped[OutputHandle] {
+        pub def regionOf(_: OutputHandle[r]): Region[r] = () as Region[r]
+    }
+
+
 }
+
 
 namespace CsvIO/Internal/OutputHandle {
 
@@ -31,13 +39,16 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Returns a new Output handle.
     ///
-    pub def new(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: FlixSandbox/Text.Charset, path: FlixSandbox/System.FilePath): Result[OutputHandle, String] & Impure =
-        import static flixspt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
+    pub def makeOutputHandle(format: ##org.apache.commons.csv.CSVFormat,
+                cs: FlixSandbox/Text.Charset, 
+                path: FlixSandbox/System.FilePath, 
+                _: Region[r]): Result[OutputHandle[r], String] & Impure =
+        import static flixspt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
             let FilePath(path1) = path;
             let Charset(cs1) = cs;
-            let ans = OutputHandle(createCsvWriter(path1, format, columnCount, cs1));
+            let ans = OutputHandle(createCsvWriter(path1, format, cs1));
             Ok(ans)
         } catch {
             case _: ##java.lang.Exception => Err("new")
@@ -46,13 +57,16 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
     ///
-    pub def newWithBOM(format: ##org.apache.commons.csv.CSVFormat, columnCount: Int32, cs: FlixSandbox/Text.Charset, path: FlixSandbox/System.FilePath): Result[OutputHandle, String] & Impure =
-        import static flixspt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, Int32, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
+    pub def makeOutputHandleWithBOM(format: ##org.apache.commons.csv.CSVFormat, 
+                                    cs: FlixSandbox/Text.Charset, 
+                                    path: FlixSandbox/System.FilePath, 
+                                    _: Region[r]): Result[OutputHandle[r], String] & Impure =
+        import static flixspt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
             let FilePath(path1) = path;
             let Charset(cs1) = cs;
-            let ans = OutputHandle(createCsvWriterWithBOM(path1, format, columnCount, cs1));
+            let ans: OutputHandle[r] = OutputHandle(createCsvWriterWithBOM(path1, format, cs1));
             Ok(ans)
         } catch {
             case _: ##java.lang.Exception => Err("newWithBOM")
@@ -61,7 +75,8 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Close the CSV output stream.
     ///
-    pub def close!(x: OutputHandle): Result[Unit, String] & Impure =
+    /// Fully Impure - closes a file handle
+    pub def close!(x: OutputHandle[r]): Result[Unit, String] & Impure =
         import flixspt.csvio.CsvWriter.close(): Unit & Impure;
         try {
             let OutputHandle(x1) = x;
@@ -72,31 +87,16 @@ namespace CsvIO/Internal/OutputHandle {
         }
 
 
-    pub def clearCells!(x: OutputHandle): Result[Unit, String] & Impure =
-        import flixspt.csvio.CsvWriter.clearCells(): Unit & Impure;
+    pub def writeRow!(xs: List[String], x: OutputHandle[r]): Result[Unit, String] & Impure =
+        import flixspt.csvio.CsvWriter.writeRowOfObjects(##java.util.ArrayList): Unit & Impure;
+        let step = l -> match l {
+            case x1 :: rs => Some((x1 as ##java.lang.Object, rs))
+            case Nil      => None
+        };
         try {
-            let OutputHandle(x1) = x;
-            let _ = clearCells(x1);
-            Ok()
-        } catch {
-            case _: ##java.lang.Exception => Err("clearCells!")
-        }
-
-    pub def setCellString!(x: OutputHandle, ix: Int32, value: String): Result[Unit, String] & Impure =
-        import flixspt.csvio.CsvWriter.setCellString(Int32, String): Unit & Impure;
-        try {
-            let OutputHandle(x1) = x;
-            let _ = setCellString(x1, ix, value);
-            Ok()
-        } catch {
-            case _: ##java.lang.Exception => Err("setCellString!")
-        }
-
-    pub def writeRow!(x: OutputHandle): Result[Unit, String] & Impure =
-        import flixspt.csvio.CsvWriter.writeRow(): Unit & Impure;
-        try {
-            let OutputHandle(x1) = x;
-            let _ = writeRow(x1);
+            let OutputHandle(out1) = x;
+            let arrlist = FlixSandbox/Marshal.unfoldArrayList(step, xs);
+            let _ = writeRowOfObjects(out1, arrlist);
             Ok()
         } catch {
             case _: ##java.lang.Exception => Err("setCellString!")
