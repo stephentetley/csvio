@@ -25,9 +25,9 @@ namespace CsvIO/CsvWriter {
 
     ///
     /// outputIndexedCsv.
-    /// TODO add optional headings 
+    /// TODO switch to iterator rather than list
     ///
-    pub def outputColumnIndexedCsv!(format: CsvFormat,
+    pub def outputCsv(format: CsvFormat,
                         cs: FlixSandbox/Text.Charset,
                         path: FlixSandbox/System.FilePath,
                         makeRow: a -> List[String] & ef,
@@ -41,22 +41,21 @@ namespace CsvIO/CsvWriter {
             Ok()
         }
 
-/*
-    pub def outputColumnIndexedCsvWithBOM!(format: CsvFormat,
+
+    pub def outputCsvWithBOM(format: CsvFormat,
                         cs: FlixSandbox/Text.Charset,
                         path: FlixSandbox/System.FilePath,
-                        columnCount: Int32,
-                        writeRow: a -> List[Strings],
+                        makeRow: a -> List[String] & ef,
                         rows: List[a]): Result[Unit, String] & Impure =
         use Result.flatMap;
         let CsvFormat(format1) = format;
         region r1 {
-            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(format1, columnCount, cs, path, r1);
-            let* _      = Result.traverse(row -> writeRow(row, rowWriter, handle), rows);
+            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(format1, cs, path, r1);
+            let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
             let* _      = CsvIO/Internal/OutputHandle.close!(handle);
             Ok()
         }
-*/
+
 
 
 
