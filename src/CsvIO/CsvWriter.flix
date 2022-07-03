@@ -28,7 +28,7 @@ namespace CsvIO/CsvWriter {
     /// TODO switch to iterator rather than list
     ///
     pub def outputCsv(format: CsvFormat,
-                        cs: FlixSandbox/Text.Charset,
+                        cs: Text.Charset,
                         path: FlixSandbox/System.FilePath,
                         makeRow: a -> List[String] & ef,
                         rows: List[a]): Result[Unit, String] & Impure =
@@ -43,7 +43,7 @@ namespace CsvIO/CsvWriter {
 
 
     pub def outputCsvWithBOM(format: CsvFormat,
-                        cs: FlixSandbox/Text.Charset,
+                        cs: Text.Charset,
                         path: FlixSandbox/System.FilePath,
                         makeRow: a -> List[String] & ef,
                         rows: List[a]): Result[Unit, String] & Impure =

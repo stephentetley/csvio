@@ -14,7 +14,7 @@ namespace Test01 {
         let* fmt    = region r1 {
             toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto() *> setSkipHeaderRecord(true), r1)
         };
-        let* hdl    = CsvIO/CsvReader.newCsvReadHandle(fmt, FlixSandbox/Text/Charset.utf_8(), eval, path);
+        let* hdl    = CsvIO/CsvReader.newCsvReadHandle(fmt, Text/Charset.utf_8(), eval, path);
         let iter    = CsvIO/CsvReader.getIterator(hdl);
         let _       = Iterator.foreach(println, iter);
         let* _      = CsvIO/CsvReader.close(hdl);
@@ -34,11 +34,11 @@ namespace Test01 {
         let* fmt1   = region r1 {
             toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto() *> setSkipHeaderRecord(true), r1)
         };
-        let* src    = CsvIO/CsvReader.readCsv(fmt1, FlixSandbox/Text/Charset.utf_8(), eval, path);
+        let* src    = CsvIO/CsvReader.readCsv(fmt1, Text/Charset.utf_8(), eval, path);
         let* fmt2   = region r1 {
             toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders("Short" :: "Long" :: Nil), r1)
         };
-        let* _      = CsvIO/CsvWriter.outputCsv(fmt2, FlixSandbox/Text/Charset.utf_8(), outpath, toCells, src);
+        let* _      = CsvIO/CsvWriter.outputCsv(fmt2, Text/Charset.utf_8(), outpath, toCells, src);
         Ok()      
 
 
@@ -55,11 +55,11 @@ namespace Test01 {
         let* fmt1    = region r1 {
             toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto() *> setSkipHeaderRecord(true), r1)
         };        
-        let* src    = CsvIO/CsvReader.readCsv(fmt1, FlixSandbox/Text/Charset.utf_8(), eval, path);
+        let* src    = CsvIO/CsvReader.readCsv(fmt1, Text/Charset.utf_8(), eval, path);
         let* fmt2   = region r1 {
             toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders("Short" :: "Long" :: Nil), r1)
         };        
-        let* _      = CsvIO/CsvWriter.outputCsvWithBOM(fmt2, FlixSandbox/Text/Charset.utf_8(), outpath, toCells, src);
+        let* _      = CsvIO/CsvWriter.outputCsvWithBOM(fmt2, Text/Charset.utf_8(), outpath, toCells, src);
         Ok() 
         
 }

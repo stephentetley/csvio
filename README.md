@@ -2,10 +2,17 @@
 
 Flix library to read and write Csv files built on top of Apache Commons Csv.
 
-This library depends on `flix-sandbox` - a jar and a Flix pkg file are included 
-in the folder `lib`.
+July 2022 - pending refactoring to use regions.
 
-Further dependencies:
+Dependencies: 
 
-* Apache commons-csv
-* Apache commons-io
+https://github.com/stephentetley/flix-regex
+https://github.com/stephentetley/flix-time
+https://github.com/stephentetley/flix-sandbox
+https://github.com/stephentetley/charset-locale
+https://github.com/stephentetley/collection-interop
+
+Apache Commons IO
+Apache Commons CSV
+
+Compatible *.pkg and *.jar files are included in the folder `lib`.

@@ -18,7 +18,8 @@
 namespace CsvIO/CsvReader {
     
     use FlixSandbox/System.FilePath.{FilePath};
-    use FlixSandbox/Text.Charset.{Charset};
+    
+    use Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.RowEvaluator;
@@ -33,7 +34,7 @@ namespace CsvIO/CsvReader {
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
 
-    pub enum CsvReadHandle[a]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String]]))
+    pub enum CsvReadHandle[a]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String], Static]))
 
     pub def close(handle: CsvReadHandle[a]): Result[Unit, String] & Impure = 
         import flixspt.csvio.ReadIterator.close(): Unit & Impure;
@@ -45,7 +46,7 @@ namespace CsvIO/CsvReader {
             case _: ##java.lang.Exception => Err("close")
         }
 
-    pub def getIterator(handle: CsvReadHandle[a]): Iterator[Result[a, String]] = 
+    pub def getIterator(handle: CsvReadHandle[a]): Iterator[Result[a, String], Static] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
 
@@ -55,7 +56,7 @@ namespace CsvIO/CsvReader {
     /// Returns a new Csv Handle (iterator x a "close" handle).
     ///
     pub def newCsvReadHandle(format: CsvFormat,
-                            cs: FlixSandbox/Text.Charset,
+                            cs: Text.Charset,
                             eval: RowEvaluator[a], 
                             path: FlixSandbox/System.FilePath): Result[CsvReadHandle[a], String] & Impure =
         import static flixspt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.ReadIterator & Impure;
@@ -114,7 +115,7 @@ namespace CsvIO/CsvReader {
 
 
     pub def readCsv(format: CsvFormat,
-                    charset: FlixSandbox/Text.Charset,
+                    charset: Text.Charset,
                     eval: RowEvaluator[a], 
                     path: FlixSandbox/System.FilePath): Result[List[a], String] & Impure =
         use Result.flatMap;
