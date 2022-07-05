@@ -40,10 +40,10 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Returns a new Output handle.
     ///
-    pub def makeOutputHandle(format: ##org.apache.commons.csv.CSVFormat,
-                cs: Text.Charset, 
-                path: FlixSandbox/System.FilePath, 
-                _: Region[r]): Result[OutputHandle[r], String] & Impure =
+    pub def makeOutputHandle(_: Region[r], 
+                            format: ##org.apache.commons.csv.CSVFormat,
+                            cs: Text.Charset, 
+                            path: FlixSandbox/System.FilePath): Result[OutputHandle[r], String] & Impure =
         import static flixspt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
@@ -58,10 +58,10 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     /// Returns a new Output handle with a BOM UTF_8, UTF_16LS and UTF_16BE only.
     ///
-    pub def makeOutputHandleWithBOM(format: ##org.apache.commons.csv.CSVFormat, 
+    pub def makeOutputHandleWithBOM(_: Region[r], 
+                                    format: ##org.apache.commons.csv.CSVFormat, 
                                     cs: Text.Charset, 
-                                    path: FlixSandbox/System.FilePath, 
-                                    _: Region[r]): Result[OutputHandle[r], String] & Impure =
+                                    path: FlixSandbox/System.FilePath): Result[OutputHandle[r], String] & Impure =
         import static flixspt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {

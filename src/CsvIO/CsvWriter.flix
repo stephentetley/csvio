@@ -35,7 +35,7 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         region r1 {
             let CsvFormat(format1) = format;
-            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandle(format1, cs, path, r1);
+            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandle(r1, format1, cs, path);
             let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
             let* _      = CsvIO/Internal/OutputHandle.close!(handle);
             Ok()
@@ -50,7 +50,7 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         let CsvFormat(format1) = format;
         region r1 {
-            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(format1, cs, path, r1);
+            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
             let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
             let* _      = CsvIO/Internal/OutputHandle.close!(handle);
             Ok()
