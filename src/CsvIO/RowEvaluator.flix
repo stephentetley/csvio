@@ -17,23 +17,23 @@
 
 namespace CsvIO {
 
-    pub enum RowEvaluator[a](##flixspt.csvio.InputRow -> Result[a, String] & Impure)
+    pub enum RowEvaluator[_: Region, a: Type](##flixspt.csvio.InputRow -> Result[a, String])
 
-    instance Functor[RowEvaluator] {
-        pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
+    instance Functor[RowEvaluator[r]] {
+        pub def map(f: a -> b & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
             CsvIO/RowEvaluator.map(f, x)
     }
 
-    instance Applicative[RowEvaluator] {
-        pub def point(x: a): RowEvaluator[a] = 
+    instance Applicative[RowEvaluator[r]] {
+        pub def point(x: a): RowEvaluator[r, a] = 
             CsvIO/RowEvaluator.point(x)
 
-        pub def ap(mf: RowEvaluator[a -> b & ef], ma: RowEvaluator[a]): RowEvaluator[b] & ef =
+        pub def ap(mf: RowEvaluator[r, a -> b & ef], ma: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
             CsvIO/RowEvaluator.ap(mf, ma)
     }
 
-    instance Monad[RowEvaluator] {
-        pub def flatMap(k: a -> RowEvaluator[b] & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
+    instance Monad[RowEvaluator[r]] {
+        pub def flatMap(k: a -> RowEvaluator[r, b] & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
             CsvIO/RowEvaluator.flatMap(k, x)
     }    
 
@@ -55,33 +55,32 @@ namespace CsvIO/RowEvaluator {
     use CsvIO.RowEvaluator;
     use CsvIO.RowEvaluator.{RowEvaluator};
 
-    pub def point(x: a): RowEvaluator[a] = 
-        RowEvaluator(_ -> Ok(x) as & Impure)
+    pub def point(x: a): RowEvaluator[r, a] = RowEvaluator(_ -> Ok(x))
 
-    def apply1(x: RowEvaluator[a], r: ##flixspt.csvio.InputRow): Result[a, String] & Impure =
+    def apply1(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] =
         let RowEvaluator(f) = x;
-        f(r)
+        f(row)
 
-    pub def runRowEvaluator(x: RowEvaluator[a], r: ##flixspt.csvio.InputRow): Result[a, String] & Impure = apply1(x, r)
+    pub def runRowEvaluator(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] = apply1(x, row)
         
 
-    pub def map(f: a -> b & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
-        RowEvaluator(r -> 
-            match apply1(x, r) {
+    pub def map(f: a -> b & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
+        RowEvaluator(row -> 
+            match apply1(x, row) {
                 case Ok(a) => {
-                    let ans = f(a) as & Impure;
+                    let ans = f(a) as & Pure;
                     Ok(ans)
                 }
                 case Err(e) => Err(e)
             }
         ) as & ef
 
-    pub def ap(mf: RowEvaluator[a -> b & ef], ma: RowEvaluator[a]): RowEvaluator[b] & ef =
-        RowEvaluator(r -> 
-            match apply1(mf, r) {
-                case Ok(f) => { 
-                    match apply1(ma, r) {
-                        case Ok(a) => Ok(f(a) as & Impure)
+    pub def ap(mf: RowEvaluator[r, a -> b & ef], ma: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
+        RowEvaluator(row -> 
+            match apply1(mf, row) {
+                case Ok(f)   => { 
+                    match apply1(ma, row) {
+                        case Ok(a)   => Ok(f(a) as & Pure)
                         case Err(e2) => Err(e2)
                     }
                 }
@@ -90,46 +89,46 @@ namespace CsvIO/RowEvaluator {
         ) as & ef
 
 
-    pub def flatMap(k: a -> RowEvaluator[b] & ef, x: RowEvaluator[a]): RowEvaluator[b] & ef =
-        RowEvaluator(r -> 
-            match apply1(x, r) { 
-                case Ok(a) => { let ans = k(a); apply1(ans, r) }
+    pub def flatMap(k: a -> RowEvaluator[r, b] & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
+        RowEvaluator(row -> 
+            match apply1(x, row) { 
+                case Ok(a)  => { let ans = k(a) as & Pure; apply1(ans, row) }
                 case Err(e) => Err(e)
             }
         ) as & ef
 
-    pub def optional(x: RowEvaluator[a]): RowEvaluator[Option[a]] =
+    pub def optional(x: RowEvaluator[r, a]): RowEvaluator[r, Option[a]] =
         RowEvaluator(r ->
             match apply1(x, r) {
-                case Ok(a) => Ok(Some(a))
+                case Ok(a)  => Ok(Some(a))
                 case Err(_) => Ok(None)
             }
         )
 
 
-    def liftPrimRowReader(eval: ##flixspt.csvio.InputRow -> Result[a, String] & Impure): RowEvaluator[a] =
-        RowEvaluator(r -> eval(r))
+    def liftPrimRowReader(eval: ##flixspt.csvio.InputRow -> Result[a, String] & ef): RowEvaluator[r, a] & ef =
+        RowEvaluator(row -> eval(row) as & Pure) as & ef
 
-    pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[a] = match x {
+    pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[r, a] = match x {
         case Some(a) => point(a)
         case None => throwError(errMsg)
     }
 
-    pub def liftResult(x: Result[a, String]): RowEvaluator[a] = 
-        RowEvaluator(_ -> x as & Impure)
+    pub def liftResult(x: Result[a, String]): RowEvaluator[r, a] = 
+        RowEvaluator(_ -> x)
 
-    pub def liftOperation(fn: Unit -> Result[a, String] & Impure): RowEvaluator[a] =
-        RowEvaluator(_ -> fn())
+    pub def liftOperation(fn: Unit -> Result[a, String] & ef): RowEvaluator[r, a] & ef =
+        RowEvaluator(_ -> fn() as & Pure) as & ef
 
-    pub def throwError(err: String): RowEvaluator[a] =
-        RowEvaluator(_ -> Err(err) as & Impure)
+    pub def throwError(err: String): RowEvaluator[r, a] =
+        RowEvaluator(_ -> Err(err))
 
-    pub def choice(xs: List[RowEvaluator[a]]): RowEvaluator[a] =
+    pub def choice(xs: List[RowEvaluator[r, a]]): RowEvaluator[r, a] =
         RowEvaluator(r -> choiceHelper(r, xs))
 
-    def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[RowEvaluator[a]]): Result[a, String] & Impure =
+    def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[RowEvaluator[r, a]]): Result[a, String] =
         match xs {
-            case Nil => Err("choice") as & Impure
+            case Nil => Err("choice")
             case x1 :: rs => match apply1(x1, r) {
                 case Ok(a) => Ok(a)
                 case Err(_) => choiceHelper(r, rs)
@@ -138,8 +137,8 @@ namespace CsvIO/RowEvaluator {
 
     // Cell readers
 
-    pub def getStringAt(ix: Int32): RowEvaluator[String] =
-        import flixspt.csvio.InputRow.getStringAt(Int32): String & Impure;
+    pub def getStringAt(ix: Int32): RowEvaluator[r, String] \ Read(r) =
+        import flixspt.csvio.InputRow.getStringAt(Int32): String & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getStringAt(row, ix);
@@ -152,8 +151,8 @@ namespace CsvIO/RowEvaluator {
     ///
     /// Get a string by its column name / label.
     ///
-    pub def getStringNamed(label: String): RowEvaluator[String] =
-        import flixspt.csvio.InputRow.getStringNamed(String): String & Impure;
+    pub def getStringNamed(label: String): RowEvaluator[r, String] \ Read(r) =
+        import flixspt.csvio.InputRow.getStringNamed(String): String & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getStringNamed(row, label);
@@ -163,8 +162,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt8At(ix: Int32): RowEvaluator[Int8] =
-        import flixspt.csvio.InputRow.getByteAt(Int32): Int8 & Impure;
+    pub def getInt8At(ix: Int32): RowEvaluator[r, Int8] \ Read(r) =
+        import flixspt.csvio.InputRow.getByteAt(Int32): Int8 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getByteAt(row, ix);
@@ -174,8 +173,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt8Named(label: String): RowEvaluator[Int8] =
-        import flixspt.csvio.InputRow.getByteNamed(String): Int8 & Impure;
+    pub def getInt8Named(label: String): RowEvaluator[r, Int8] \ Read(r) =
+        import flixspt.csvio.InputRow.getByteNamed(String): Int8 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getByteNamed(row, label);
@@ -185,8 +184,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt16At(ix: Int32): RowEvaluator[Int16] =
-        import flixspt.csvio.InputRow.getShortAt(Int32): Int16 & Impure;
+    pub def getInt16At(ix: Int32): RowEvaluator[r, Int16] \ Read(r) =
+        import flixspt.csvio.InputRow.getShortAt(Int32): Int16 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getShortAt(row, ix);
@@ -196,8 +195,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt16Named(label: String): RowEvaluator[Int16] =
-        import flixspt.csvio.InputRow.getShortNamed(String): Int16 & Impure;
+    pub def getInt16Named(label: String): RowEvaluator[r, Int16] \ Read(r) =
+        import flixspt.csvio.InputRow.getShortNamed(String): Int16 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getShortNamed(row, label);
@@ -207,8 +206,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt32At(ix: Int32): RowEvaluator[Int32] =
-        import flixspt.csvio.InputRow.getIntAt(Int32): Int32 & Impure;
+    pub def getInt32At(ix: Int32): RowEvaluator[r, Int32] \ Read(r) =
+        import flixspt.csvio.InputRow.getIntAt(Int32): Int32 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getIntAt(row, ix);
@@ -218,8 +217,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt32Named(label: String): RowEvaluator[Int32] =
-        import flixspt.csvio.InputRow.getIntNamed(String): Int32 & Impure;
+    pub def getInt32Named(label: String): RowEvaluator[r, Int32] \ Read(r) =
+        import flixspt.csvio.InputRow.getIntNamed(String): Int32 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getIntNamed(row, label);
@@ -229,8 +228,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt64At(ix: Int32): RowEvaluator[Int64] =
-        import flixspt.csvio.InputRow.getLongAt(Int32): Int64 & Impure;
+    pub def getInt64At(ix: Int32): RowEvaluator[r, Int64] \ Read(r) =
+        import flixspt.csvio.InputRow.getLongAt(Int32): Int64 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getLongAt(row, ix);
@@ -240,8 +239,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getInt64Named(label: String): RowEvaluator[Int64] =
-        import flixspt.csvio.InputRow.getLongNamed(String): Int64 & Impure;
+    pub def getInt64Named(label: String): RowEvaluator[r, Int64] \ Read(r) =
+        import flixspt.csvio.InputRow.getLongNamed(String): Int64 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getLongNamed(row, label);
@@ -251,8 +250,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getFloat32At(ix: Int32): RowEvaluator[Float32] =
-        import flixspt.csvio.InputRow.getFloatAt(Int32): Float32 & Impure;
+    pub def getFloat32At(ix: Int32): RowEvaluator[r, Float32] \ Read(r) =
+        import flixspt.csvio.InputRow.getFloatAt(Int32): Float32 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getFloatAt(row, ix);
@@ -262,8 +261,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getFloat32Named(label: String): RowEvaluator[Float32] =
-        import flixspt.csvio.InputRow.getFloatNamed(String): Float32 & Impure;
+    pub def getFloat32Named(label: String): RowEvaluator[r, Float32] \ Read(r) =
+        import flixspt.csvio.InputRow.getFloatNamed(String): Float32 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getFloatNamed(row, label);
@@ -273,8 +272,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getFloat64At(ix: Int32): RowEvaluator[Float64] =
-        import flixspt.csvio.InputRow.getDoubleAt(Int32): Float64 & Impure;
+    pub def getFloat64At(ix: Int32): RowEvaluator[r, Float64] \ Read(r) =
+        import flixspt.csvio.InputRow.getDoubleAt(Int32): Float64 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getDoubleAt(row, ix);
@@ -284,8 +283,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getFloat64Named(label: String): RowEvaluator[Float64] =
-        import flixspt.csvio.InputRow.getDoubleNamed(String): Float64 & Impure;
+    pub def getFloat64Named(label: String): RowEvaluator[r, Float64] \ Read(r) =
+        import flixspt.csvio.InputRow.getDoubleNamed(String): Float64 & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getDoubleNamed(row, label);
@@ -295,8 +294,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getBigIntAt(ix: Int32): RowEvaluator[BigInt] =
-        import flixspt.csvio.InputRow.getBigIntegerAt(Int32): BigInt & Impure;
+    pub def getBigIntAt(ix: Int32): RowEvaluator[r, BigInt] \ Read(r) =
+        import flixspt.csvio.InputRow.getBigIntegerAt(Int32): BigInt & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getBigIntegerAt(row, ix);
@@ -306,8 +305,8 @@ namespace CsvIO/RowEvaluator {
             }
         )
 
-    pub def getBigIntNamed(label: String): RowEvaluator[BigInt] =
-        import flixspt.csvio.InputRow.getBigIntegerNamed(String): BigInt & Impure;
+    pub def getBigIntNamed(label: String): RowEvaluator[r, BigInt] \ Read(r) =
+        import flixspt.csvio.InputRow.getBigIntegerNamed(String): BigInt & r;
         liftPrimRowReader(row -> 
             try {
                 let a = getBigIntegerNamed(row, label);
@@ -320,53 +319,53 @@ namespace CsvIO/RowEvaluator {
 /*
     /// June 2022 - stubbed out due to regex changes...
 
-    pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalMatchesAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[r, a] =
         let* input = getStringAt(ix);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.matches(patt, eval, input));
         point(ans)
 
-    pub def evalMatchesNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalMatchesNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[r, a] =
         let* input = getStringNamed(label);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.matches(patt, eval, input));
         point(ans)
 
-    pub def evalContainsAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalContainsAt(ix: Int32, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[r, a] =
         let* input = getStringAt(ix);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
 
-    pub def evalContainsNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[a] =
+    pub def evalContainsNamed(label: String, patt: Text/Regex.Pattern, eval: MatchEvaluator[a]): RowEvaluator[r, a] =
         let* input = getStringNamed(label);
         let* ans = liftOperation(_ -> Text/RegexEval/Regex.contains(patt, eval, input));
         point(ans)
 */
 
-    pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[Time.LocalDate] =
+    pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[r, Time.LocalDate] \ Read(r) =
         let* input = getStringAt(ix);
         let* ans = liftResult(Time/LocalDate.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[Time.LocalDate] =
+    pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): RowEvaluator[r, Time.LocalDate] \ Read(r) =
         let* input = getStringNamed(label);
         let* ans = liftResult(Time/LocalDate.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[Time.LocalDateTime] =
+    pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[r, Time.LocalDateTime] \ Read(r) =
         let* input = getStringAt(ix);
         let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[Time.LocalDateTime] =
+    pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): RowEvaluator[r, Time.LocalDateTime] \ Read(r) =
         let* input = getStringNamed(label);
         let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[Time.LocalTime] =
+    pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[r, Time.LocalTime] \ Read(r) =
         let* input = getStringAt(ix);
         let* ans = liftResult(Time/LocalTime.parse(formatter, input));
         point(ans)
 
-    pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[Time.LocalTime] =
+    pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): RowEvaluator[r, Time.LocalTime] \ Read(r) =
         let* input = getStringNamed(label);
         let* ans = liftResult(Time/LocalTime.parse(formatter, input));
         point(ans)

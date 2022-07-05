@@ -34,10 +34,10 @@ namespace CsvIO/CsvReader {
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
 
-    pub enum CsvReadHandle[a]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String], Static]))
+    pub enum CsvReadHandle[r: Region, a: Type]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String], r]))
 
-    pub def close(handle: CsvReadHandle[a]): Result[Unit, String] & Impure = 
-        import flixspt.csvio.ReadIterator.close(): Unit & Impure;
+    pub def close(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
+        import flixspt.csvio.ReadIterator.close(): Unit & r;
         let CsvReadHandle((x1, _)) = handle;
         try {
             close(x1);
@@ -46,7 +46,7 @@ namespace CsvIO/CsvReader {
             case _: ##java.lang.Exception => Err("close")
         }
 
-    pub def getIterator(handle: CsvReadHandle[a]): Iterator[Result[a, String], Static] = 
+    pub def getIterator(handle: CsvReadHandle[r, a]): Iterator[Result[a, String], r] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
 
@@ -57,11 +57,11 @@ namespace CsvIO/CsvReader {
     ///
     pub def newCsvReadHandle(format: CsvFormat,
                             cs: Text.Charset,
-                            eval: RowEvaluator[a], 
-                            path: FlixSandbox/System.FilePath): Result[CsvReadHandle[a], String] & Impure =
+                            eval: RowEvaluator[r, a], 
+                            path: FlixSandbox/System.FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
         import static flixspt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.ReadIterator & Impure;
-        import flixspt.csvio.ReadIterator.hasNext(): Bool & Impure;
-        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & Impure;
+        import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
+        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & r;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
@@ -88,11 +88,11 @@ namespace CsvIO/CsvReader {
     /// Returns a new Csv Handle (iterator x close handle).
     ///
     pub def newCsvReadHandleWithBOM(format: CsvFormat,
-                                    eval: RowEvaluator[a], 
-                                    path: FlixSandbox/System.FilePath): Result[CsvReadHandle[a], String] & Impure =        
+                                    eval: RowEvaluator[r, a], 
+                                    path: FlixSandbox/System.FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
         import static flixspt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat): ##flixspt.csvio.ReadIterator & Impure;
-        import flixspt.csvio.ReadIterator.hasNext(): Bool & Impure;
-        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & Impure;
+        import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
+        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & r;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
@@ -116,7 +116,7 @@ namespace CsvIO/CsvReader {
 
     pub def readCsv(format: CsvFormat,
                     charset: Text.Charset,
-                    eval: RowEvaluator[a], 
+                    eval: RowEvaluator[r, a], 
                     path: FlixSandbox/System.FilePath): Result[List[a], String] & Impure =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(format, charset, eval, path);
