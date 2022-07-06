@@ -17,7 +17,9 @@
 
 namespace CsvIO {
 
-    pub enum RowEvaluator[_: Region, a: Type](##flixspt.csvio.InputRow -> Result[a, String])
+
+    /// CPS transform?
+    pub enum RowEvaluator[r: Region, a: Type](##flixspt.csvio.InputRow -> Result[a, String] & r)
 
     instance Functor[RowEvaluator[r]] {
         pub def map(f: a -> b & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
@@ -55,20 +57,20 @@ namespace CsvIO/RowEvaluator {
     use CsvIO.RowEvaluator;
     use CsvIO.RowEvaluator.{RowEvaluator};
 
-    pub def point(x: a): RowEvaluator[r, a] = RowEvaluator(_ -> Ok(x))
+    pub def point(x: a): RowEvaluator[r, a] = RowEvaluator(_ -> Ok(x) as & r)
 
-    def apply1(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] =
+    def apply1(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] & r =
         let RowEvaluator(f) = x;
         f(row)
 
-    pub def runRowEvaluator(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] = apply1(x, row)
+    pub def runRowEvaluator(x: RowEvaluator[r, a], row: ##flixspt.csvio.InputRow): Result[a, String] & r = apply1(x, row)
         
 
     pub def map(f: a -> b & ef, x: RowEvaluator[r, a]): RowEvaluator[r, b] & ef =
         RowEvaluator(row -> 
             match apply1(x, row) {
                 case Ok(a) => {
-                    let ans = f(a) as & Pure;
+                    let ans = f(a) as & r;
                     Ok(ans)
                 }
                 case Err(e) => Err(e)
@@ -80,7 +82,7 @@ namespace CsvIO/RowEvaluator {
             match apply1(mf, row) {
                 case Ok(f)   => { 
                     match apply1(ma, row) {
-                        case Ok(a)   => Ok(f(a) as & Pure)
+                        case Ok(a)   => Ok(f(a) as & r)
                         case Err(e2) => Err(e2)
                     }
                 }
@@ -107,7 +109,7 @@ namespace CsvIO/RowEvaluator {
 
 
     def liftPrimRowReader(eval: ##flixspt.csvio.InputRow -> Result[a, String] & ef): RowEvaluator[r, a] & ef =
-        RowEvaluator(row -> eval(row) as & Pure) as & ef
+        RowEvaluator(row -> eval(row) as & r) as & ef
 
     pub def liftOption(x: Option[a], errMsg: String): RowEvaluator[r, a] = match x {
         case Some(a) => point(a)
@@ -115,18 +117,18 @@ namespace CsvIO/RowEvaluator {
     }
 
     pub def liftResult(x: Result[a, String]): RowEvaluator[r, a] = 
-        RowEvaluator(_ -> x)
+        RowEvaluator(_ -> x as & r)
 
     pub def liftOperation(fn: Unit -> Result[a, String] & ef): RowEvaluator[r, a] & ef =
-        RowEvaluator(_ -> fn() as & Pure) as & ef
+        RowEvaluator(_ -> fn() as & r) as & ef
 
     pub def throwError(err: String): RowEvaluator[r, a] =
-        RowEvaluator(_ -> Err(err))
+        RowEvaluator(_ -> Err(err) as & r)
 
     pub def choice(xs: List[RowEvaluator[r, a]]): RowEvaluator[r, a] =
         RowEvaluator(r -> choiceHelper(r, xs))
 
-    def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[RowEvaluator[r, a]]): Result[a, String] =
+    def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[RowEvaluator[r, a]]): Result[a, String] & r =
         match xs {
             case Nil => Err("choice")
             case x1 :: rs => match apply1(x1, r) {
@@ -158,7 +160,9 @@ namespace CsvIO/RowEvaluator {
                 let a = getStringNamed(row, label);
                 Ok(a)
             } catch {
-                case _: ##java.lang.Exception => Err("getStringNamed('${label}')")
+                case ex: ##java.lang.Exception => 
+                    import java.lang.Throwable.getMessage(): String & r;
+                    Err("getStringNamed('${label}'): ${getMessage(ex)}")
             }
         )
 

@@ -14,7 +14,7 @@ namespace TestBuilder {
                     *> setDelimiter(',')
                     *> setTrim(true)
                 ;
-            toCsvFormat(builder, r1)
+            toCsvFormat(r1, builder)
         }
 
 }
