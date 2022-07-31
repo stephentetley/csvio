@@ -2,15 +2,19 @@
 
 Flix library to read and write Csv files built on top of Apache Commons Csv.
 
-July 2022 - pending refactoring to use regions.
+License: Apache 2.0
 
 Dependencies: 
 
 https://github.com/stephentetley/flix-regex
+
 https://github.com/stephentetley/flix-time
-https://github.com/stephentetley/flix-sandbox
-https://github.com/stephentetley/charset-locale
-https://github.com/stephentetley/collection-interop
+
+https://github.com/stephentetley/interop-filepath
+
+https://github.com/stephentetley/interop-charset-locale
+
+https://github.com/stephentetley/interop-collections
 
 Apache Commons IO
 Apache Commons CSV
