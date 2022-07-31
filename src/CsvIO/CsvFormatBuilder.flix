@@ -82,7 +82,9 @@ namespace CsvIO/CsvFormatBuilder {
                 case Ok(_)    => Ok(CsvFormat(build1(jbuilder)))
             }
         } catch {
-            case ex: ##java.lang.Exception => Err(FlixSandbox/Marshal.unmarshalExceptionMessage(ex)) as \ r
+            case ex: ##java.io.IOException =>
+                import java.lang.Throwable.getMessage(): String & r;
+                Err(getMessage(ex))
         }
 
 
@@ -97,7 +99,9 @@ namespace CsvIO/CsvFormatBuilder {
                 case Ok(_)    => Ok(CsvFormat(build1(jbuilder)))
             }
         } catch {
-            case ex: ##java.lang.Exception => Err(FlixSandbox/Marshal.unmarshalExceptionMessage(ex)) as \ r
+            case ex: ##java.io.IOException =>
+                import java.lang.Throwable.getMessage(): String & r;
+                Err(getMessage(ex))
         }
 
 
@@ -142,7 +146,7 @@ namespace CsvIO/CsvFormatBuilder {
         CsvFormatBuilder((s, k) ->
             try {
                 let CsvFormatBuilderHandle(s1) = s;
-                let _ = f(s1) as & Pure;
+                let _ = f(s1) as & r;
                 k()
             } catch {
                 case ex: ##java.lang.Exception => 
@@ -185,17 +189,16 @@ namespace CsvIO/CsvFormatBuilder {
 
     pub def setHeaderAuto(): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
         liftJavaBuilderPrim(x -> 
-            region r1 {
-                import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String, r1]): ##org.apache.commons.csv.CSVFormat$Builder & r1;
-                FlixSandbox/Marshal.runVaragsOfString(Nil, setHeader(x), r1)
-            } as \ Write(r)
+            import static flixspt.csvio.BuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder & r;
+            setHeaderEmpty(x) as \ Write(r)
         )
 
-    pub def setHeaders(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) =         
+    pub def setHeaders(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
         liftJavaBuilderPrim(x -> 
             region r1 {
-                import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String, r1]): ##org.apache.commons.csv.CSVFormat$Builder & r1;
-                FlixSandbox/Marshal.runVaragsOfString(l, setHeader(x), r1)
+                import static flixspt.csvio.BuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
+                let arrl = Interop/Collections/ArrayList.fromList(r1, l);
+                setHeader(x, Interop/Collections/ArrayList.getArrayList(arrl))
             } as \ Write(r)
         )
 
@@ -203,8 +206,9 @@ namespace CsvIO/CsvFormatBuilder {
     pub def setHeaderComments(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         liftJavaBuilderPrim(x -> 
             region r1 {        
-                import org.apache.commons.csv.CSVFormat$Builder.setHeaderComments(Array[String, r1]): ##org.apache.commons.csv.CSVFormat$Builder & r1;
-                FlixSandbox/Marshal.runVaragsOfString(l, setHeaderComments(x), r1)
+                import static flixspt.csvio.BuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
+                let arrl = Interop/Collections/ArrayList.fromList(r1, l);
+                setHeaderComments(x, Interop/Collections/ArrayList.getArrayList(arrl))
             } as \ Write(r)
         )
 

@@ -17,6 +17,9 @@
 
 namespace CsvIO/CsvWriter {
     
+    use Interop/System.FilePath;
+    use Interop/Text.Charset;
+
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
     use CsvIO.RowSetter;
@@ -28,8 +31,8 @@ namespace CsvIO/CsvWriter {
     /// TODO switch to iterator rather than list
     ///
     pub def outputCsv(format: CsvFormat,
-                        cs: Text.Charset,
-                        path: FlixSandbox/System.FilePath,
+                        cs: Charset,
+                        path: FilePath,
                         makeRow: a -> List[String] & ef,
                         rows: List[a]): Result[Unit, String] & Impure =
         use Result.flatMap;
@@ -43,8 +46,8 @@ namespace CsvIO/CsvWriter {
 
 
     pub def outputCsvWithBOM(format: CsvFormat,
-                        cs: Text.Charset,
-                        path: FlixSandbox/System.FilePath,
+                        cs: Charset,
+                        path: FilePath,
                         makeRow: a -> List[String] & ef,
                         rows: List[a]): Result[Unit, String] & Impure =
         use Result.flatMap;

@@ -17,7 +17,7 @@
 
 namespace CsvIO/Internal {
 
-    /// TODO Add a region...
+
     pub enum OutputHandle[_: Region](##flixspt.csvio.CsvWriter)
 
     instance Scoped[OutputHandle] {
@@ -30,9 +30,10 @@ namespace CsvIO/Internal {
 
 namespace CsvIO/Internal/OutputHandle {
 
-    use FlixSandbox/System.FilePath.{FilePath};
-    
-    use Text.Charset.{Charset};
+    use Interop/System.FilePath;
+    use Interop/System.FilePath.{FilePath};
+    use Interop/Text.Charset;
+    use Interop/Text.Charset.{Charset};
 
     use CsvIO/Internal.OutputHandle;
     use CsvIO/Internal.OutputHandle.{OutputHandle};
@@ -42,8 +43,8 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     pub def makeOutputHandle(_: Region[r], 
                             format: ##org.apache.commons.csv.CSVFormat,
-                            cs: Text.Charset, 
-                            path: FlixSandbox/System.FilePath): Result[OutputHandle[r], String] & Impure =
+                            cs: Charset, 
+                            path: FilePath): Result[OutputHandle[r], String] & Impure =
         import static flixspt.csvio.CsvWriter.createCsvWriter(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
@@ -60,8 +61,8 @@ namespace CsvIO/Internal/OutputHandle {
     ///
     pub def makeOutputHandleWithBOM(_: Region[r], 
                                     format: ##org.apache.commons.csv.CSVFormat, 
-                                    cs: Text.Charset, 
-                                    path: FlixSandbox/System.FilePath): Result[OutputHandle[r], String] & Impure =
+                                    cs: Charset, 
+                                    path: FilePath): Result[OutputHandle[r], String] & Impure =
         import static flixspt.csvio.CsvWriter.createCsvWriterWithBOM(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.CsvWriter & Impure;
         use Result.flatMap;
         try {
@@ -91,13 +92,14 @@ namespace CsvIO/Internal/OutputHandle {
     pub def writeRow!(xs: List[String], x: OutputHandle[r]): Result[Unit, String] & Impure =
         import flixspt.csvio.CsvWriter.writeRowOfObjects(##java.util.ArrayList): Unit & Impure;
         let step = l -> match l {
-            case x1 :: rs => Some((x1 as ##java.lang.Object, rs))
+            case x1 :: rs => Some((x1, rs))
             case Nil      => None
         };
         try {
             let OutputHandle(out1) = x;
-            let arrlist = FlixSandbox/Marshal.unfoldArrayList(step, xs);
-            let _ = writeRowOfObjects(out1, arrlist);
+            let r = Scoped.regionOf(x);
+            let arrlist = Interop/Collections/ArrayList.unfoldArrayList(r, step, xs);
+            let _ = writeRowOfObjects(out1, Interop/Collections/ArrayList.getArrayList(arrlist));
             Ok()
         } catch {
             case _: ##java.lang.Exception => Err("setCellString!")
