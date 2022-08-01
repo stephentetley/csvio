@@ -18,7 +18,7 @@
 namespace CsvIO {
 
 
-    /// CPS transform?
+    /// TODO - to be replaced by CsvRecordEvaluator...
     pub enum RowEvaluator[r: Region, a: Type](##flixspt.csvio.InputRow -> Result[a, String] & r)
 
     instance Functor[RowEvaluator[r]] {
