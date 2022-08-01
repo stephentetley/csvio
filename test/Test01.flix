@@ -8,11 +8,11 @@ namespace Test01 {
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
-        use CsvIO/CsvFormatBuilder.{setHeaders, setSkipHeaderRecord};
+        use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
         let path    = Interop/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
         let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
         let* fmt    = region r1 {
-            CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord(true))
+            CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true))
         };
         let* hdl    = CsvIO/CsvReader.newCsvReadHandle(fmt, Interop/Text/Charset.utf_8(), eval, path);
         let iter    = CsvIO/CsvReader.getIterator(hdl);
@@ -26,15 +26,15 @@ namespace Test01 {
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
-        use CsvIO/CsvFormatBuilder.{toCsvFormatWithCsvFormat, setHeaderAuto, setHeaders, setSkipHeaderRecord};
+        use CsvIO/CsvFormatBuilder.{toCsvFormatWithCsvFormat, setHeaderAuto!, setHeaders!};
         region r1 {
             let path    = Interop/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
             let outpath = Interop/System/FilePath.filePath("E://coding/flix/csvio/data/compass-out.csv");
             let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
             let toCells = xy -> {let (x, y) = xy; y :: x :: Nil};  /// Flip 
-            let* fmt1   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto());
+            let* fmt1   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto!());
             let* src    = CsvIO/CsvReader.readCsv(fmt1, Interop/Text/Charset.utf_8(), eval, path);
-            let* fmt2   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders("Short" :: "Long" :: Nil));
+            let* fmt2   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders!("Short" :: "Long" :: Nil));
             let* _      = CsvIO/CsvWriter.outputCsv(fmt2, Interop/Text/Charset.utf_8(), outpath, toCells, src);
             println("test02 - done");
             Ok()

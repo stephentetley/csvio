@@ -18,18 +18,7 @@
 namespace CsvIO {
 
 
-    pub enum CsvFormatBuilderHandle[_: Region](##org.apache.commons.csv.CSVFormat$Builder)
-
-    ///
-    /// State and Codensity(Error) monad
-    /// 
-    /// `ka` is the continuation answer type
-    ///
-    /// TODO - do we need the internal impurity?
-    ///
-    pub enum CsvFormatBuilder[r: Region, ka: Type, a: Type](
-        CsvFormatBuilderHandle[r] -> (a -> Result[ka, String] & r) -> Result[ka, String] & r)
-
+    pub enum CsvFormatBuilder[r: Region, ka: Type, a: Type](MonadLib.Builder[r, ka, ##org.apache.commons.csv.CSVFormat$Builder, a])
 
     instance Functor[CsvFormatBuilder[r, ka]] {
         pub def map(f: a -> b & ef, ma: CsvFormatBuilder[r, ka, a]): CsvFormatBuilder[r, ka, b] & ef = 
@@ -53,31 +42,31 @@ namespace CsvIO {
 
 namespace CsvIO/CsvFormatBuilder {
 
-    use CsvIO.CsvFormatBuilderHandle;
-    use CsvIO.CsvFormatBuilderHandle.{CsvFormatBuilderHandle};
     use CsvIO.CsvFormatBuilder;
     use CsvIO.CsvFormatBuilder.{CsvFormatBuilder};
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
     use CsvIO/CsvFormat.QuoteMode;
 
+    pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##org.apache.commons.csv.CSVFormat$Builder, a] = 
+        let CsvFormatBuilder(x1) = x;
+        x1
 
     ///
-    /// Helper function for the implementation of `map` and `ap` etc.
+    /// Returns the result of applying `ma` to the mutable state `s`.
     ///
-    def apply1(ma: CsvFormatBuilder[r, ka, a], 
-                st: CsvFormatBuilderHandle[r], 
-                k: a -> Result[ka, String] & r): Result[ka, String] & r=
-        let CsvFormatBuilder(ma1) = ma;
-        ma1(st, k)
+    pub def runBuilder(r: Region[r], 
+                        ma: CsvFormatBuilder[r, a, a], 
+                        s: ##org.apache.commons.csv.CSVFormat$Builder): Result[a, String] & r = 
+        MonadLib/Builder.runBuilder(r, getCsvFormatBuilder(ma), s)
 
 
-    pub def toCsvFormat(_: Region[r], ma: CsvFormatBuilder[r, a, a]): Result[CsvFormat, String] \ Write(r) = 
+    pub def toCsvFormat(r: Region[r], ma: CsvFormatBuilder[r, a, a]): Result[CsvFormat, String] \ Write(r) = 
         import static org.apache.commons.csv.CSVFormat$Builder.create(): ##org.apache.commons.csv.CSVFormat$Builder & r as create1;
         import org.apache.commons.csv.CSVFormat$Builder.build(): ##org.apache.commons.csv.CSVFormat & r as build1;
         try {
             let jbuilder = create1();
-            match runBuilder(ma, CsvFormatBuilderHandle(jbuilder)) {
+            match runBuilder(r, ma, jbuilder) {
                 case Err(msg) => Err(msg)
                 case Ok(_)    => Ok(CsvFormat(build1(jbuilder)))
             }
@@ -88,13 +77,13 @@ namespace CsvIO/CsvFormatBuilder {
         }
 
 
-    pub def toCsvFormatWithCsvFormat(_: Region[r], fmt: CsvFormat, ma: CsvFormatBuilder[r, a, a]): Result[CsvFormat, String] \ Write(r) = 
+    pub def toCsvFormatWithCsvFormat(r: Region[r], fmt: CsvFormat, ma: CsvFormatBuilder[r, a, a]): Result[CsvFormat, String] \ Write(r) = 
         import static org.apache.commons.csv.CSVFormat$Builder.create(##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVFormat$Builder & r as create1;
         import org.apache.commons.csv.CSVFormat$Builder.build(): ##org.apache.commons.csv.CSVFormat & r as build1;
         try {
             let fmt1 = CsvIO/CsvFormat.getCsvFormat(fmt);
             let jbuilder = create1(fmt1);
-            match runBuilder(ma, CsvFormatBuilderHandle(jbuilder)) {
+            match runBuilder(r, ma, jbuilder) {
                 case Err(msg) => Err(msg)
                 case Ok(_)    => Ok(CsvFormat(build1(jbuilder)))
             }
@@ -105,96 +94,68 @@ namespace CsvIO/CsvFormatBuilder {
         }
 
 
-    ///
-    /// Returns the result (new state and answer) of applying `ma` to the initial state `st`.
-    ///
-    def runBuilder(ma: CsvFormatBuilder[r, a, a], 
-                    st: CsvFormatBuilderHandle[r]): Result[a, String] & r =
-        let cont = a -> Ok(a) as & r;
-        apply1(ma, st, cont)
 
 
-    pub def point(x: a): CsvFormatBuilder[r, ka, a] =
-        CsvFormatBuilder((_, k) -> k(x))
+    pub def point(x: a): CsvFormatBuilder[r, ka, a] = CsvFormatBuilder(MonadLib/Builder.point(x))
 
     pub def map(f: a -> b & ef, ma: CsvFormatBuilder[r, ka, a]): CsvFormatBuilder[r, ka, b] & ef =
-        CsvFormatBuilder((s, k) ->
-            apply1(ma, s, a -> k(f(a) as & r))
-        ) as & ef
+        CsvFormatBuilder(MonadLib/Builder.map(f, getCsvFormatBuilder(ma)))
 
         
     pub def ap(mf: CsvFormatBuilder[r, ka, a -> b & ef], ma: CsvFormatBuilder[r, ka, a]): CsvFormatBuilder[r, ka, b] & ef =
-        CsvFormatBuilder((s, k) ->
-            apply1(mf, s, f ->
-                apply1(ma, s, a ->
-                    k(f(a) as & r)))
-        ) as & ef
+        CsvFormatBuilder(MonadLib/Builder.ap(getCsvFormatBuilder(mf), getCsvFormatBuilder(ma)))
 
 
     pub def flatMap(f: a -> CsvFormatBuilder[r, ka, b] & ef, ma: CsvFormatBuilder[r, ka, a]): CsvFormatBuilder[r, ka, b] & ef =
-        CsvFormatBuilder((s, k) ->
-            apply1(ma, s, a ->
-                apply1(f(a) as & r, s, b ->
-                    k(b)))
-        ) as & ef
+        CsvFormatBuilder(MonadLib/Builder.flatMap(f >> getCsvFormatBuilder, getCsvFormatBuilder(ma)))
 
     pub def throwError(msg: String): CsvFormatBuilder[r, ka, a] = 
-        CsvFormatBuilder((_, _) -> Err(msg) as & r)
+        CsvFormatBuilder(MonadLib/Builder.throwError(msg))
+    
+    def liftSetter(f: ##org.apache.commons.csv.CSVFormat$Builder -> ##org.apache.commons.csv.CSVFormat$Builder & ef): CsvFormatBuilder[r, ka, Unit] & ef =
+        CsvFormatBuilder(MonadLib/Builder.liftSetter(f))
 
-
-    def liftJavaBuilderPrim(f: ##org.apache.commons.csv.CSVFormat$Builder -> ##org.apache.commons.csv.CSVFormat$Builder & ef): CsvFormatBuilder[r, ka, Unit] & ef = 
-        CsvFormatBuilder((s, k) ->
-            try {
-                let CsvFormatBuilderHandle(s1) = s;
-                let _ = f(s1) as & r;
-                k()
-            } catch {
-                case ex: ##java.lang.Exception => 
-                    import java.lang.Throwable.getMessage(): String & Pure; 
-                    Err(getMessage(ex))
-            }            
-        ) as & ef
 
     /// API...
 
-    pub def setAllowDuplicateHeaderNames(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setAllowDuplicateHeaderNames!(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setAllowDuplicateHeaderNames(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setAllowDuplicateHeaderNames, allow))
+        liftSetter(flip(setAllowDuplicateHeaderNames, allow))
 
     // setAllowMissingColumnNames
-    pub def setAllowMissingColumnNames(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setAllowMissingColumnNames!(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setAllowMissingColumnNames(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setAllowMissingColumnNames, allow))
+        liftSetter(flip(setAllowMissingColumnNames, allow))
 
 
-    pub def setAutoFlush(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setAutoFlush!(allow: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setAutoFlush(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setAutoFlush, allow))
+        liftSetter(flip(setAutoFlush, allow))
 
-    pub def setCommentMarker(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setCommentMarker!(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setCommentMarker(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setCommentMarker, c))
+        liftSetter(flip(setCommentMarker, c))
 
-    pub def setDelimiter(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setDelimiter!(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setDelimiter(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setDelimiter, c))
+        liftSetter(flip(setDelimiter, c))
 
-    pub def setDelimiterString(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setDelimiterString!(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setDelimiter(String): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setDelimiter, s))
+        liftSetter(flip(setDelimiter, s))
 
-    pub def setEscape(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setEscape!(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setEscape(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setEscape, c))
+        liftSetter(flip(setEscape, c))
 
-    pub def setHeaderAuto(): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
-        liftJavaBuilderPrim(x -> 
+    pub def setHeaderAuto!(): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
+        liftSetter(x -> 
             import static flixspt.csvio.BuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder & r;
             setHeaderEmpty(x) as \ Write(r)
         )
 
-    pub def setHeaders(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
-        liftJavaBuilderPrim(x -> 
+    pub def setHeaders!(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
+        liftSetter(x -> 
             region r1 {
                 import static flixspt.csvio.BuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
                 let arrl = Interop/Collections/ArrayList.fromList(r1, l);
@@ -203,8 +164,8 @@ namespace CsvIO/CsvFormatBuilder {
         )
 
 
-    pub def setHeaderComments(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
-        liftJavaBuilderPrim(x -> 
+    pub def setHeaderComments!(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+        liftSetter(x -> 
             region r1 {        
                 import static flixspt.csvio.BuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
                 let arrl = Interop/Collections/ArrayList.fromList(r1, l);
@@ -213,51 +174,51 @@ namespace CsvIO/CsvFormatBuilder {
         )
 
     
-    pub def setIgnoreEmptyLines(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setIgnoreEmptyLines!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreEmptyLines(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setIgnoreEmptyLines, b))
+        liftSetter(flip(setIgnoreEmptyLines, b))
 
-    pub def setIgnoreHeaderCase(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setIgnoreHeaderCase!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreHeaderCase(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setIgnoreHeaderCase, b))
+        liftSetter(flip(setIgnoreHeaderCase, b))
 
-    pub def setIgnoreSurroundingSpaces(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setIgnoreSurroundingSpaces!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreSurroundingSpaces(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setIgnoreSurroundingSpaces, b))   
+        liftSetter(flip(setIgnoreSurroundingSpaces, b))   
 
-    pub def setNullString(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setNullString!(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setNullString(String): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setNullString, s))  
+        liftSetter(flip(setNullString, s))  
 
-    pub def setQuote(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setQuote!(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setQuote(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setQuote, c))
+        liftSetter(flip(setQuote, c))
 
     /// setQuoteMode        
-    pub def setQuoteMode(m: QuoteMode): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setQuoteMode!(m: QuoteMode): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setQuoteMode(##org.apache.commons.csv.QuoteMode): ##org.apache.commons.csv.CSVFormat$Builder & r;
         let m1 = CsvIO/CsvFormat.marshalQuoteMode(m);
-        liftJavaBuilderPrim(flip(setQuoteMode, m1))
+        liftSetter(flip(setQuoteMode, m1))
 
 
-    pub def setRecordSeparator(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setRecordSeparator!(c: Char): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(Char): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setRecordSeparator, c))
+        liftSetter(flip(setRecordSeparator, c))
 
-    pub def setRecordSeparatorString(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setRecordSeparatorString!(s: String): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(String): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setRecordSeparator, s))
+        liftSetter(flip(setRecordSeparator, s))
 
-    pub def setSkipHeaderRecord(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setSkipHeaderRecord!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setSkipHeaderRecord(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setSkipHeaderRecord, b))  
+        liftSetter(flip(setSkipHeaderRecord, b))  
 
-    pub def setTrailingDelimiter(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setTrailingDelimiter!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setTrailingDelimiter(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setTrailingDelimiter, b))  
+        liftSetter(flip(setTrailingDelimiter, b))  
 
-    pub def setTrim(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
+    pub def setTrim!(b: Bool): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setTrim(Bool): ##org.apache.commons.csv.CSVFormat$Builder & r;
-        liftJavaBuilderPrim(flip(setTrim, b))  
+        liftSetter(flip(setTrim, b))  
 
 }

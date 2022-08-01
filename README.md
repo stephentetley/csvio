@@ -16,6 +16,8 @@ https://github.com/stephentetley/interop-charset-locale
 
 https://github.com/stephentetley/interop-collections
 
+https://github.com/stephentetley/monad-lib
+
 Apache Commons IO
 Apache Commons CSV
 
