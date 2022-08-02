@@ -23,7 +23,7 @@ namespace CsvIO/CsvReader {
     use Interop/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
-    use CsvIO.RowEvaluator;
+    use CsvIO.CsvRecordEvaluator;
     use CsvIO.CsvFormat.{CsvFormat};
 
     ///
@@ -56,13 +56,14 @@ namespace CsvIO/CsvReader {
     ///
     /// Returns a new Csv Handle (iterator x a "close" handle).
     ///
-    pub def newCsvReadHandle(format: CsvFormat,
+    pub def newCsvReadHandle(r: Region[r], 
+                            format: CsvFormat,
                             cs: Charset,
-                            eval: RowEvaluator[r, a], 
+                            eval: CsvRecordEvaluator[r, a, a], 
                             path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
         import static flixspt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.ReadIterator & Impure;
         import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
-        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & r;
+        import flixspt.csvio.ReadIterator.next(): ##org.apache.commons.csv.CSVRecord & r;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
@@ -72,7 +73,7 @@ namespace CsvIO/CsvReader {
             let iterNext = () -> {
                 try {
                     let row = next(primIter);
-                    CsvIO/RowEvaluator.runRowEvaluator(eval, row)
+                    CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
                 } catch {
                     case _: ##java.lang.Exception => Err("csvReadIter[next]")
                 }
@@ -88,12 +89,13 @@ namespace CsvIO/CsvReader {
     ///
     /// Returns a new Csv Handle (iterator x close handle).
     ///
-    pub def newCsvReadHandleWithBOM(format: CsvFormat,
-                                    eval: RowEvaluator[r, a], 
+    pub def newCsvReadHandleWithBOM(r: Region[r], 
+                                    format: CsvFormat,
+                                    eval: CsvRecordEvaluator[r, a, a], 
                                     path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
         import static flixspt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat): ##flixspt.csvio.ReadIterator & Impure;
         import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
-        import flixspt.csvio.ReadIterator.next(): ##flixspt.csvio.InputRow & r;
+        import flixspt.csvio.ReadIterator.next(): ##org.apache.commons.csv.CSVRecord & r;
         try {
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
@@ -102,7 +104,7 @@ namespace CsvIO/CsvReader {
             let iterNext = () -> {
                 try {
                     let row = next(primIter);
-                    CsvIO/RowEvaluator.runRowEvaluator(eval, row)
+                    CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
                 } catch {
                     case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
                 }
@@ -115,12 +117,13 @@ namespace CsvIO/CsvReader {
         }
 
 
-    pub def readCsv(format: CsvFormat,
+    pub def readCsv(r: Region[r], 
+                    format: CsvFormat,
                     charset: Charset,
-                    eval: RowEvaluator[r, a], 
+                    eval: CsvRecordEvaluator[r, a, a], 
                     path: FilePath): Result[List[a], String] & Impure =
         use Result.flatMap;
-        let* hdl    = newCsvReadHandle(format, charset, eval, path);
+        let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
         let* xs     = Iterator.toList(iter) |> Result.sequence;
         let* _      = close(hdl);

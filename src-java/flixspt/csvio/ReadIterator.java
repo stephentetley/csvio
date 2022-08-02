@@ -16,13 +16,14 @@
 
 package flixspt.csvio;
 
-import org.apache.commons.csv.*;
-import org.apache.commons.io.input.BOMInputStream;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Iterator;
+
+import org.apache.commons.csv.*;
+import org.apache.commons.io.input.BOMInputStream;
+
 
 public class ReadIterator {
 
@@ -98,9 +99,8 @@ public class ReadIterator {
         return csvIterator.hasNext();
     }
 
-    public InputRow next() throws Exception {
-        InputRow row = new InputRow(csvIterator.next());
-        return row;
+    public CSVRecord next() throws Exception {
+        return csvIterator.next();
     }
 
     // NOTE - explicit close
