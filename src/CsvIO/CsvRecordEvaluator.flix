@@ -170,147 +170,75 @@ namespace CsvIO/CsvRecordEvaluator {
         import org.apache.commons.csv.CSVRecord.getComment(): String & r;
         liftGetter(getComment) |> map(s -> if (Object.isNull(s)) "" else s)
 
+    pub def isConsistent(): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
+        import org.apache.commons.csv.CSVRecord.isConsistent(): Bool & r;
+        liftGetter(isConsistent)
+
+    pub def isMapped(label: String): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
+        import org.apache.commons.csv.CSVRecord.isMapped(String): Bool & r;
+        liftGetter(flip(isMapped, label))
+
+    pub def isSetAt(ix: Int32): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
+        import org.apache.commons.csv.CSVRecord.isSet(Int32): Bool & r;
+        liftGetter(flip(isSet, ix))        
+
+    pub def isSetNamed(label: String): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
+        import org.apache.commons.csv.CSVRecord.isSet(String): Bool & r;
+        liftGetter(flip(isSet, label))
+
+    // TODO - toList, toMap...
+
+    pub def parseAt(ix: Int32, parse: String -> Result[a, String] & ef , updErr : String -> String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
+        getStringAt(ix) >>= (parse >> liftResult) |> modifyError(updErr)
+
+    pub def parseNamed(label: String, parse: String -> Result[a, String] & ef , updErr : String -> String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
+        getStringNamed(label) >>= (parse >> liftResult) |> modifyError(updErr)
 
     pub def getInt8At(ix: Int32): CsvRecordEvaluator[r, ka, Int8] \ Read(r) =
-        getStringAt(ix) >>= (Int8.fromString >> liftResult) |> modifyError(msg -> "getInt8At('${ix}'): ${msg}")
+        parseAt(ix, Int8.fromString, msg -> "getInt8At('${ix}'): ${msg}")
 
     pub def getInt8Named(label: String): CsvRecordEvaluator[r, ka, Int8] \ Read(r) =
-        getStringNamed(label) >>= (Int8.fromString >> liftResult) |> modifyError(msg -> "getInt8Named('${label}'): ${msg}")
+        parseNamed(label, Int8.fromString, msg -> "getInt8Named('${label}'): ${msg}")
 
-/*
+    pub def getInt16At(ix: Int32): CsvRecordEvaluator[r, ka, Int16] \ Read(r) =
+        parseAt(ix, Int16.fromString, msg -> "getInt16At('${ix}'): ${msg}")
 
-    pub def getInt16At(ix: Int32): CsvRecordEvaluator[r, Int16] \ Read(r) =
-        import flixspt.csvio.InputRow.getShortAt(Int32): Int16 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getShortAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt16At(${ix})")
-            }
-        )
+    pub def getInt16Named(label: String): CsvRecordEvaluator[r, ka, Int16] \ Read(r) =
+        parseNamed(label, Int16.fromString, msg -> "getInt16Named('${label}'): ${msg}")
 
-    pub def getInt16Named(label: String): CsvRecordEvaluator[r, Int16] \ Read(r) =
-        import flixspt.csvio.InputRow.getShortNamed(String): Int16 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getShortNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt16Named('${label}')")
-            }
-        )
+    pub def getInt32At(ix: Int32): CsvRecordEvaluator[r, ka, Int32] \ Read(r) =
+        parseAt(ix, Int32.fromString, msg -> "getInt32At('${ix}'): ${msg}")
 
-    pub def getInt32At(ix: Int32): CsvRecordEvaluator[r, Int32] \ Read(r) =
-        import flixspt.csvio.InputRow.getIntAt(Int32): Int32 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getIntAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt32At(${ix})")
-            }
-        )
+    pub def getInt32Named(label: String): CsvRecordEvaluator[r, ka, Int32] \ Read(r) =
+        parseNamed(label, Int32.fromString, msg -> "getInt32Named('${label}'): ${msg}")
 
-    pub def getInt32Named(label: String): CsvRecordEvaluator[r, Int32] \ Read(r) =
-        import flixspt.csvio.InputRow.getIntNamed(String): Int32 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getIntNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt32Named('${label}')")
-            }
-        )
+    pub def getInt64At(ix: Int32): CsvRecordEvaluator[r, ka, Int64] \ Read(r) =
+        parseAt(ix, Int64.fromString, msg -> "getInt64At('${ix}'): ${msg}")
 
-    pub def getInt64At(ix: Int32): CsvRecordEvaluator[r, Int64] \ Read(r) =
-        import flixspt.csvio.InputRow.getLongAt(Int32): Int64 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getLongAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt64At(${ix})")
-            }
-        )
+    pub def getInt64Named(label: String): CsvRecordEvaluator[r, ka, Int64] \ Read(r) =
+        parseNamed(label, Int64.fromString, msg -> "getInt64Named('${label}'): ${msg}")
 
-    pub def getInt64Named(label: String): CsvRecordEvaluator[r, Int64] \ Read(r) =
-        import flixspt.csvio.InputRow.getLongNamed(String): Int64 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getLongNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getInt64Named('${label}')")
-            }
-        )
 
-    pub def getFloat32At(ix: Int32): CsvRecordEvaluator[r, Float32] \ Read(r) =
-        import flixspt.csvio.InputRow.getFloatAt(Int32): Float32 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getFloatAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getFloat32At(${ix})")
-            }
-        )
+    pub def getFloat32At(ix: Int32): CsvRecordEvaluator[r, ka, Float32] \ Read(r) =
+        parseAt(ix, Float32.fromString, msg -> "getFloat32At('${ix}'): ${msg}")
 
-    pub def getFloat32Named(label: String): CsvRecordEvaluator[r, Float32] \ Read(r) =
-        import flixspt.csvio.InputRow.getFloatNamed(String): Float32 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getFloatNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getFloat32Named('${label}')")
-            }
-        )
+    pub def getFloat32Named(label: String): CsvRecordEvaluator[r, ka, Float32] \ Read(r) =
+        parseNamed(label, Float32.fromString, msg -> "getFloat32Named('${label}'): ${msg}")
 
-    pub def getFloat64At(ix: Int32): CsvRecordEvaluator[r, Float64] \ Read(r) =
-        import flixspt.csvio.InputRow.getDoubleAt(Int32): Float64 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getDoubleAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getFloat64At(${ix})")
-            }
-        )
+    pub def getFloat64At(ix: Int32): CsvRecordEvaluator[r, ka, Float64] \ Read(r) =
+        parseAt(ix, Float64.fromString, msg -> "getFloat64At('${ix}'): ${msg}")
 
-    pub def getFloat64Named(label: String): CsvRecordEvaluator[r, Float64] \ Read(r) =
-        import flixspt.csvio.InputRow.getDoubleNamed(String): Float64 & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getDoubleNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getFloat64Named('${label}')")
-            }
-        )
+    pub def getFloat64Named(label: String): CsvRecordEvaluator[r, ka, Float64] \ Read(r) =
+        parseNamed(label, Float64.fromString, msg -> "getFloat64Named('${label}'): ${msg}")
 
-    pub def getBigIntAt(ix: Int32): CsvRecordEvaluator[r, BigInt] \ Read(r) =
-        import flixspt.csvio.InputRow.getBigIntegerAt(Int32): BigInt & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getBigIntegerAt(row, ix);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getBigIntAt(${ix})")
-            }
-        )
 
-    pub def getBigIntNamed(label: String): CsvRecordEvaluator[r, BigInt] \ Read(r) =
-        import flixspt.csvio.InputRow.getBigIntegerNamed(String): BigInt & r;
-        liftPrimRowReader(row -> 
-            try {
-                let a = getBigIntegerNamed(row, label);
-                Ok(a)
-            } catch {
-                case _: ##java.lang.Exception => Err("getBigIntNamed('${label}')")
-            }
-        )
-*/
+    pub def getBigIntAt(ix: Int32): CsvRecordEvaluator[r, ka, BigInt] \ Read(r) =
+        parseAt(ix, BigInt.fromString, msg -> "getBigIntAt('${ix}'): ${msg}")
+
+    pub def getBigIntNamed(label: String): CsvRecordEvaluator[r, ka, BigInt] \ Read(r) =
+        parseNamed(label, BigInt.fromString, msg -> "getBigIntNamed('${label}'): ${msg}")
+
+
 /*
     /// June 2022 - stubbed out due to regex changes...
 
@@ -336,37 +264,25 @@ namespace CsvIO/CsvRecordEvaluator {
 */
 
 
-/*
-    pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, Time.LocalDate] \ Read(r) =
-        let* input = getStringAt(ix);
-        let* ans = liftResult(Time/LocalDate.parse(formatter, input));
-        point(ans)
 
-    pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, Time.LocalDate] \ Read(r) =
-        let* input = getStringNamed(label);
-        let* ans = liftResult(Time/LocalDate.parse(formatter, input));
-        point(ans)
+    pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, ka, Time.LocalDate] \ Read(r) =
+        parseAt(ix, Time/LocalDate.parse(formatter), msg -> "getLocalDateAt('${ix}'): ${msg}") 
 
-    pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, Time.LocalDateTime] \ Read(r) =
-        let* input = getStringAt(ix);
-        let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
-        point(ans)
+    pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, ka, Time.LocalDate] \ Read(r) =
+        parseNamed(label, Time/LocalDate.parse(formatter), msg -> "getLocalDateNamed('${label}'): ${msg}")
 
-    pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, Time.LocalDateTime] \ Read(r) =
-        let* input = getStringNamed(label);
-        let* ans = liftResult(Time/LocalDateTime.parse(formatter, input));
-        point(ans)
 
-    pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, Time.LocalTime] \ Read(r) =
-        let* input = getStringAt(ix);
-        let* ans = liftResult(Time/LocalTime.parse(formatter, input));
-        point(ans)
+    pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalDateTime] \ Read(r) =
+        parseAt(ix, Time/LocalDateTime.parse(formatter), msg -> "getLocalDateTimeAt('${ix}'): ${msg}") 
 
-    pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, Time.LocalTime] \ Read(r) =
-        let* input = getStringNamed(label);
-        let* ans = liftResult(Time/LocalTime.parse(formatter, input));
-        point(ans)
+    pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalDateTime] \ Read(r) =
+        parseNamed(label, Time/LocalDateTime.parse(formatter), msg -> "getLocalDateTimeNamed('${label}'): ${msg}")
 
-*/
+
+    pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalTime] \ Read(r) =
+        parseAt(ix, Time/LocalTime.parse(formatter), msg -> "getLocalTimeAt('${ix}'): ${msg}") 
+
+    pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalTime] \ Read(r) =
+        parseNamed(label, Time/LocalTime.parse(formatter), msg -> "getLocalTimeNamed('${label}'): ${msg}")
 
 }
