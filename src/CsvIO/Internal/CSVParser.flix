@@ -29,13 +29,18 @@ namespace CsvIO/Internal/CSVParser {
     use CsvIO/Internal.CSVParser;
     use CsvIO/Internal.CSVParser.{CSVParser};
 
+    use Interop/IO.SubReader;
+
+
     pub def getCSVParser(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
         let CSVParser(p1) = p;
         p1
 
-    pub def newCSVParser(_: Region[r], reader: ##java.io.Reader, fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) = 
+    pub def newCSVParser[r: Region, t: Region -> Type](_: Region[r], 
+                                                        reader: t[r], 
+                                                        fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) with SubReader[t]= 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser & r as newCsvParser;
-        CSVParser(newCsvParser(reader, fmt))
+        CSVParser(newCsvParser(Interop/IO/Reader.getHH(Interop/IO/SubReader.ucast(reader)), fmt))
 
 
 

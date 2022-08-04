@@ -61,8 +61,8 @@ namespace CsvIO/CsvReader2 {
             let Charset(cs1) = cs;
             let file1   = toFile(path1);
             let* ins = Interop/IO/FileInputStream.newFileInputStream(r, file1);
-            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, Interop/IO/FileInputStream.getFileInputStream(ins) as ##java.io.InputStream, cs1);
-            let* parser = CsvIO/Internal/CSVFormat.parse(Interop/IO/InputStreamReader.getInputStreamReader(reader) as ##java.io.Reader, CSVFormat(fmt1));
+            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let* parser = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1 = CsvIO/Internal/CSVParser.iterator(parser);
             let iterDone = () -> Iterator.isEmpty(iter1);
             let iterNext = () -> {

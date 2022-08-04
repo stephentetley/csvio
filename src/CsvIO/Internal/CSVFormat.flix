@@ -31,15 +31,18 @@ namespace CsvIO/Internal/CSVFormat {
     use CsvIO/Internal.CSVParser;
     use CsvIO/Internal.CSVParser.{CSVParser};
 
+    use Interop/IO.SubReader;
+
     pub def getCSVFormat(p: CSVFormat[r]): ##org.apache.commons.csv.CSVFormat = 
         let CSVFormat(p1) = p;
         p1
 
-    pub def parse(rd: ##java.io.Reader, fmt: CSVFormat[r]): Result[CSVParser[r], String] \ Write(r) = 
+    pub def parse[r: Region, t: Region -> Type](rd: t[r], fmt: CSVFormat[r]): Result[CSVParser[r], String] \ Write(r) with SubReader[t]= 
         try {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser & r;
             let CSVFormat(fmt1) = fmt;
-            CSVParser(parse(fmt1, rd)) |> Ok
+            let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.ucast(rd));
+            CSVParser(parse(fmt1, rd1)) |> Ok
         } catch {
             case ex: ##java.io.IOException =>
                 import java.lang.Throwable.getMessage(): String & r;

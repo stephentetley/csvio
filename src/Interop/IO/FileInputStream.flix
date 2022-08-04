@@ -16,12 +16,26 @@
 
 namespace Interop/IO {
 
+    use Interop/IO.InputStream;
+    use Interop/IO.InputStream.{InputStream};
 
     pub enum FileInputStream[_: Region](##java.io.FileInputStream)
 
     instance Scoped[FileInputStream] {
         pub def regionOf(_: FileInputStream[r]): Region[r] = () as Region[r]
     }
+
+
+    instance Interop/IO.SubInputStream[FileInputStream] {
+        pub def ucast(s: FileInputStream[r]): InputStream[r] = 
+            let FileInputStream(s1) = s;
+            InputStream(s1 as ##java.io.InputStream)
+
+        pub def dcast(s: InputStream[r]): FileInputStream[r] = 
+            let InputStream(s1) = s;
+            FileInputStream(s1 as ##java.io.FileInputStream) 
+    }
+
 
 }
 
@@ -43,19 +57,5 @@ namespace Interop/IO/FileInputStream {
                 import java.lang.Throwable.getMessage(): String & r;
                 Err(getMessage(ex))
         }
-
-
-    /// pub def close(p: CSVParser[r]): Unit \ Write(r) = 
-    ///     import org.apache.commons.csv.CSVParser.close(): Unit & r;
-    ///     let CSVParser(p1) = p;
-    ///     close(p1)
-
-    /// pub def iterator(p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r] \ Read(r) = 
-    ///     import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator & r;
-    ///     let CSVParser(p1) = p;
-    ///     let r1 = Scoped.regionOf(p);
-    ///     let rawIter = Interop/Collections/RawIterator.new(r1, iterator(p1));
-    ///     Interop/Collections/RawIterator.iteratorWith(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
-
 
 }

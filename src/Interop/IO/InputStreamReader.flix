@@ -16,12 +16,24 @@
 
 namespace Interop/IO {
 
+    use Interop/IO.Reader;
+    use Interop/IO.Reader.{Reader};
+
     pub enum InputStreamReader[_: Region](##java.io.InputStreamReader)
 
     instance Scoped[InputStreamReader] {
         pub def regionOf(_: InputStreamReader[r]): Region[r] = () as Region[r]
     }
 
+    instance Interop/IO.SubReader[InputStreamReader] {
+        pub def ucast(s: InputStreamReader[r]): Reader[r] = 
+            let InputStreamReader(s1) = s;
+            Reader(s1 as ##java.io.Reader)
+
+        pub def dcast(s: Reader[r]): InputStreamReader[r] = 
+            let Reader(s1) = s;
+            InputStreamReader(s1 as ##java.io.InputStreamReader) 
+    }
 
 }
 
@@ -30,27 +42,16 @@ namespace Interop/IO/InputStreamReader {
     use Interop/IO.InputStreamReader;
     use Interop/IO.InputStreamReader.{InputStreamReader};
 
-    pub def getInputStreamReader(rd: InputStreamReader[r]): ##java.io.InputStreamReader = 
+    use Interop/IO.SubInputStream;
+
+
+    pub def getHH(rd: InputStreamReader[r]): ##java.io.InputStreamReader = 
         let InputStreamReader(rd1) = rd;
         rd1
 
-    pub def newInputStreamReader(_: Region[r], ins: ##java.io.InputStream, cs: ##java.nio.charset.Charset): InputStreamReader[r] \ Write(r) = 
+    pub def newInputStreamReader[r: Region, stream: Region -> Type](_: Region[r], ins: stream[r], cs: ##java.nio.charset.Charset): InputStreamReader[r] \ Write(r) with SubInputStream[stream] = 
         import new java.io.InputStreamReader(##java.io.InputStream, ##java.nio.charset.Charset): ##java.io.InputStreamReader & r as newInputStreamReader;
-        InputStreamReader(newInputStreamReader(ins, cs))
-
-
-
-    /// pub def close(p: CSVParser[r]): Unit \ Write(r) = 
-    ///     import org.apache.commons.csv.CSVParser.close(): Unit & r;
-    ///     let CSVParser(p1) = p;
-    ///     close(p1)
-
-    /// pub def iterator(p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r] \ Read(r) = 
-    ///     import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator & r;
-    ///     let CSVParser(p1) = p;
-    ///     let r1 = Scoped.regionOf(p);
-    ///     let rawIter = Interop/Collections/RawIterator.new(r1, iterator(p1));
-    ///     Interop/Collections/RawIterator.iteratorWith(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
+        InputStreamReader(newInputStreamReader(Interop/IO/InputStream.getHH(Interop/IO/SubInputStream.ucast(ins)), cs))
 
 
 }

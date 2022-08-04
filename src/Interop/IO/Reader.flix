@@ -16,30 +16,31 @@
 
 namespace Interop/IO {
 
-
     /// Abstract class...
-    pub enum InputStream[_: Region](##java.io.InputStream)
 
-    instance Scoped[InputStream] {
-        pub def regionOf(_: InputStream[r]): Region[r] = () as Region[r]
+    pub enum Reader[_: Region](##java.io.Reader)
+
+    instance Scoped[Reader] {
+        pub def regionOf(_: Reader[r]): Region[r] = () as Region[r]
     }
 
-    pub class SubInputStream[t: Region -> Type] {
-        pub def ucast[r: Region](s: t[r]): InputStream[r]
-        pub def dcast[r: Region](s: InputStream[r]): t[r]
+    pub class SubReader[t: Region -> Type] {
+        pub def ucast[r: Region](s: t[r]): Reader[r]
+        pub def dcast[r: Region](s: Reader[r]): t[r]
     }
-
 
 }
 
-namespace Interop/IO/InputStream {
+namespace Interop/IO/Reader {
 
-    use Interop/IO.InputStream;
-    use Interop/IO.InputStream.{InputStream};
+    use Interop/IO.Reader;
+    use Interop/IO.Reader.{Reader};
 
-    pub def getHH(ins: InputStream[r]): ##java.io.InputStream = 
-        let InputStream(ins1) = ins;
-        ins1
+
+
+    pub def getHH(rd: Reader[r]): ##java.io.Reader = 
+        let Reader(rd1) = rd;
+        rd1
 
 
 
