@@ -34,7 +34,8 @@ namespace CsvIO/CsvReader {
 
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
-
+    /// 
+    /// TODO... move to (CsvIO/Internal/CSVParser[r], Iterator[Result[a, String], r])
     pub enum CsvReadHandle[r: Region, a: Type]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String], r]))
 
     pub def close(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 

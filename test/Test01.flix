@@ -22,6 +22,24 @@ namespace Test01 {
 
 
     @test
+    def test01b(): Result[Unit, String] & Impure = 
+        use Result.flatMap;
+        use CsvIO/CsvRecordEvaluator.{getStringNamed};
+        use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
+        use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
+        region r1 {
+            let path    = Interop/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
+            let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
+            let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true));
+            let* hdl    = CsvIO/CsvReader2.newCsvReadHandle(r1, fmt, Interop/Text/Charset.utf_8(), eval, path);
+            let iter    = CsvIO/CsvReader2.getIterator(hdl);
+            let _       = Iterator.foreach(ans -> println("test01b: ${ans}"), iter);
+            let* _      = CsvIO/CsvReader2.close(hdl);
+            Ok()
+        }
+
+
+    @test
     def test02(): Result[Unit, String] & Impure = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
