@@ -10,6 +10,10 @@ https://github.com/stephentetley/flix-regex
 
 https://github.com/stephentetley/flix-time
 
+https://github.com/stephentetley/interop-commons-io-bom
+
+https://github.com/stephentetley/interop-io-stream
+
 https://github.com/stephentetley/interop-filepath
 
 https://github.com/stephentetley/interop-charset-locale

@@ -33,7 +33,7 @@ namespace CsvIO/Internal/CSVFormat {
 
     use Interop/IO.SubReader;
 
-    pub def getCSVFormat(p: CSVFormat[r]): ##org.apache.commons.csv.CSVFormat = 
+    pub def getHH(p: CSVFormat[r]): ##org.apache.commons.csv.CSVFormat = 
         let CSVFormat(p1) = p;
         p1
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stephen Tetley
+ * Copyright 2022 Stephen Tetley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,32 +25,23 @@ namespace CsvIO/CsvReader {
     use CsvIO.CsvFormat;
     use CsvIO.CsvRecordEvaluator;
     use CsvIO.CsvFormat.{CsvFormat};
+    use CsvIO/Internal.CSVFormat.{CSVFormat};
 
-    ///
-    /// Represents a CSV row.
-    ///
-    type alias CsvRow = ##flixspt.csvio.InputRow
 
 
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
     /// 
-    /// TODO... move to (CsvIO/Internal/CSVParser[r], Iterator[Result[a, String], r])
-    pub enum CsvReadHandle[r: Region, a: Type]((##flixspt.csvio.ReadIterator, Iterator[Result[a, String], r]))
-
-    pub def close(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
-        import flixspt.csvio.ReadIterator.close(): Unit & r;
-        let CsvReadHandle((x1, _)) = handle;
-        try {
-            close(x1);
-            Ok()
-        } catch {
-            case _: ##java.lang.Exception => Err("close")
-        }
+    pub enum CsvReadHandle[r: Region, a: Type]((CsvIO/Internal.CSVParser[r], Iterator[Result[a, String], r]))
 
     pub def getIterator(handle: CsvReadHandle[r, a]): Iterator[Result[a, String], r] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
+
+    pub def close(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
+        let CsvReadHandle((x1, _)) = handle;
+        CsvIO/Internal/CSVParser.close(x1)
+
 
 
 
@@ -61,60 +52,36 @@ namespace CsvIO/CsvReader {
                             format: CsvFormat,
                             cs: Charset,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
-        import static flixspt.csvio.ReadIterator.createIterForFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat, ##java.nio.charset.Charset): ##flixspt.csvio.ReadIterator & Impure;
-        import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
-        import flixspt.csvio.ReadIterator.next(): ##org.apache.commons.csv.CSVRecord & r;
+                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), IO } =
+        use Result.{flatMap};
         try {
+            import java.nio.file.Path.toFile(): ##java.io.File \ IO;
             let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
             let Charset(cs1) = cs;
-            let primIter = createIterForFile(path1, fmt1, cs1);
-            let iterDone = () -> if (hasNext(primIter)) false else true;
+            let file1   = toFile(path1);
+            let* ins = Interop/IO/FileInputStream.newFileInputStream(r, file1);
+            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let* parser = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1 = CsvIO/Internal/CSVParser.iterator(parser);
+            let iterDone = () -> Iterator.isEmpty(iter1);
             let iterNext = () -> {
                 try {
-                    let row = next(primIter);
-                    CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
-                } catch {
-                    case _: ##java.lang.Exception => Err("csvReadIter[next]")
-                }
-            };
-            let iter1 = Iterator(iterDone, iterNext);
-            let hdl = CsvReadHandle((primIter, iter1));
-            Ok(hdl)
-        } catch {
-            case _: ##java.lang.Exception => Err("newCsvReadHandle")            
-        }
-
-
-    ///
-    /// Returns a new Csv Handle (iterator x close handle).
-    ///
-    pub def newCsvReadHandleWithBOM(r: Region[r], 
-                                    format: CsvFormat,
-                                    eval: CsvRecordEvaluator[r, a, a], 
-                                    path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Impure } =
-        import static flixspt.csvio.ReadIterator.createIterForBOMFile(##java.nio.file.Path, ##org.apache.commons.csv.CSVFormat): ##flixspt.csvio.ReadIterator & Impure;
-        import flixspt.csvio.ReadIterator.hasNext(): Bool & r;
-        import flixspt.csvio.ReadIterator.next(): ##org.apache.commons.csv.CSVRecord & r;
-        try {
-            let FilePath(path1) = path;
-            let CsvFormat(fmt1) = format;
-            let primIter = createIterForBOMFile(path1, fmt1);
-            let iterDone = () -> if (hasNext(primIter)) false else true;
-            let iterNext = () -> {
-                try {
-                    let row = next(primIter);
-                    CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
+                    match Iterator.next(iter1) { 
+                        case None      => Err("Done")
+                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
+                    }
                 } catch {
                     case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
                 }
             };
-            let iter1 = Iterator(iterDone, iterNext);
-            let hdl = CsvReadHandle((primIter, iter1));
+            let iter2 = Iterator(iterDone, iterNext);
+            let hdl = CsvReadHandle((parser, iter2));
             Ok(hdl)
         } catch {
-            case _: ##java.lang.Exception => Err("newCsvReadHandleWithBOM")            
+            case ex: ##java.io.IOException =>
+                import java.lang.Throwable.getMessage(): String & r;
+                Err(getMessage(ex))           
         }
 
 
@@ -129,5 +96,47 @@ namespace CsvIO/CsvReader {
         let* xs     = Iterator.toList(iter) |> Result.sequence;
         let* _      = close(hdl);
         Ok(xs)
+
+
+    ///
+    /// Returns a new Csv Handle (iterator x a "close" handle).
+    ///
+    pub def newCsvReadHandleWithBOM(r: Region[r], 
+                            format: CsvFormat,
+                            eval: CsvRecordEvaluator[r, a, a], 
+                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), IO } =
+        use Result.{flatMap};
+        try {
+            import java.nio.file.Path.toFile(): ##java.io.File \ IO;
+            let FilePath(path1) = path;
+            let CsvFormat(fmt1) = format;
+            let file1   = toFile(path1);
+            let* ins = Interop/IO/FileInputStream.newFileInputStream(r, file1);
+            let bomIns = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
+            let csname = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
+            let csname1 = if (Object.isNull(csname)) "UTF-16" else csname; 
+            let* Charset(cs1) = Interop/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let* parser = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1 = CsvIO/Internal/CSVParser.iterator(parser);
+            let iterDone = () -> Iterator.isEmpty(iter1);
+            let iterNext = () -> {
+                try {
+                    match Iterator.next(iter1) { 
+                        case None      => Err("Done")
+                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
+                    }
+                } catch {
+                    case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
+                }
+            };
+            let iter2 = Iterator(iterDone, iterNext);
+            let hdl = CsvReadHandle((parser, iter2));
+            Ok(hdl)
+        } catch {
+            case ex: ##java.io.IOException =>
+                import java.lang.Throwable.getMessage(): String & r;
+                Err(getMessage(ex))           
+        }
 
 }

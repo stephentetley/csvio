@@ -32,7 +32,7 @@ namespace CsvIO/Internal/CSVParser {
     use Interop/IO.SubReader;
 
 
-    pub def getCSVParser(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
+    pub def getHH(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
         let CSVParser(p1) = p;
         p1
 
