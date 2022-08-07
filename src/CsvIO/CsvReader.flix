@@ -52,7 +52,7 @@ namespace CsvIO/CsvReader {
                             format: CsvFormat,
                             cs: Charset,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), IO } =
+                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             import java.nio.file.Path.toFile(): ##java.io.File \ IO;
@@ -89,7 +89,7 @@ namespace CsvIO/CsvReader {
                     format: CsvFormat,
                     charset: Charset,
                     eval: CsvRecordEvaluator[r, a, a], 
-                    path: FilePath): Result[List[a], String] & Impure =
+                    path: FilePath): Result[List[a], String]  \ { Read(r), Write(r), IO } =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
@@ -104,7 +104,7 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandleWithBOM(r: Region[r], 
                             format: CsvFormat,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), IO } =
+                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             import java.nio.file.Path.toFile(): ##java.io.File \ IO;

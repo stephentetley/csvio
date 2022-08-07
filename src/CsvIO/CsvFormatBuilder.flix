@@ -150,14 +150,14 @@ namespace CsvIO/CsvFormatBuilder {
 
     pub def setHeaderAuto!(): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
         liftSetter(x -> 
-            import static flixspt.csvio.BuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder & r;
+            import static flixspt.csvio.FormatBuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder & r;
             setHeaderEmpty(x) as \ Write(r)
         )
 
     pub def setHeaders!(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) =
         liftSetter(x -> 
             region r1 {
-                import static flixspt.csvio.BuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
+                import static flixspt.csvio.FormatBuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
                 let arrl = Interop/Collections/ArrayList.fromList(r1, l);
                 setHeader(x, Interop/Collections/ArrayList.getArrayList(arrl))
             } as \ Write(r)
@@ -167,7 +167,7 @@ namespace CsvIO/CsvFormatBuilder {
     pub def setHeaderComments!(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
         liftSetter(x -> 
             region r1 {        
-                import static flixspt.csvio.BuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
+                import static flixspt.csvio.FormatBuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
                 let arrl = Interop/Collections/ArrayList.fromList(r1, l);
                 setHeaderComments(x, Interop/Collections/ArrayList.getArrayList(arrl))
             } as \ Write(r)

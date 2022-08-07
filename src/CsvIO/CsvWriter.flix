@@ -18,12 +18,14 @@
 namespace CsvIO/CsvWriter {
     
     use Interop/System.FilePath;
+    use Interop/System.FilePath.{FilePath};
     use Interop/Text.Charset;
+    use Interop/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
     use CsvIO.RowSetter;
-    use CsvIO/Internal.OutputHandle;
+    use CsvIO/Internal.CSVFormat.{CSVFormat};
 
 
     ///
@@ -34,30 +36,36 @@ namespace CsvIO/CsvWriter {
                         cs: Charset,
                         path: FilePath,
                         makeRow: a -> List[String] & ef,
-                        rows: List[a]): Result[Unit, String] & Impure =
+                        rows: List[a]): Result[Unit, String] \ {IO} =
         use Result.flatMap;
         region r1 {
+            import java.nio.file.Path.toFile(): ##java.io.File & Pure;    
             let CsvFormat(format1) = format;
-            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandle(r1, format1, cs, path);
-            let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
-            let* _      = CsvIO/Internal/OutputHandle.close!(handle);
+            let FilePath(path1) = path;
+            let file1       = toFile(path1);
+            let Charset(cs1) = cs;
+            let* fos        = Interop/IO/FileOutputStream.newFileOutputStream(r1, file1);
+            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs1);
+            let* printer    = CsvIO/Internal/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
+            let* _          = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/CSVPrinter.printRecord!(cells, printer)}, rows);
+            let* _          = CsvIO/Internal/CSVPrinter.close!(printer);
             Ok()
         }
 
 
-    pub def outputCsvWithBOM(format: CsvFormat,
-                        cs: Charset,
-                        path: FilePath,
-                        makeRow: a -> List[String] & ef,
-                        rows: List[a]): Result[Unit, String] & Impure =
-        use Result.flatMap;
-        let CsvFormat(format1) = format;
-        region r1 {
-            let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
-            let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
-            let* _      = CsvIO/Internal/OutputHandle.close!(handle);
-            Ok()
-        }
+    /// pub def outputCsvWithBOM(format: CsvFormat,
+    ///                     cs: Charset,
+    ///                     path: FilePath,
+    ///                     makeRow: a -> List[String] & ef,
+    ///                     rows: List[a]): Result[Unit, String] & Impure =
+    ///     use Result.flatMap;
+    ///     let CsvFormat(format1) = format;
+    ///     region r1 {
+    ///         let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
+    ///         let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
+    ///         let* _      = CsvIO/Internal/OutputHandle.close!(handle);
+    ///         Ok()
+    ///     }
 
 
 

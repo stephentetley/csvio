@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stephen Tetley
+ * Copyright 2022 Stephen Tetley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package flixspt.csvio;
 import java.util.ArrayList;
 import org.apache.commons.csv.CSVFormat;
 
-public class BuilderVarargs {
+public class FormatBuilderVarargs {
 
     public static CSVFormat.Builder setHeaderEmpty(CSVFormat.Builder builder) throws Exception {
         String[] arr = new String[0];
