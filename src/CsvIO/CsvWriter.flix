@@ -17,8 +17,8 @@
 
 namespace CsvIO/CsvWriter {
     
-    use Interop/System.FilePath;
-    use Interop/System.FilePath.{FilePath};
+    use Basis/System.FilePath;
+    use Basis/System.FilePath.{FilePath};
     use Interop/Text.Charset;
     use Interop/Text.Charset.{Charset};
 
@@ -39,12 +39,10 @@ namespace CsvIO/CsvWriter {
                         rows: List[a]): Result[Unit, String] \ {IO} =
         use Result.flatMap;
         region r1 {
-            import java.nio.file.Path.toFile(): ##java.io.File & Pure;    
-            let CsvFormat(format1) = format;
-            let FilePath(path1) = path;
-            let file1       = toFile(path1);
+            let CsvFormat(format1) = format;            
             let Charset(cs1) = cs;
-            let* fos        = Interop/IO/FileOutputStream.newFileOutputStream(r1, file1);
+            let file1       = Basis/System/FilePath.toFile(r1, path);
+            let* fos        = Interop/IO/FileOutputStream.newFileOutputStream(file1);
             let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs1);
             let* printer    = CsvIO/Internal/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
             let* _          = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/CSVPrinter.printRecord!(cells, printer)}, rows);

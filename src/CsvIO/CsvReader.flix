@@ -17,8 +17,8 @@
 
 namespace CsvIO/CsvReader {
     
-    use Interop/System.FilePath;
-    use Interop/System.FilePath.{FilePath};
+    use Basis/System.FilePath;
+    use Basis/System.FilePath.{FilePath};
     use Interop/Text.Charset;
     use Interop/Text.Charset.{Charset};
 
@@ -55,17 +55,15 @@ namespace CsvIO/CsvReader {
                             path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
-            import java.nio.file.Path.toFile(): ##java.io.File \ IO;
-            let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
             let Charset(cs1) = cs;
-            let file1   = toFile(path1);
-            let* ins = Interop/IO/FileInputStream.newFileInputStream(r, file1);
-            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
-            let* parser = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
-            let iter1 = CsvIO/Internal/CSVParser.iterator(parser);
-            let iterDone = () -> Iterator.isEmpty(iter1);
-            let iterNext = () -> {
+            let file1       = Basis/System/FilePath.toFile(r, path);
+            let* ins        = Interop/IO/FileInputStream.newFileInputStream(file1);
+            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1       = CsvIO/Internal/CSVParser.iterator(parser);
+            let iterDone    = () -> Iterator.isEmpty(iter1);
+            let iterNext    = () -> {
                 try {
                     match Iterator.next(iter1) { 
                         case None      => Err("Done")
@@ -75,8 +73,8 @@ namespace CsvIO/CsvReader {
                     case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
                 }
             };
-            let iter2 = Iterator(iterDone, iterNext);
-            let hdl = CsvReadHandle((parser, iter2));
+            let iter2       = Iterator(iterDone, iterNext);
+            let hdl         = CsvReadHandle((parser, iter2));
             Ok(hdl)
         } catch {
             case ex: ##java.io.IOException =>
@@ -107,20 +105,18 @@ namespace CsvIO/CsvReader {
                             path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
-            import java.nio.file.Path.toFile(): ##java.io.File \ IO;
-            let FilePath(path1) = path;
             let CsvFormat(fmt1) = format;
-            let file1   = toFile(path1);
-            let* ins = Interop/IO/FileInputStream.newFileInputStream(r, file1);
-            let bomIns = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
-            let csname = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
-            let csname1 = if (Object.isNull(csname)) "UTF-16" else csname; 
+            let file1       = Basis/System/FilePath.toFile(r, path);
+            let* ins        = Interop/IO/FileInputStream.newFileInputStream(file1);
+            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
+            let csname      = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
+            let csname1     = if (Object.isNull(csname)) "UTF-16" else csname; 
             let* Charset(cs1) = Interop/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
-            let reader = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
-            let* parser = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
-            let iter1 = CsvIO/Internal/CSVParser.iterator(parser);
-            let iterDone = () -> Iterator.isEmpty(iter1);
-            let iterNext = () -> {
+            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1       = CsvIO/Internal/CSVParser.iterator(parser);
+            let iterDone    = () -> Iterator.isEmpty(iter1);
+            let iterNext    = () -> {
                 try {
                     match Iterator.next(iter1) { 
                         case None      => Err("Done")
@@ -130,8 +126,8 @@ namespace CsvIO/CsvReader {
                     case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
                 }
             };
-            let iter2 = Iterator(iterDone, iterNext);
-            let hdl = CsvReadHandle((parser, iter2));
+            let iter2       = Iterator(iterDone, iterNext);
+            let hdl         = CsvReadHandle((parser, iter2));
             Ok(hdl)
         } catch {
             case ex: ##java.io.IOException =>
