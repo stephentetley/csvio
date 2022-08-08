@@ -12,13 +12,13 @@ https://github.com/stephentetley/flix-time
 
 https://github.com/stephentetley/interop-commons-io-bom
 
-https://github.com/stephentetley/interop-io-stream
-
-https://github.com/stephentetley/interop-filepath
+https://github.com/stephentetley/basis-filepath
 
 https://github.com/stephentetley/interop-charset-locale
 
 https://github.com/stephentetley/interop-collections
+
+https://github.com/stephentetley/interop-base
 
 https://github.com/stephentetley/monad-lib
 
