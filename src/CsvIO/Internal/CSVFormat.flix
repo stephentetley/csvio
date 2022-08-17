@@ -41,7 +41,7 @@ namespace CsvIO/Internal/CSVFormat {
         try {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser & r;
             let CSVFormat(fmt1) = fmt;
-            let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.ucast(rd));
+            let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(rd));
             CSVParser(parse(fmt1, rd1)) |> Ok
         } catch {
             case ex: ##java.io.IOException =>

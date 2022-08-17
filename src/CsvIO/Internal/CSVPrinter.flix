@@ -44,7 +44,7 @@ namespace CsvIO/Internal/CSVPrinter {
                                                         fmt: CSVFormat[r1]): Result[CSVPrinter[r2], String] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
         try {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter & r2 as newCSVPrinter;
-            let ws1 = Interop/Lang/ImpAppendable.ucast(ws) |> Interop/Lang/Appendable.getHH;
+            let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
             let fmt1 = CsvIO/Internal/CSVFormat.getHH(fmt);        
             CSVPrinter(newCSVPrinter(ws1, fmt1)) as \ {Read(r1), Write(r2)} |> Ok 
         } catch {
@@ -73,8 +73,8 @@ namespace CsvIO/Internal/CSVPrinter {
             import static flixspt.csvio.PrinterVarargs.printRecordOfStrings(##org.apache.commons.csv.CSVPrinter, ##java.util.ArrayList): Unit & r;
             let CSVPrinter(p1) = p;
             let r1 = Scoped.regionOf(p);
-            let arrl = Interop/Collections/ArrayList.fromList(r1, l);
-            printRecordOfStrings(p1, Interop/Collections/ArrayList.getArrayList(arrl));
+            let arrl = Interop/Util/ArrayList.fromList(r1, l);
+            printRecordOfStrings(p1, Interop/Util/ArrayList.getHH(arrl));
             Ok()
         } catch {
             case ex: ##java.io.IOException =>

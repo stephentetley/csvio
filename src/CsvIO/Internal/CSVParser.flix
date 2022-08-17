@@ -40,7 +40,7 @@ namespace CsvIO/Internal/CSVParser {
                                                         reader: t[r], 
                                                         fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) with SubReader[t]= 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser & r as newCsvParser;
-        CSVParser(newCsvParser(Interop/IO/Reader.getHH(Interop/IO/SubReader.ucast(reader)), fmt))
+        CSVParser(newCsvParser(Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(reader)), fmt))
 
 
 
@@ -59,8 +59,8 @@ namespace CsvIO/Internal/CSVParser {
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator & r;
         let CSVParser(p1) = p;
         let r1 = Scoped.regionOf(p);
-        let rawIter = Interop/Collections/RawIterator.new(r1, iterator(p1));
-        Interop/Collections/RawIterator.iteratorWith(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
+        let rawIter = Interop/Util/IteratorZ.mkIteratorZ(r1, iterator(p1));
+        Interop/Util/IteratorZ.iteratorWith(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
 
 
 }

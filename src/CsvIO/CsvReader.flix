@@ -19,8 +19,8 @@ namespace CsvIO/CsvReader {
     
     use Basis/System.FilePath;
     use Basis/System.FilePath.{FilePath};
-    use Interop/Text.Charset;
-    use Interop/Text.Charset.{Charset};
+    use Basis/Text.Charset;
+    use Basis/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvRecordEvaluator;
@@ -57,8 +57,8 @@ namespace CsvIO/CsvReader {
         try {
             let CsvFormat(fmt1) = format;
             let Charset(cs1) = cs;
-            let file1       = Basis/System/FilePath.toFile(r, path);
-            let* ins        = Interop/IO/FileInputStream.newFileInputStream(file1);
+            let* file1      = Basis/System/FilePath.toFile(r, path);
+            let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
             let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = CsvIO/Internal/CSVParser.iterator(parser);
@@ -106,12 +106,12 @@ namespace CsvIO/CsvReader {
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;
-            let file1       = Basis/System/FilePath.toFile(r, path);
-            let* ins        = Interop/IO/FileInputStream.newFileInputStream(file1);
+            let* file1      = Basis/System/FilePath.toFile(r, path);
+            let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
             let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
             let csname      = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
             let csname1     = if (Object.isNull(csname)) "UTF-16" else csname; 
-            let* Charset(cs1) = Interop/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+            let* Charset(cs1) = Basis/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
             let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = CsvIO/Internal/CSVParser.iterator(parser);

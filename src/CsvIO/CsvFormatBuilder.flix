@@ -158,8 +158,8 @@ namespace CsvIO/CsvFormatBuilder {
         liftSetter(x -> 
             region r1 {
                 import static flixspt.csvio.FormatBuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
-                let arrl = Interop/Collections/ArrayList.fromList(r1, l);
-                setHeader(x, Interop/Collections/ArrayList.getArrayList(arrl))
+                let arrl = Interop/Util/ArrayList.fromList(r1, l);
+                setHeader(x, Interop/Util/ArrayList.getHH(arrl))
             } as \ Write(r)
         )
 
@@ -168,8 +168,8 @@ namespace CsvIO/CsvFormatBuilder {
         liftSetter(x -> 
             region r1 {        
                 import static flixspt.csvio.FormatBuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder & r1;
-                let arrl = Interop/Collections/ArrayList.fromList(r1, l);
-                setHeaderComments(x, Interop/Collections/ArrayList.getArrayList(arrl))
+                let arrl = Interop/Util/ArrayList.fromList(r1, l);
+                setHeaderComments(x, Interop/Util/ArrayList.getHH(arrl))
             } as \ Write(r)
         )
 
