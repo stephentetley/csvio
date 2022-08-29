@@ -59,8 +59,8 @@ namespace CsvIO/Internal/CSVParser {
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator & r;
         let CSVParser(p1) = p;
         let r1 = Scoped.regionOf(p);
-        let rawIter = Interop/Util/IteratorZ.mkIteratorZ(r1, iterator(p1));
-        Interop/Util/IteratorZ.iteratorWith(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
+        let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(r1);
+        Interop/Util/IteratorZ.toFlixIterator(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
 
 
 }

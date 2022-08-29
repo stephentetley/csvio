@@ -73,7 +73,7 @@ namespace CsvIO/Internal/CSVPrinter {
             import static flixspt.csvio.PrinterVarargs.printRecordOfStrings(##org.apache.commons.csv.CSVPrinter, ##java.util.ArrayList): Unit & r;
             let CSVPrinter(p1) = p;
             let r1 = Scoped.regionOf(p);
-            let arrl = Interop/Util/ArrayList.fromList(r1, l);
+            let arrl = Interop/Util/ArrayList.fromFoldable(r1, l);
             printRecordOfStrings(p1, Interop/Util/ArrayList.getHH(arrl));
             Ok()
         } catch {

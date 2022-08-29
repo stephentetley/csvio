@@ -1,0 +1,14 @@
+<project default="compile">
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="flixspt" destdir="build/classes">
+            <classpath>
+                <pathelement path="${classpath}"/>
+                <pathelement location="../lib/commons-io-2.11.0.jar"/>
+                <pathelement location="../lib/commons-csv-1.9.0.jar"/>
+            </classpath>        
+        </javac>
+        <jar destfile="build/csviojava-1.7.jar" basedir="build/classes"/>
+    </target>
+
+</project>
