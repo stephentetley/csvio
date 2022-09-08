@@ -46,7 +46,7 @@ namespace CsvIO/CsvReader {
 
 
     ///
-    /// Returns a new Csv Handle (iterator x a "close" handle).
+    /// Returns a new Csv Handle (iterator and a "close" handle).
     ///
     pub def newCsvReadHandle(r: Region[r], 
                             format: CsvFormat,
@@ -70,7 +70,7 @@ namespace CsvIO/CsvReader {
                         case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
                     }
                 } catch {
-                    case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
+                    case _: ##java.lang.Exception => Err("csvReadIter[next]")
                 }
             };
             let iter2       = Iterator(iterDone, iterNext);

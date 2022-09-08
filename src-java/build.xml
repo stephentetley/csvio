@@ -8,7 +8,7 @@
                 <pathelement location="../lib/commons-csv-1.9.0.jar"/>
             </classpath>        
         </javac>
-        <jar destfile="build/csviojava-1.7.jar" basedir="build/classes"/>
+        <jar destfile="build/csvio-java-1.7.jar" basedir="build/classes"/>
     </target>
 
 </project>
