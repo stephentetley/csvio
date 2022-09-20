@@ -67,7 +67,7 @@ namespace CsvIO/CsvReader {
                 try {
                     match Iterator.next(iter1) { 
                         case None      => Err("Done")
-                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
+                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row))
                     }
                 } catch {
                     case _: ##java.lang.Exception => Err("csvReadIter[next]")
@@ -120,7 +120,7 @@ namespace CsvIO/CsvReader {
                 try {
                     match Iterator.next(iter1) { 
                         case None      => Err("Done")
-                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, row)
+                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row))
                     }
                 } catch {
                     case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
