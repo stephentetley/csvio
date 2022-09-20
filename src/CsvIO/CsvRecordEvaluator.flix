@@ -22,7 +22,7 @@ namespace CsvIO {
     pub enum CsvRecordEvaluator[r: Region, ka: Type, a: Type](MonadLib.Evaluator[r, ka, ##org.apache.commons.csv.CSVRecord, a])
 
     instance Functor[CsvRecordEvaluator[r, ka]] {
-        pub def map(f: a -> b & ef, x: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+        pub def map(f: a -> b \ ef, x: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
             CsvIO/CsvRecordEvaluator.map(f, x)
     }
 
@@ -30,12 +30,12 @@ namespace CsvIO {
         pub def point(x: a): CsvRecordEvaluator[r, ka, a] = 
             CsvIO/CsvRecordEvaluator.point(x)
 
-        pub def ap(mf: CsvRecordEvaluator[r, ka, a -> b & ef], ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+        pub def ap(mf: CsvRecordEvaluator[r, ka, a -> b \ ef], ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
             CsvIO/CsvRecordEvaluator.ap(mf, ma)
     }
 
     instance Monad[CsvRecordEvaluator[r, ka]] {
-        pub def flatMap(k: a -> CsvRecordEvaluator[r, ka, b] & ef, x: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+        pub def flatMap(k: a -> CsvRecordEvaluator[r, ka, b] \ ef, x: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
             CsvIO/CsvRecordEvaluator.flatMap(k, x)
     }    
     
@@ -47,6 +47,18 @@ namespace CsvIO {
         pub def orelse(a: CsvRecordEvaluator[r, ka, a], b: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] =
             CsvIO/CsvRecordEvaluator.orelse(a, b)
     }
+
+    instance MonadLib.MonadError[CsvRecordEvaluator[r, ka]] {
+        pub def throwError(msg: String): CsvRecordEvaluator[r, ka, a] = 
+            CsvIO/CsvRecordEvaluator.throwError(msg)
+
+        pub def mapError(f: String -> String \ ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] \ ef =
+            CsvIO/CsvRecordEvaluator.mapError(f, ma)
+
+        pub def catchError(ma: CsvRecordEvaluator[r, ka, a], f: String -> CsvRecordEvaluator[r, ka, a] \ ef): CsvRecordEvaluator[r, ka, a] \ ef =
+            CsvIO/CsvRecordEvaluator.catchError(ma, f)
+    }
+
 }
 
 /// Note - the underlying library - Apache Commons Csv - supports both named 
@@ -75,20 +87,20 @@ namespace CsvIO/CsvRecordEvaluator {
         
     pub def runCsvRecordEvaluator(r: Region[r], 
                                 ma: CsvRecordEvaluator[r, a, a], 
-                                st: ##org.apache.commons.csv.CSVRecord): Result[a, String] & r =
+                                st: ##org.apache.commons.csv.CSVRecord): Result[a, String] \ r =
         MonadLib/Evaluator.runEvaluator(r, getCsvRecordEvaluator(ma), st)
 
 
     pub def point(x: a): CsvRecordEvaluator[r, ka, a] = CsvRecordEvaluator(MonadLib/Evaluator.point(x))
 
-    pub def map(f: a -> b & ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+    pub def map(f: a -> b \ ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
         CsvRecordEvaluator(MonadLib/Evaluator.map(f, getCsvRecordEvaluator(ma)))
 
-    pub def ap(mf: CsvRecordEvaluator[r, ka, a -> b & ef], ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+    pub def ap(mf: CsvRecordEvaluator[r, ka, a -> b \ ef], ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
         CsvRecordEvaluator(MonadLib/Evaluator.ap(getCsvRecordEvaluator(mf), getCsvRecordEvaluator(ma)))
 
 
-    pub def flatMap(f: a -> CsvRecordEvaluator[r, ka, b] & ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] & ef =
+    pub def flatMap(f: a -> CsvRecordEvaluator[r, ka, b] \ ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, b] \ ef =
         CsvRecordEvaluator(MonadLib/Evaluator.flatMap(f >> getCsvRecordEvaluator, getCsvRecordEvaluator(ma)))
 
 
@@ -96,24 +108,22 @@ namespace CsvIO/CsvRecordEvaluator {
     pub def throwError(msg: String): CsvRecordEvaluator[r, ka, a] = 
         CsvRecordEvaluator(MonadLib/Evaluator.throwError(msg))
 
-    pub def swapError(msg: String, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] = 
-        CsvRecordEvaluator(MonadLib/Evaluator.swapError(msg, getCsvRecordEvaluator(ma)))
+    pub def mapError(f: String -> String \ ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] \ ef = 
+        CsvRecordEvaluator(MonadLib/Evaluator.mapError(f, getCsvRecordEvaluator(ma)))
 
-    pub def modifyError(f: String -> String & ef, ma: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] & ef = 
-        CsvRecordEvaluator(MonadLib/Evaluator.modifyError(f, getCsvRecordEvaluator(ma)))
+    pub def catchError(ma: CsvRecordEvaluator[r, ka, a], f: String -> CsvRecordEvaluator[r, ka, a] \ ef): CsvRecordEvaluator[r, ka, a] \ ef =
+        CsvRecordEvaluator(MonadLib/Evaluator.catchError(getCsvRecordEvaluator(ma), f >> getCsvRecordEvaluator))
 
-    pub def empty(): CsvRecordEvaluator[r, ka, a] = CsvRecordEvaluator(MonadLib/Evaluator.empty())
+    pub def empty(): CsvRecordEvaluator[r, ka, a] = 
+        CsvRecordEvaluator(MonadLib/Evaluator.empty())
         
     pub def orelse(ma: CsvRecordEvaluator[r, ka, a], mb: CsvRecordEvaluator[r, ka, a]): CsvRecordEvaluator[r, ka, a] =
         CsvRecordEvaluator(MonadLib/Evaluator.orelse(getCsvRecordEvaluator(ma), getCsvRecordEvaluator(mb)))
 
-    def liftGetter(f: ##org.apache.commons.csv.CSVRecord -> a & ef): CsvRecordEvaluator[r, ka, a] & ef =
+    def liftGetter(f: ##org.apache.commons.csv.CSVRecord -> a \ ef): CsvRecordEvaluator[r, ka, a] \ ef =
         CsvRecordEvaluator(MonadLib/Evaluator.liftGetter(f))
 
-    pub def liftResult(x: Result[a, String]): CsvRecordEvaluator[r, ka, a] =  match x {
-        case Ok(x1)   => point(x1)
-        case Err(msg) => throwError(msg)
-    }
+
 
     /// pub def optional(x: CsvRecordEvaluator[r, a]): CsvRecordEvaluator[r, Option[a]] =
     ///     CsvRecordEvaluator(r ->
@@ -123,21 +133,16 @@ namespace CsvIO/CsvRecordEvaluator {
     ///         }
     ///     )
 
-    /// pub def liftOption(x: Option[a], errMsg: String): CsvRecordEvaluator[r, a] = match x {
-    ///     case Some(a) => point(a)
-    ///     case None => throwError(errMsg)
-    /// }
 
 
-
-    /// pub def liftOperation(fn: Unit -> Result[a, String] & ef): CsvRecordEvaluator[r, a] & ef =
-    ///     CsvRecordEvaluator(_ -> fn() as & r) as & ef
+    /// pub def liftOperation(fn: Unit -> Result[a, String] \ ef): CsvRecordEvaluator[r, a] \ ef =
+    ///     CsvRecordEvaluator(_ -> fn() as \ r) as \ ef
 
 
     /// pub def choice(xs: List[CsvRecordEvaluator[r, a]]): CsvRecordEvaluator[r, a] =
     ///     CsvRecordEvaluator(r -> choiceHelper(r, xs))
 
-    /// def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[CsvRecordEvaluator[r, a]]): Result[a, String] & r =
+    /// def choiceHelper(r: ##flixspt.csvio.InputRow, xs: List[CsvRecordEvaluator[r, a]]): Result[a, String] \ r =
     ///     match xs {
     ///         case Nil => Err("choice")
     ///         case x1 :: rs => match apply1(x1, r) {
@@ -149,7 +154,7 @@ namespace CsvIO/CsvRecordEvaluator {
     // Cell readers
 
     pub def getStringAt(ix: Int32): CsvRecordEvaluator[r, ka, String] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.get(Int32): String & r as get1;
+        import org.apache.commons.csv.CSVRecord.get(Int32): String \ r as get1;
         liftGetter(flip(get1, ix))
 
 
@@ -157,86 +162,89 @@ namespace CsvIO/CsvRecordEvaluator {
     /// Get a string by its column name / label.
     ///
     pub def getStringNamed(label: String): CsvRecordEvaluator[r, ka, String] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.get(String): String & r as get1;
-        liftGetter(flip(get1, label)) |> modifyError(msg -> "getStringNamed('${label}'): ${msg}")
+        import org.apache.commons.csv.CSVRecord.get(String): String \ r as get1;
+        liftGetter(flip(get1, label)) |> mapError(_ -> "getStringNamed('${label}'")
 
 
     pub def hasComment(): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.hasComment(): Bool & r;
+        import org.apache.commons.csv.CSVRecord.hasComment(): Bool \ r;
         liftGetter(hasComment)
 
 
     pub def getComment(): CsvRecordEvaluator[r, ka, String] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.getComment(): String & r;
+        import org.apache.commons.csv.CSVRecord.getComment(): String \ r;
         liftGetter(getComment) |> map(s -> if (Object.isNull(s)) "" else s)
 
     pub def isConsistent(): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isConsistent(): Bool & r;
+        import org.apache.commons.csv.CSVRecord.isConsistent(): Bool \ r;
         liftGetter(isConsistent)
 
     pub def isMapped(label: String): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isMapped(String): Bool & r;
+        import org.apache.commons.csv.CSVRecord.isMapped(String): Bool \ r;
         liftGetter(flip(isMapped, label))
 
     pub def isSetAt(ix: Int32): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isSet(Int32): Bool & r;
+        import org.apache.commons.csv.CSVRecord.isSet(Int32): Bool \ r;
         liftGetter(flip(isSet, ix))        
 
     pub def isSetNamed(label: String): CsvRecordEvaluator[r, ka, Bool] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isSet(String): Bool & r;
+        import org.apache.commons.csv.CSVRecord.isSet(String): Bool \ r;
         liftGetter(flip(isSet, label))
 
     // TODO - toList, toMap...
 
-    pub def parseAt(ix: Int32, parse: String -> Result[a, String] & ef , updErr : String -> String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
-        getStringAt(ix) >>= (parse >> liftResult) |> modifyError(updErr)
+    pub def parseAt(ix: Int32, parse: String -> Option[a] \ ef, msg: String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
+        let* s = getStringAt(ix);
+        MonadLib/MonadError.liftOption(msg, parse(s))
 
-    pub def parseNamed(label: String, parse: String -> Result[a, String] & ef , updErr : String -> String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
-        getStringNamed(label) >>= (parse >> liftResult) |> modifyError(updErr)
+    pub def parseNamed(label: String, parse: String -> Option[a] \ ef, msg: String): CsvRecordEvaluator[r, ka, a] \ { Read(r), ef } =
+        let* s = getStringNamed(label);
+        MonadLib/MonadError.liftOption(msg, parse(s))
+
 
     pub def getInt8At(ix: Int32): CsvRecordEvaluator[r, ka, Int8] \ Read(r) =
-        parseAt(ix, Int8.fromString, msg -> "getInt8At('${ix}'): ${msg}")
+        parseAt(ix, Int8.fromString, "getInt8At(${ix})")
 
     pub def getInt8Named(label: String): CsvRecordEvaluator[r, ka, Int8] \ Read(r) =
-        parseNamed(label, Int8.fromString, msg -> "getInt8Named('${label}'): ${msg}")
+        parseNamed(label, Int8.fromString, "getInt8Named('${label}'")
 
     pub def getInt16At(ix: Int32): CsvRecordEvaluator[r, ka, Int16] \ Read(r) =
-        parseAt(ix, Int16.fromString, msg -> "getInt16At('${ix}'): ${msg}")
+        parseAt(ix, Int16.fromString, "getInt16At('${ix}'")
 
     pub def getInt16Named(label: String): CsvRecordEvaluator[r, ka, Int16] \ Read(r) =
-        parseNamed(label, Int16.fromString, msg -> "getInt16Named('${label}'): ${msg}")
+        parseNamed(label, Int16.fromString, "getInt16Named('${label}'")
 
     pub def getInt32At(ix: Int32): CsvRecordEvaluator[r, ka, Int32] \ Read(r) =
-        parseAt(ix, Int32.fromString, msg -> "getInt32At('${ix}'): ${msg}")
+        parseAt(ix, Int32.fromString, "getInt32At('${ix}'")
 
     pub def getInt32Named(label: String): CsvRecordEvaluator[r, ka, Int32] \ Read(r) =
-        parseNamed(label, Int32.fromString, msg -> "getInt32Named('${label}'): ${msg}")
+        parseNamed(label, Int32.fromString, "getInt32Named('${label}'")
 
     pub def getInt64At(ix: Int32): CsvRecordEvaluator[r, ka, Int64] \ Read(r) =
-        parseAt(ix, Int64.fromString, msg -> "getInt64At('${ix}'): ${msg}")
+        parseAt(ix, Int64.fromString, "getInt64At('${ix}'")
 
     pub def getInt64Named(label: String): CsvRecordEvaluator[r, ka, Int64] \ Read(r) =
-        parseNamed(label, Int64.fromString, msg -> "getInt64Named('${label}'): ${msg}")
+        parseNamed(label, Int64.fromString, "getInt64Named('${label}'")
 
 
     pub def getFloat32At(ix: Int32): CsvRecordEvaluator[r, ka, Float32] \ Read(r) =
-        parseAt(ix, Float32.fromString, msg -> "getFloat32At('${ix}'): ${msg}")
+        parseAt(ix, Float32.fromString, "getFloat32At('${ix}'")
 
     pub def getFloat32Named(label: String): CsvRecordEvaluator[r, ka, Float32] \ Read(r) =
-        parseNamed(label, Float32.fromString, msg -> "getFloat32Named('${label}'): ${msg}")
+        parseNamed(label, Float32.fromString, "getFloat32Named('${label}'")
 
     pub def getFloat64At(ix: Int32): CsvRecordEvaluator[r, ka, Float64] \ Read(r) =
-        parseAt(ix, Float64.fromString, msg -> "getFloat64At('${ix}'): ${msg}")
+        parseAt(ix, Float64.fromString, "getFloat64At('${ix}'")
 
     pub def getFloat64Named(label: String): CsvRecordEvaluator[r, ka, Float64] \ Read(r) =
-        parseNamed(label, Float64.fromString, msg -> "getFloat64Named('${label}'): ${msg}")
+        parseNamed(label, Float64.fromString, "getFloat64Named('${label}'")
 
 
     pub def getBigIntAt(ix: Int32): CsvRecordEvaluator[r, ka, BigInt] \ Read(r) =
-        parseAt(ix, BigInt.fromString, msg -> "getBigIntAt('${ix}'): ${msg}")
+        parseAt(ix, BigInt.fromString, "getBigIntAt('${ix}'")
 
     pub def getBigIntNamed(label: String): CsvRecordEvaluator[r, ka, BigInt] \ Read(r) =
-        parseNamed(label, BigInt.fromString, msg -> "getBigIntNamed('${label}'): ${msg}")
+        parseNamed(label, BigInt.fromString, "getBigIntNamed('${label}'")
 
 
 /*
@@ -266,23 +274,23 @@ namespace CsvIO/CsvRecordEvaluator {
 
 
     pub def getLocalDateAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, ka, Time.LocalDate] \ Read(r) =
-        parseAt(ix, Time/LocalDate.parse(formatter), msg -> "getLocalDateAt('${ix}'): ${msg}") 
+        parseAt(ix, Time/LocalDate.parse(formatter) >> Result.toOption, "getLocalDateAt('${ix}'") 
 
     pub def getLocalDateNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateFormat]): CsvRecordEvaluator[r, ka, Time.LocalDate] \ Read(r) =
-        parseNamed(label, Time/LocalDate.parse(formatter), msg -> "getLocalDateNamed('${label}'): ${msg}")
+        parseNamed(label, Time/LocalDate.parse(formatter) >> Result.toOption, "getLocalDateNamed('${label}'")
 
 
     pub def getLocalDateTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalDateTime] \ Read(r) =
-        parseAt(ix, Time/LocalDateTime.parse(formatter), msg -> "getLocalDateTimeAt('${ix}'): ${msg}") 
+        parseAt(ix, Time/LocalDateTime.parse(formatter) >> Result.toOption, "getLocalDateTimeAt('${ix}'") 
 
     pub def getLocalDateTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.DateTimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalDateTime] \ Read(r) =
-        parseNamed(label, Time/LocalDateTime.parse(formatter), msg -> "getLocalDateTimeNamed('${label}'): ${msg}")
+        parseNamed(label, Time/LocalDateTime.parse(formatter) >> Result.toOption, "getLocalDateTimeNamed('${label}'")
 
 
     pub def getLocalTimeAt(ix: Int32, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalTime] \ Read(r) =
-        parseAt(ix, Time/LocalTime.parse(formatter), msg -> "getLocalTimeAt('${ix}'): ${msg}") 
+        parseAt(ix, Time/LocalTime.parse(formatter) >> Result.toOption, "getLocalTimeAt('${ix}'") 
 
     pub def getLocalTimeNamed(label: String, formatter: DateTimeFormatter[Time/Format.TimeFormat]): CsvRecordEvaluator[r, ka, Time.LocalTime] \ Read(r) =
-        parseNamed(label, Time/LocalTime.parse(formatter), msg -> "getLocalTimeNamed('${label}'): ${msg}")
+        parseNamed(label, Time/LocalTime.parse(formatter) >> Result.toOption, "getLocalTimeNamed('${label}'")
 
 }

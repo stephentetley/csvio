@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace CsvIO/Internal {
+namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVFormat[_: Region](##org.apache.commons.csv.CSVFormat)
 
@@ -24,12 +24,12 @@ namespace CsvIO/Internal {
 
 }
 
-namespace CsvIO/Internal/CSVFormat {
+namespace Interop/Apache/Commons/Csv/CSVFormat {
 
-    use CsvIO/Internal.CSVFormat;
-    use CsvIO/Internal.CSVFormat.{CSVFormat};
-    use CsvIO/Internal.CSVParser;
-    use CsvIO/Internal.CSVParser.{CSVParser};
+    use Interop/Apache/Commons/Csv.CSVFormat;
+    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+    use Interop/Apache/Commons/Csv.CSVParser;
+    use Interop/Apache/Commons/Csv.CSVParser.{CSVParser};
 
     use Interop/IO.SubReader;
 

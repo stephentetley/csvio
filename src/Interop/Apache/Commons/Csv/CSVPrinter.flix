@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-namespace CsvIO/Internal {
+namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVPrinter[_: Region](##org.apache.commons.csv.CSVPrinter)
 
     instance Scoped[CSVPrinter] {
         pub def regionOf(_: CSVPrinter[r]): Region[r] = () as Region[r]
     }
-
+    
 }
 
-namespace CsvIO/Internal/CSVPrinter {
+namespace Interop/Apache/Commons/Csv/CSVPrinter {
 
     use Interop/Lang.ImpAppendable;
 
-    use CsvIO/Internal.CSVPrinter;
-    use CsvIO/Internal.CSVPrinter.{CSVPrinter};
+    use Interop/Apache/Commons/Csv.CSVPrinter;
+    use Interop/Apache/Commons/Csv.CSVPrinter.{CSVPrinter};
     
-    use CsvIO/Internal.CSVFormat;
+    use Interop/Apache/Commons/Csv.CSVFormat;
     
 
 
@@ -40,12 +40,12 @@ namespace CsvIO/Internal/CSVPrinter {
         p1
 
 
-    pub def newCSVPrinter[r1: Region, r2: Region, t: Region -> Type](ws: t[r2], 
-                                                        fmt: CSVFormat[r1]): Result[CSVPrinter[r2], String] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
+    pub def newCSVPrinter[r1: Region, r2: Region, t: Region -> Type]
+                        (ws: t[r2], fmt: CSVFormat[r1]): Result[CSVPrinter[r2], String] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
         try {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter & r2 as newCSVPrinter;
             let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
-            let fmt1 = CsvIO/Internal/CSVFormat.getHH(fmt);        
+            let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);        
             CSVPrinter(newCSVPrinter(ws1, fmt1)) as \ {Read(r1), Write(r2)} |> Ok 
         } catch {
             case ex: ##java.io.IOException =>

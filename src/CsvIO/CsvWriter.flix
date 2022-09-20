@@ -25,7 +25,7 @@ namespace CsvIO/CsvWriter {
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
     use CsvIO.RowSetter;
-    use CsvIO/Internal.CSVFormat.{CSVFormat};
+    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
 
 
     ///
@@ -44,9 +44,9 @@ namespace CsvIO/CsvWriter {
             let* file1      = Basis/System/FilePath.toFile(r1, path);
             let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
             let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs1);
-            let* printer    = CsvIO/Internal/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
-            let* _          = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/CSVPrinter.printRecord!(cells, printer)}, rows);
-            let* _          = CsvIO/Internal/CSVPrinter.close!(printer);
+            let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
+            let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
+            let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);
             Ok()
         }
 
@@ -59,9 +59,9 @@ namespace CsvIO/CsvWriter {
     ///     use Result.flatMap;
     ///     let CsvFormat(format1) = format;
     ///     region r1 {
-    ///         let* handle = CsvIO/Internal/OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
-    ///         let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO/Internal/OutputHandle.writeRow!(cells, handle)}, rows);
-    ///         let* _      = CsvIO/Internal/OutputHandle.close!(handle);
+    ///         let* handle = Interop/Apache/Commons/Csv/OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
+    ///         let* _      = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/OutputHandle.writeRow!(cells, handle)}, rows);
+    ///         let* _      = Interop/Apache/Commons/Csv/OutputHandle.close!(handle);
     ///         Ok()
     ///     }
 

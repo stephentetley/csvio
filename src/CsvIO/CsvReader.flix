@@ -25,22 +25,22 @@ namespace CsvIO/CsvReader {
     use CsvIO.CsvFormat;
     use CsvIO.CsvRecordEvaluator;
     use CsvIO.CsvFormat.{CsvFormat};
-    use CsvIO/Internal.CSVFormat.{CSVFormat};
+    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
 
 
 
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
     /// 
-    pub enum CsvReadHandle[r: Region, a: Type]((CsvIO/Internal.CSVParser[r], Iterator[Result[a, String], r]))
+    pub enum CsvReadHandle[r: Region, a: Type]((Interop/Apache/Commons/Csv.CSVParser[r], Iterator[Result[a, String], r]))
 
     pub def getIterator(handle: CsvReadHandle[r, a]): Iterator[Result[a, String], r] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
 
-    pub def close(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
+    pub def close!(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
         let CsvReadHandle((x1, _)) = handle;
-        CsvIO/Internal/CSVParser.close(x1)
+        Interop/Apache/Commons/Csv/CSVParser.close!(x1)
 
 
 
@@ -60,8 +60,8 @@ namespace CsvIO/CsvReader {
             let* file1      = Basis/System/FilePath.toFile(r, path);
             let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
-            let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
-            let iter1       = CsvIO/Internal/CSVParser.iterator(parser);
+            let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
             let iterDone    = () -> Iterator.isEmpty(iter1);
             let iterNext    = () -> {
                 try {
@@ -92,7 +92,7 @@ namespace CsvIO/CsvReader {
         let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
         let* xs     = Iterator.toList(iter) |> Result.sequence;
-        let* _      = close(hdl);
+        let* _      = close!(hdl);
         Ok(xs)
 
 
@@ -113,8 +113,8 @@ namespace CsvIO/CsvReader {
             let csname1     = if (Object.isNull(csname)) "UTF-16" else csname; 
             let* Charset(cs1) = Basis/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
-            let* parser     = CsvIO/Internal/CSVFormat.parse(reader, CSVFormat(fmt1));
-            let iter1       = CsvIO/Internal/CSVParser.iterator(parser);
+            let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
+            let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
             let iterDone    = () -> Iterator.isEmpty(iter1);
             let iterNext    = () -> {
                 try {

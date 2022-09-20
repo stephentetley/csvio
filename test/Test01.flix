@@ -17,7 +17,7 @@ namespace Test01 {
             let* hdl    = CsvIO/CsvReader.newCsvReadHandle(r1, fmt, Basis/Text/Charset.utf_8(), eval, path);
             let iter    = CsvIO/CsvReader.getIterator(hdl);
             let _       = Iterator.foreach(ans -> println("test01: ${ans}"), iter);
-            let* _      = CsvIO/CsvReader.close(hdl);
+            let* _      = CsvIO/CsvReader.close!(hdl);
             Ok()
         }
     
@@ -34,7 +34,7 @@ namespace Test01 {
             let* hdl    = CsvIO/CsvReader.newCsvReadHandleWithBOM(r1, fmt, eval, path);
             let iter    = CsvIO/CsvReader.getIterator(hdl);
             let _       = Iterator.foreach(ans -> println("test02: ${ans}"), iter);
-            let* _      = CsvIO/CsvReader.close(hdl);
+            let* _      = CsvIO/CsvReader.close!(hdl);
             Ok()
         }
 

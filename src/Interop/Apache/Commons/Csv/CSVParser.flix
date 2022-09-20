@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace CsvIO/Internal {
+namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVParser[_: Region](##org.apache.commons.csv.CSVParser)
 
@@ -24,10 +24,10 @@ namespace CsvIO/Internal {
 
 }
 
-namespace CsvIO/Internal/CSVParser {
+namespace Interop/Apache/Commons/Csv/CSVParser {
 
-    use CsvIO/Internal.CSVParser;
-    use CsvIO/Internal.CSVParser.{CSVParser};
+    use Interop/Apache/Commons/Csv.CSVParser;
+    use Interop/Apache/Commons/Csv.CSVParser.{CSVParser};
 
     use Interop/IO.SubReader;
 
@@ -39,24 +39,24 @@ namespace CsvIO/Internal/CSVParser {
     pub def newCSVParser[r: Region, t: Region -> Type](_: Region[r], 
                                                         reader: t[r], 
                                                         fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) with SubReader[t]= 
-        import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser & r as newCsvParser;
+        import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser \ r as newCsvParser;
         CSVParser(newCsvParser(Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(reader)), fmt))
 
 
 
-    pub def close(p: CSVParser[r]): Result[Unit, String] \ Write(r) = 
+    pub def close!(p: CSVParser[r]): Result[Unit, String] \ Write(r) = 
         try {
-            import org.apache.commons.csv.CSVParser.close(): Unit & r;
+            import org.apache.commons.csv.CSVParser.close(): Unit \ r;
             let CSVParser(p1) = p;
             close(p1) |> Ok
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String & r;
+                import java.lang.Throwable.getMessage(): String \ r;
                 Err(getMessage(ex))
         }
 
     pub def iterator(p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r] \ Read(r) = 
-        import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator & r;
+        import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ r;
         let CSVParser(p1) = p;
         let r1 = Scoped.regionOf(p);
         let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(r1);
