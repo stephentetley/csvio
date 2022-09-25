@@ -17,10 +17,8 @@
 
 namespace CsvIO/CsvWriter {
     
-    use Basis/System.FilePath;
-    use Basis/System.FilePath.{FilePath};
+    use Basis/System.Path;
     use Basis/Text.Charset;
-    use Basis/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
@@ -34,16 +32,15 @@ namespace CsvIO/CsvWriter {
     ///
     pub def outputCsv(format: CsvFormat,
                         cs: Charset,
-                        path: FilePath,
+                        path: Path,
                         makeRow: a -> List[String] \ ef,
                         rows: List[a]): Result[Unit, String] \ {IO, ef} =
         use Result.flatMap;
         region r1 {
-            let CsvFormat(format1) = format;            
-            let Charset(cs1) = cs;
-            let* file1      = Basis/System/FilePath.toFile(r1, path);
+            let CsvFormat(format1) = format;
+            let* file1      = Basis/System/Path.toFile(r1, path);
             let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
-            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs1);
+            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs);
             let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
             let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
             let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);

@@ -11,7 +11,7 @@ namespace Test01 {
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
         region r1 {
-            let* path    = Basis/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
+            let* path    = Basis/System/Path.newPath("E://coding/flix/csvio/data/compass.csv");
             let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
             let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true));
             let* hdl    = CsvIO/CsvReader.newCsvReadHandle(r1, fmt, Basis/Text/Charset.utf_8(), eval, path);
@@ -28,7 +28,7 @@ namespace Test01 {
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
         region r1 {
-            let* path    = Basis/System/FilePath.filePath("E://coding/flix/csvio/data/compass-utf8-bom.csv");
+            let* path    = Basis/System/Path.newPath("E://coding/flix/csvio/data/compass-utf8-bom.csv");
             let eval    = Applicative.product(getStringNamed("Short"), getStringNamed("Long"));
             let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Short" :: "Long" :: Nil) *> setSkipHeaderRecord!(true));
             let* hdl    = CsvIO/CsvReader.newCsvReadHandleWithBOM(r1, fmt, eval, path);
@@ -45,8 +45,8 @@ namespace Test01 {
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{toCsvFormatWithCsvFormat, setHeaderAuto!, setHeaders!};
         region r1 {
-            let* path   = Basis/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
-            let* outpath = Basis/System/FilePath.filePath("E://coding/flix/csvio/data/compass-out.csv");
+            let* path   = Basis/System/Path.newPath("E://coding/flix/csvio/data/compass.csv");
+            let* outpath = Basis/System/Path.newPath("E://coding/flix/csvio/data/compass-out.csv");
             let eval    = Applicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
             let toCells = xy -> {let (x, y) = xy; y :: x :: Nil};  /// Flip 
             let* fmt1   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto!());

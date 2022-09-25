@@ -17,10 +17,8 @@
 
 namespace CsvIO/CsvReader {
     
-    use Basis/System.FilePath;
-    use Basis/System.FilePath.{FilePath};
+    use Basis/System.Path;
     use Basis/Text.Charset;
-    use Basis/Text.Charset.{Charset};
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvRecordEvaluator;
@@ -52,14 +50,13 @@ namespace CsvIO/CsvReader {
                             format: CsvFormat,
                             cs: Charset,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
+                            path: Path): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;
-            let Charset(cs1) = cs;
-            let* file1      = Basis/System/FilePath.toFile(r, path);
+            let* file1      = Basis/System/Path.toFile(r, path);
             let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
-            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
             let iterDone    = () -> Iterator.isEmpty(iter1);
@@ -87,7 +84,7 @@ namespace CsvIO/CsvReader {
                     format: CsvFormat,
                     charset: Charset,
                     eval: CsvRecordEvaluator[r, a, a], 
-                    path: FilePath): Result[List[a], String]  \ { Read(r), Write(r), IO } =
+                    path: Path): Result[List[a], String]  \ { Read(r), Write(r), IO } =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
@@ -102,16 +99,16 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandleWithBOM(r: Region[r], 
                             format: CsvFormat,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: FilePath): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
+                            path: Path): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;
-            let* file1      = Basis/System/FilePath.toFile(r, path);
+            let* file1      = Basis/System/Path.toFile(r, path);
             let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
             let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
             let csname      = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
             let csname1     = if (Object.isNull(csname)) "UTF-16" else csname; 
-            let* Charset(cs1) = Basis/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+            let* cs1        = Basis/Text/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
