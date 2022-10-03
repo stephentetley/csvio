@@ -17,8 +17,8 @@
 
 namespace CsvIO/CsvWriter {
     
-    use Basis/System.Path;
-    use Basis/Text.Charset;
+    use Basis/NIO/File.Path;
+    use Basis/NIO/Charset.Charset;
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
@@ -38,7 +38,7 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         region r1 {
             let CsvFormat(format1) = format;
-            let* file1      = Basis/System/Path.toFile(r1, path);
+            let* file1      = Basis/NIO/File/Path.toFile(r1, path);
             let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
             let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs);
             let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
