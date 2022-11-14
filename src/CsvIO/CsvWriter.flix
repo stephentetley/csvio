@@ -40,7 +40,7 @@ namespace CsvIO/CsvWriter {
             let CsvFormat(format1) = format;
             let* file1      = Basis/NIO/File/Path.toFile(r1, path);
             let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
-            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(r1, fos, cs);
+            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(fos |> Interop/IO/SubOutputStream.toOutputStream, cs);
             let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
             let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
             let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);

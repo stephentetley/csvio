@@ -55,8 +55,8 @@ namespace CsvIO/CsvReader {
         try {
             let CsvFormat(fmt1) = format;
             let* file1      = Basis/NIO/File/Path.toFile(r, path);
-            let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
-            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs);
+            let* ins        = Interop/IO/FileInputStream.newWithFile(file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
+            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(ins, cs);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
             let iterDone    = () -> Iterator.isEmpty(iter1);
@@ -104,12 +104,12 @@ namespace CsvIO/CsvReader {
         try {
             let CsvFormat(fmt1) = format;
             let* file1      = Basis/NIO/File/Path.toFile(r, path);
-            let* ins        = Interop/IO/FileInputStream.newWithFile(file1);
-            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(r, ins);
-            let csname      = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
-            let csname1     = if (Object.isNull(csname)) "UTF-16" else csname; 
+            let* ins        = Interop/IO/FileInputStream.newWithFile(file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
+            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(ins);
+            let* csname     = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
+            let csname1     = Option.getWithDefault("UTF-16", csname);
             let* cs1        = Basis/NIO/Charset/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
-            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(r, ins, cs1);
+            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(ins, cs1);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
             let iterDone    = () -> Iterator.isEmpty(iter1);

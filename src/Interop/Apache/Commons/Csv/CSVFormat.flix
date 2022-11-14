@@ -39,7 +39,7 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
 
     pub def parse[r: Region, t: Region -> Type](rd: t[r], fmt: CSVFormat[r]): Result[CSVParser[r], String] \ Write(r) with SubReader[t]= 
         try {
-            import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser & r;
+            import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ r;
             let CSVFormat(fmt1) = fmt;
             let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(rd));
             CSVParser(parse(fmt1, rd1)) |> Ok

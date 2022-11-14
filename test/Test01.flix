@@ -16,7 +16,7 @@ namespace Test01 {
             let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true));
             let* hdl    = CsvIO/CsvReader.newCsvReadHandle(r1, fmt, Basis/NIO/Charset/Charset.utf_8(), eval, path);
             let iter    = CsvIO/CsvReader.getIterator(hdl);
-            let _       = Iterator.foreach(ans -> println("test01: ${ans}"), iter);
+            let _       = Iterator.forEach(ans -> println("test01: ${ans}"), iter);
             let* _      = CsvIO/CsvReader.close!(hdl);
             Ok()
         }
@@ -33,7 +33,7 @@ namespace Test01 {
             let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Short" :: "Long" :: Nil) *> setSkipHeaderRecord!(true));
             let* hdl    = CsvIO/CsvReader.newCsvReadHandleWithBOM(r1, fmt, eval, path);
             let iter    = CsvIO/CsvReader.getIterator(hdl);
-            let _       = Iterator.foreach(ans -> println("test02: ${ans}"), iter);
+            let _       = Iterator.forEach(ans -> println("test02: ${ans}"), iter);
             let* _      = CsvIO/CsvReader.close!(hdl);
             Ok()
         }
