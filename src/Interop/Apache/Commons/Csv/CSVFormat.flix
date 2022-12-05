@@ -16,10 +16,12 @@
 
 namespace Interop/Apache/Commons/Csv {
 
+    /// Class / Mutable
+
     pub enum CSVFormat[_: Region](##org.apache.commons.csv.CSVFormat)
 
     instance Scoped[CSVFormat] {
-        pub def regionOf(_: CSVFormat[r]): Region[r] = () as Region[r]
+        pub def regionOf(_: CSVFormat[r]): Region[r] = unsafe_cast () as Region[r]
     }
 
 }
@@ -45,7 +47,7 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
             CSVParser(parse(fmt1, rd1)) |> Ok
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String & r;
+                import java.lang.Throwable.getMessage(): String \ r;
                 Err(getMessage(ex))
         }
 

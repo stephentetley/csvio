@@ -16,10 +16,14 @@
 
 namespace Interop/Apache/Commons/Csv {
 
+
+    /// Class / Immutable - shouldn't use a region
+
+    /// TODO - remove region...
     pub enum CSVRecord[_: Region](##org.apache.commons.csv.CSVRecord)
 
     instance Scoped[CSVRecord] {
-        pub def regionOf(_: CSVRecord[r]): Region[r] = () as Region[r]
+        pub def regionOf(_: CSVRecord[r]): Region[r] = unsafe_cast () as Region[r]
     }
 
 }

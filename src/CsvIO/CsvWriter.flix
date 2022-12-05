@@ -22,7 +22,6 @@ namespace CsvIO/CsvWriter {
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
-    use CsvIO.RowSetter;
     use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
 
 
@@ -51,8 +50,8 @@ namespace CsvIO/CsvWriter {
     /// pub def outputCsvWithBOM(format: CsvFormat,
     ///                     cs: Charset,
     ///                     path: FilePath,
-    ///                     makeRow: a -> List[String] & ef,
-    ///                     rows: List[a]): Result[Unit, String] & Impure =
+    ///                     makeRow: a -> List[String] \ ef,
+    ///                     rows: List[a]): Result[Unit, String] \ IO =
     ///     use Result.flatMap;
     ///     let CsvFormat(format1) = format;
     ///     region r1 {

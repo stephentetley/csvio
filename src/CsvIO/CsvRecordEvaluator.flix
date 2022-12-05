@@ -69,8 +69,6 @@ namespace CsvIO {
 namespace CsvIO/CsvRecordEvaluator {
 
     use Monad.{>>=};
-
-    use FlixSandbox/Text.Charset.{Charset};
     
     use Time/Format.DateTimeFormatter;
 

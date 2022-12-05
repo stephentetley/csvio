@@ -75,7 +75,7 @@ namespace CsvIO/CsvReader {
             Ok(hdl)
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String & r;
+                import java.lang.Throwable.getMessage(): String \ r;
                 Err(getMessage(ex))           
         }
 
@@ -128,7 +128,7 @@ namespace CsvIO/CsvReader {
             Ok(hdl)
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String & r;
+                import java.lang.Throwable.getMessage(): String \ r;
                 Err(getMessage(ex))           
         }
 

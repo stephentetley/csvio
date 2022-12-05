@@ -16,10 +16,12 @@
 
 namespace Interop/Apache/Commons/Csv {
 
+    /// Class / Mutable
+
     pub enum CSVParser[_: Region](##org.apache.commons.csv.CSVParser)
 
     instance Scoped[CSVParser] {
-        pub def regionOf(_: CSVParser[r]): Region[r] = () as Region[r]
+        pub def regionOf(_: CSVParser[r]): Region[r] = unsafe_cast () as Region[r]
     }
 
 }
@@ -60,7 +62,7 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
         let CSVParser(p1) = p;
         let r1 = Scoped.regionOf(p);
         let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(r1);
-        Interop/Util/IteratorZ.toFlixIterator(obj -> obj as ##org.apache.commons.csv.CSVRecord, rawIter)
+        Interop/Util/IteratorZ.toFlixIterator(obj -> unsafe_cast obj as ##org.apache.commons.csv.CSVRecord, rawIter)
 
 
 }

@@ -41,11 +41,11 @@ namespace CsvIO/CsvFormat {
 
 
     pub def marshalQuoteMode(x: QuoteMode): ##org.apache.commons.csv.QuoteMode = 
-        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL;
-        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL_NON_NULL;
-        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode & Pure as get_MINIMAL;
-        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode & Pure as get_NON_NUMERIC;
-        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode & Pure as get_NONE;
+        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode \ {} as get_ALL;
+        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode \ {} as get_ALL_NON_NULL;
+        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode \ {} as get_MINIMAL;
+        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode \ {} as get_NON_NUMERIC;
+        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode \ {} as get_NONE;
         match x {
             case All            => get_ALL()
             case AllNonNull     => get_ALL_NON_NULL()
@@ -56,17 +56,17 @@ namespace CsvIO/CsvFormat {
 
 
     def primEqualsQuoteMode(x: ##org.apache.commons.csv.QuoteMode, y: ##org.apache.commons.csv.QuoteMode): Bool =
-        import java.lang.Enum.equals(##java.lang.Object): Bool & Pure;
-        let x1 = x as ##java.lang.Enum;
-        let y1 = y as ##java.lang.Object;
+        import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
+        let x1 = unsafe_cast x as ##java.lang.Enum;
+        let y1 = unsafe_cast y as ##java.lang.Object;
         equals(x1, y1)
 
     pub def unmarshalQuoteMode(x: ##org.apache.commons.csv.QuoteMode): QuoteMode = 
-        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL;
-        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode & Pure as get_ALL_NON_NULL;
-        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode & Pure as get_MINIMAL;
-        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode & Pure as get_NON_NUMERIC;
-        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode & Pure as get_NONE;
+        import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode \ {} as get_ALL;
+        import static get org.apache.commons.csv.QuoteMode.ALL_NON_NULL: ##org.apache.commons.csv.QuoteMode \ {} as get_ALL_NON_NULL;
+        import static get org.apache.commons.csv.QuoteMode.MINIMAL: ##org.apache.commons.csv.QuoteMode \ {} as get_MINIMAL;
+        import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode \ {} as get_NON_NUMERIC;
+        import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode \ {} as get_NONE;
         match x {
             case x1 if primEqualsQuoteMode(x1, get_ALL())          => All            
             case x1 if primEqualsQuoteMode(x1, get_ALL_NON_NULL()) => AllNonNull
@@ -100,51 +100,51 @@ namespace CsvIO/CsvFormat {
     pub def makeCsvFormat(format: PredefinedFormat): CsvFormat = 
         match format {
             case DEFAULT                => {
-                import static get org.apache.commons.csv.CSVFormat.DEFAULT: ##org.apache.commons.csv.CSVFormat & Pure as get_DEFAULT;
+                import static get org.apache.commons.csv.CSVFormat.DEFAULT: ##org.apache.commons.csv.CSVFormat \ {} as get_DEFAULT;
                 get_DEFAULT()
             }
             case EXCEL                  => {
-                import static get org.apache.commons.csv.CSVFormat.EXCEL: ##org.apache.commons.csv.CSVFormat & Pure as get_EXCEL;
+                import static get org.apache.commons.csv.CSVFormat.EXCEL: ##org.apache.commons.csv.CSVFormat \ {} as get_EXCEL;
                 get_EXCEL()
             }
             case INFORMIX_UNLOAD        => {
-                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD;
+                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD: ##org.apache.commons.csv.CSVFormat \ {} as get_INFORMIX_UNLOAD;
                 get_INFORMIX_UNLOAD()
             }
             case INFORMIX_UNLOAD_CSV    => {
-                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_INFORMIX_UNLOAD_CSV;
+                import static get org.apache.commons.csv.CSVFormat.INFORMIX_UNLOAD_CSV: ##org.apache.commons.csv.CSVFormat \ {} as get_INFORMIX_UNLOAD_CSV;
                 get_INFORMIX_UNLOAD_CSV()
             }
             case MONGODB_CSV            => {
-                import static get org.apache.commons.csv.CSVFormat.MONGODB_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_CSV;
+                import static get org.apache.commons.csv.CSVFormat.MONGODB_CSV: ##org.apache.commons.csv.CSVFormat \ {} as get_MONGODB_CSV;
                 get_MONGODB_CSV()
             }
             case MONGODB_TSV            => {
-                import static get org.apache.commons.csv.CSVFormat.MONGODB_TSV: ##org.apache.commons.csv.CSVFormat & Pure as get_MONGODB_TSV;
+                import static get org.apache.commons.csv.CSVFormat.MONGODB_TSV: ##org.apache.commons.csv.CSVFormat \ {} as get_MONGODB_TSV;
                 get_MONGODB_TSV()
             }        
             case MYSQL                  => {
-                import static get org.apache.commons.csv.CSVFormat.MYSQL: ##org.apache.commons.csv.CSVFormat & Pure as get_MYSQL;
+                import static get org.apache.commons.csv.CSVFormat.MYSQL: ##org.apache.commons.csv.CSVFormat \ {} as get_MYSQL;
                 get_MYSQL()
             }
             case ORACLE     => {
-                import static get org.apache.commons.csv.CSVFormat.ORACLE: ##org.apache.commons.csv.CSVFormat & Pure as get_ORACLE;
+                import static get org.apache.commons.csv.CSVFormat.ORACLE: ##org.apache.commons.csv.CSVFormat \ {} as get_ORACLE;
                 get_ORACLE()        
             }
             case POSTGRESQL_CSV => {
-                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_CSV: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_CSV;
+                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_CSV: ##org.apache.commons.csv.CSVFormat \ {} as get_POSTGRESQL_CSV;
                 get_POSTGRESQL_CSV()
             }
             case POSTGRESQL_TEXT => {
-                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_TEXT: ##org.apache.commons.csv.CSVFormat & Pure as get_POSTGRESQL_TEXT;
+                import static get org.apache.commons.csv.CSVFormat.POSTGRESQL_TEXT: ##org.apache.commons.csv.CSVFormat \ {} as get_POSTGRESQL_TEXT;
                 get_POSTGRESQL_TEXT()
             }
             case RFC4180    => {
-                import static get org.apache.commons.csv.CSVFormat.RFC4180: ##org.apache.commons.csv.CSVFormat & Pure as get_RFC4180;
+                import static get org.apache.commons.csv.CSVFormat.RFC4180: ##org.apache.commons.csv.CSVFormat \ {} as get_RFC4180;
                 get_RFC4180()
             }
             case TDF    => {
-                import static get org.apache.commons.csv.CSVFormat.TDF: ##org.apache.commons.csv.CSVFormat & Pure as get_TDF;
+                import static get org.apache.commons.csv.CSVFormat.TDF: ##org.apache.commons.csv.CSVFormat \ {} as get_TDF;
                 get_TDF()
             }
         } |> CsvFormat
