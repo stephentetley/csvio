@@ -33,7 +33,7 @@ namespace CsvIO/CsvWriter {
                         cs: Charset,
                         path: Path,
                         makeRow: a -> List[String] \ ef,
-                        rows: List[a]): Result[Unit, String] \ {IO, ef} =
+                        rows: List[a]): Result[String, Unit] \ {IO, ef} =
         use Result.flatMap;
         region r1 {
             let CsvFormat(format1) = format;
@@ -51,7 +51,7 @@ namespace CsvIO/CsvWriter {
     ///                     cs: Charset,
     ///                     path: FilePath,
     ///                     makeRow: a -> List[String] \ ef,
-    ///                     rows: List[a]): Result[Unit, String] \ IO =
+    ///                     rows: List[a]): Result[String, Unit] \ IO =
     ///     use Result.flatMap;
     ///     let CsvFormat(format1) = format;
     ///     region r1 {

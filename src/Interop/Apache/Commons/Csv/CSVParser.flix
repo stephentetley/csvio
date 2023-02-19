@@ -20,9 +20,6 @@ namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVParser[_: Region](##org.apache.commons.csv.CSVParser)
 
-    instance Scoped[CSVParser] {
-        pub def regionOf(_: CSVParser[r]): Region[r] = unsafe_cast () as Region[r]
-    }
 
 }
 
@@ -46,7 +43,7 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
 
 
 
-    pub def close!(p: CSVParser[r]): Result[Unit, String] \ Write(r) = 
+    pub def close!(p: CSVParser[r]): Result[String, Unit] \ Write(r) = 
         try {
             import org.apache.commons.csv.CSVParser.close(): Unit \ r;
             let CSVParser(p1) = p;
@@ -57,12 +54,10 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
                 Err(getMessage(ex))
         }
 
-    pub def iterator(p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r] \ Read(r) = 
+    pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {Read(r), Write(r1) } =
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ r;
         let CSVParser(p1) = p;
-        let r1 = Scoped.regionOf(p);
-        let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(r1);
+        let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(rc);
         Interop/Util/IteratorZ.toFlixIterator(obj -> unsafe_cast obj as ##org.apache.commons.csv.CSVRecord, rawIter)
-
 
 }

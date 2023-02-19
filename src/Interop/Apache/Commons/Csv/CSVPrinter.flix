@@ -20,9 +20,6 @@ namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVPrinter[_: Region](##org.apache.commons.csv.CSVPrinter)
 
-    instance Scoped[CSVPrinter] {
-        pub def regionOf(_: CSVPrinter[r]): Region[r] = unsafe_cast () as Region[r]
-    }
     
 }
 
@@ -43,12 +40,12 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
 
 
     pub def newCSVPrinter[r1: Region, r2: Region, t: Region -> Type]
-                        (ws: t[r2], fmt: CSVFormat[r1]): Result[CSVPrinter[r2], String] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
+                        (ws: t[r2], fmt: CSVFormat[r1]): Result[String, CSVPrinter[r2]] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
         try {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ r2 as newCSVPrinter;
             let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
             let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);        
-            unsafe_cast CSVPrinter(newCSVPrinter(ws1, fmt1)) as \ {Read(r1), Write(r2)} |> Ok 
+            unsafe_cast CSVPrinter(newCSVPrinter(ws1, fmt1)) as _ \ {Read(r1), Write(r2)} |> Ok 
         } catch {
             case ex: ##java.io.IOException =>
                 import java.lang.Throwable.getMessage(): String \ r2;
@@ -58,7 +55,7 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
 
 
 
-    pub def close!(p: CSVPrinter[r]): Result[Unit, String] \ Write(r) = 
+    pub def close!(p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
         try {
             import org.apache.commons.csv.CSVPrinter.close(): Unit \ r;
             let CSVPrinter(p1) = p;
@@ -70,14 +67,15 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
         }
 
 
-    pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[Unit, String] \ Write(r) = 
+    pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
         try {
-            import static flixspt.csvio.PrinterVarargs.printRecordOfStrings(##org.apache.commons.csv.CSVPrinter, ##java.util.ArrayList): Unit \ r;
-            let CSVPrinter(p1) = p;
-            let r1 = Scoped.regionOf(p);
-            let arrl = Interop/Util/ArrayList.fromFoldable(r1, l);
-            printRecordOfStrings(p1, Interop/Util/ArrayList.getHH(arrl));
-            Ok()
+            region rc {
+                import static flixspt.csvio.PrinterVarargs.printRecordOfStrings(##org.apache.commons.csv.CSVPrinter, ##java.util.ArrayList): Unit \ r;
+                let CSVPrinter(p1) = p;
+                let arrl = Interop/Util/ArrayList.fromFoldable(rc, l);
+                printRecordOfStrings(p1, Interop/Util/ArrayList.getHH(arrl));
+                Ok()
+            }
         } catch {
             case ex: ##java.io.IOException =>
                 import java.lang.Throwable.getMessage(): String \ r;

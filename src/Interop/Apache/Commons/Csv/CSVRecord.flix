@@ -22,9 +22,6 @@ namespace Interop/Apache/Commons/Csv {
     /// TODO - remove region...
     pub enum CSVRecord[_: Region](##org.apache.commons.csv.CSVRecord)
 
-    instance Scoped[CSVRecord] {
-        pub def regionOf(_: CSVRecord[r]): Region[r] = unsafe_cast () as Region[r]
-    }
 
 }
 

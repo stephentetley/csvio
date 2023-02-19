@@ -30,13 +30,13 @@ namespace CsvIO/CsvReader {
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
     /// 
-    pub enum CsvReadHandle[r: Region, a: Type]((Interop/Apache/Commons/Csv.CSVParser[r], Iterator[Result[a, String], r]))
+    pub enum CsvReadHandle[r: Region, a: Type]((Interop/Apache/Commons/Csv.CSVParser[r], Iterator[Result[String, a], r, r]))
 
-    pub def getIterator(handle: CsvReadHandle[r, a]): Iterator[Result[a, String], r] = 
+    pub def getIterator(handle: CsvReadHandle[r, a]): Iterator[Result[String, a], r, r] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
 
-    pub def close!(handle: CsvReadHandle[r, a]): Result[Unit, String] \ Write(r) = 
+    pub def close!(handle: CsvReadHandle[r, a]): Result[String, Unit] \ Write(r) = 
         let CsvReadHandle((x1, _)) = handle;
         Interop/Apache/Commons/Csv/CSVParser.close!(x1)
 
@@ -50,7 +50,7 @@ namespace CsvIO/CsvReader {
                             format: CsvFormat,
                             cs: Charset,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: Path): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
+                            path: Path): Result[String, CsvReadHandle[r, a]] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;
@@ -84,7 +84,7 @@ namespace CsvIO/CsvReader {
                     format: CsvFormat,
                     charset: Charset,
                     eval: CsvRecordEvaluator[r, a, a], 
-                    path: Path): Result[List[a], String]  \ { Read(r), Write(r), IO } =
+                    path: Path): Result[String, List[a]]  \ { Read(r), Write(r), IO } =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
@@ -99,7 +99,7 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandleWithBOM(r: Region[r], 
                             format: CsvFormat,
                             eval: CsvRecordEvaluator[r, a, a], 
-                            path: Path): Result[CsvReadHandle[r, a], String] \ { Read(r), Write(r), IO } =
+                            path: Path): Result[String, CsvReadHandle[r, a]] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;

@@ -153,7 +153,7 @@ namespace CsvIO/CsvFormat {
 
 
 
-    pub def makeCsvFormatWithHeaders(format: PredefinedFormat, headers: List[String]): Result[CsvFormat, String] =
+    pub def makeCsvFormatWithHeaders(format: PredefinedFormat, headers: List[String]): Result[String, CsvFormat] =
         region r1 {
             CsvIO/CsvFormatBuilder.toCsvFormatWithCsvFormat(r1, makeCsvFormat(format), CsvIO/CsvFormatBuilder.setHeaders!(headers))
         }

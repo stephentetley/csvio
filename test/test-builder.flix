@@ -5,7 +5,7 @@ namespace TestBuilder {
     use CsvIO.CsvFormat;
    
     @test
-    def testBuilder01(): Result[CsvFormat, String] =
+    def testBuilder01(): Result[String, CsvFormat] =
         use CsvIO/CsvFormatBuilder.{toCsvFormat, setHeaders!, setEscape!, setDelimiter!, setTrim!};
         region r1 {
             let builder = 

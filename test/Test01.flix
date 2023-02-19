@@ -5,7 +5,7 @@ namespace Test01 {
 
 
     @test
-    def test01(): Result[Unit, String] & Impure = 
+    def test01(): Result[String, Unit] & Impure = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
@@ -22,7 +22,7 @@ namespace Test01 {
         }
     
     @test
-    def test02(): Result[Unit, String] & Impure = 
+    def test02(): Result[String, Unit] & Impure = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
@@ -39,7 +39,7 @@ namespace Test01 {
         }
 
     @test
-    def test03(): Result[Unit, String] & Impure = 
+    def test03(): Result[String, Unit] & Impure = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
@@ -59,7 +59,7 @@ namespace Test01 {
 /*
 
     @test
-    def test04(): Result[Unit, String] & Impure = 
+    def test04(): Result[String, Unit] & Impure = 
         use Result.flatMap;
         use CsvIO/RowEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};

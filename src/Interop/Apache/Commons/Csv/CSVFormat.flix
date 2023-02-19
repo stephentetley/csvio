@@ -20,10 +20,6 @@ namespace Interop/Apache/Commons/Csv {
 
     pub enum CSVFormat[_: Region](##org.apache.commons.csv.CSVFormat)
 
-    instance Scoped[CSVFormat] {
-        pub def regionOf(_: CSVFormat[r]): Region[r] = unsafe_cast () as Region[r]
-    }
-
 }
 
 namespace Interop/Apache/Commons/Csv/CSVFormat {
@@ -39,7 +35,7 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
         let CSVFormat(p1) = p;
         p1
 
-    pub def parse[r: Region, t: Region -> Type](rd: t[r], fmt: CSVFormat[r]): Result[CSVParser[r], String] \ Write(r) with SubReader[t]= 
+    pub def parse[r: Region, t: Region -> Type](rd: t[r], fmt: CSVFormat[r]): Result[String, CSVParser[r]] \ Write(r) with SubReader[t]= 
         try {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ r;
             let CSVFormat(fmt1) = fmt;
