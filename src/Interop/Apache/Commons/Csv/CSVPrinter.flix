@@ -39,16 +39,16 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
         p1
 
 
-    pub def newCSVPrinter[r1: Region, r2: Region, t: Region -> Type]
-                        (ws: t[r2], fmt: CSVFormat[r1]): Result[String, CSVPrinter[r2]] \ {Read(r1), Write(r2)} with ImpAppendable[t]= 
+    pub def newCSVPrinter[r: Region, r1: Region, t: Region -> Type]
+                        (rc: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
         try {
-            import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ r2 as newCSVPrinter;
+            import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
             let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);        
-            unsafe_cast CSVPrinter(newCSVPrinter(ws1, fmt1)) as _ \ {Read(r1), Write(r2)} |> Ok 
+            CSVPrinter(newCSVPrinter(ws1, fmt1)) |> Ok 
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r2;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex))
         }
 

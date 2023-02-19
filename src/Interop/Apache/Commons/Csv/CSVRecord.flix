@@ -17,10 +17,9 @@
 namespace Interop/Apache/Commons/Csv {
 
 
-    /// Class / Immutable - shouldn't use a region
+    /// Class / Immutable
 
-    /// TODO - remove region...
-    pub enum CSVRecord[_: Region](##org.apache.commons.csv.CSVRecord)
+    pub enum CSVRecord(##org.apache.commons.csv.CSVRecord)
 
 
 }
@@ -31,62 +30,62 @@ namespace Interop/Apache/Commons/Csv/CSVRecord {
     use Interop/Apache/Commons/Csv.CSVRecord.{CSVRecord};
 
     
-    pub def getHH(x: CSVRecord[r]): ##org.apache.commons.csv.CSVRecord = 
+    pub def getHH(x: CSVRecord): ##org.apache.commons.csv.CSVRecord = 
         let CSVRecord(x1) = x;
         x1
     
-    pub def wrapHH(_: Region[r], x: ##org.apache.commons.csv.CSVRecord): CSVRecord[r] = 
+    pub def wrapHH(x: ##org.apache.commons.csv.CSVRecord): CSVRecord = 
         CSVRecord(x)
 
-    pub def getStringAt(ix: Int32, x: CSVRecord[r]): Result[String, String] \ Read(r) =
+    pub def getStringAt(ix: Int32, x: CSVRecord): Result[String, String] =
         try {
-            import org.apache.commons.csv.CSVRecord.get(Int32): String \ r as get1;
+            import org.apache.commons.csv.CSVRecord.get(Int32): String \ {} as get1;
             let CSVRecord(x1) = x;
             get1(x1, ix) |> Ok
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex))
         }
 
-    pub def getStringNamed(label: String, x: CSVRecord[r]): Result[String, String] \ Read(r) =
+    pub def getStringNamed(label: String, x: CSVRecord): Result[String, String] =
         try {
-            import org.apache.commons.csv.CSVRecord.get(String): String \ r as get1;
+            import org.apache.commons.csv.CSVRecord.get(String): String \ {} as get1;
             let CSVRecord(x1) = x;
             get1(x1, label) |> Ok
         } catch {
             case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex))
         }
 
-    pub def hasComment(x: CSVRecord[r]): Bool \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.hasComment(): Bool \ r;
+    pub def hasComment(x: CSVRecord): Bool =
+        import org.apache.commons.csv.CSVRecord.hasComment(): Bool \ {};
         let CSVRecord(x1) = x;
         hasComment(x1)
 
-    pub def getComment(x: CSVRecord[r]): Option[String] \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.getComment(): String \ r;
+    pub def getComment(x: CSVRecord): Option[String] =
+        import org.apache.commons.csv.CSVRecord.getComment(): String \ {};
         let CSVRecord(x1) = x;
         getComment(x1) |> Object.toOption
 
-    pub def isConsistent(x: CSVRecord[r]): Bool \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isConsistent(): Bool \ r;
+    pub def isConsistent(x: CSVRecord): Bool =
+        import org.apache.commons.csv.CSVRecord.isConsistent(): Bool \ {};
         let CSVRecord(x1) = x;
         isConsistent(x1)
 
-    pub def isMapped(label: String, x: CSVRecord[r]): Bool \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isMapped(String): Bool \ r;
+    pub def isMapped(label: String, x: CSVRecord): Bool =
+        import org.apache.commons.csv.CSVRecord.isMapped(String): Bool \ {};
         let CSVRecord(x1) = x;
         isMapped(x1, label)
 
-    pub def isSetAt(ix: Int32, x: CSVRecord[r]): Bool \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isSet(Int32): Bool \ r;
+    pub def isSetAt(ix: Int32, x: CSVRecord): Bool =
+        import org.apache.commons.csv.CSVRecord.isSet(Int32): Bool \ {};
         let CSVRecord(x1) = x;
         isSet(x1, ix)
 
-    pub def isSetNamed(label: String, x: CSVRecord[r]): Bool \ Read(r) =
-        import org.apache.commons.csv.CSVRecord.isSet(String): Bool \ r;
+    pub def isSetNamed(label: String, x: CSVRecord): Bool  =
+        import org.apache.commons.csv.CSVRecord.isSet(String): Bool \ {};
         let CSVRecord(x1) = x;
         isSet(x1, label)
 

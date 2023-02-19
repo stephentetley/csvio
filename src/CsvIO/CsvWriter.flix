@@ -17,12 +17,12 @@
 
 namespace CsvIO/CsvWriter {
     
-    use Basis/NIO/File.Path;
-    use Basis/NIO/Charset.Charset;
+    use Basis/NIO/File.Path
+    use Basis/NIO/Charset.Charset
 
-    use CsvIO.CsvFormat;
-    use CsvIO.CsvFormat.{CsvFormat};
-    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+    use CsvIO.CsvFormat
+    use CsvIO.CsvFormat.{CsvFormat}
+    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat}
 
 
     ///
@@ -38,9 +38,9 @@ namespace CsvIO/CsvWriter {
         region rc {
             let CsvFormat(format1) = format;
             let* file1      = Basis/NIO/File/Path.toFile(rc, path);
-            let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
-            let fos1        = Interop/IO/SubOutputStream.toOutputStream(fos);
-            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(rc, fos, cs);
+            let* fos        = Interop/IO/FileOutputStream.newWithFile(rc, file1);
+            let outs        = Interop/IO/SubOutputStream.toOutputStream(fos);
+            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(rc, outs, cs);
             let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
             let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
             let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);
