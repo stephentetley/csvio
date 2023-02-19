@@ -58,6 +58,6 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ r;
         let CSVParser(p1) = p;
         let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(rc);
-        Interop/Util/IteratorZ.toFlixIterator(obj -> unsafe_cast obj as ##org.apache.commons.csv.CSVRecord, rawIter)
+        Interop/Util/IteratorZ.toFlixIterator(rc, obj -> unsafe_cast obj as ##org.apache.commons.csv.CSVRecord, rawIter)
 
 }

@@ -1,7 +1,7 @@
 
 namespace TestBuilder {
 
-    use Applicative.{point, *>};
+    use GradedApplicative.{point, *>};
     use CsvIO.CsvFormat;
    
     @test

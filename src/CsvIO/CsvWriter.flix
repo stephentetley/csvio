@@ -35,11 +35,12 @@ namespace CsvIO/CsvWriter {
                         makeRow: a -> List[String] \ ef,
                         rows: List[a]): Result[String, Unit] \ {IO, ef} =
         use Result.flatMap;
-        region r1 {
+        region rc {
             let CsvFormat(format1) = format;
-            let* file1      = Basis/NIO/File/Path.toFile(r1, path);
+            let* file1      = Basis/NIO/File/Path.toFile(rc, path);
             let* fos        = Interop/IO/FileOutputStream.newWithFile(file1);
-            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(fos |> Interop/IO/SubOutputStream.toOutputStream, cs);
+            let fos1        = Interop/IO/SubOutputStream.toOutputStream(fos);
+            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(rc, fos, cs);
             let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(writer, CSVFormat(format1));
             let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
             let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);

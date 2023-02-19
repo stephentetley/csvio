@@ -49,7 +49,7 @@ namespace CsvIO/CsvReader {
     pub def newCsvReadHandle(r: Region[r], 
                             format: CsvFormat,
                             cs: Charset,
-                            eval: CsvRecordEvaluator[r, a, a], 
+                            eval: CsvRecordEvaluator[r, a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, a]] \ { Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
@@ -59,18 +59,7 @@ namespace CsvIO/CsvReader {
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(ins, cs);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
-            let iterDone    = () -> Iterator.isEmpty(iter1);
-            let iterNext    = () -> {
-                try {
-                    match Iterator.next(iter1) { 
-                        case None      => Err("Done")
-                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row))
-                    }
-                } catch {
-                    case _: ##java.lang.Exception => Err("csvReadIter[next]")
-                }
-            };
-            let iter2       = Iterator(iterDone, iterNext);
+            let iter2       = Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row)), iter1);
             let hdl         = CsvReadHandle((parser, iter2));
             Ok(hdl)
         } catch {
@@ -83,8 +72,8 @@ namespace CsvIO/CsvReader {
     pub def readCsv(r: Region[r], 
                     format: CsvFormat,
                     charset: Charset,
-                    eval: CsvRecordEvaluator[r, a, a], 
-                    path: Path): Result[String, List[a]]  \ { Read(r), Write(r), IO } =
+                    eval: CsvRecordEvaluator[r, a, ef, a], 
+                    path: Path): Result[String, List[a]]  \ { ef, Read(r), Write(r), IO } =
         use Result.flatMap;
         let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
         let iter    = getIterator(hdl);
@@ -96,34 +85,23 @@ namespace CsvIO/CsvReader {
     ///
     /// Returns a new Csv Handle (iterator x a "close" handle).
     ///
-    pub def newCsvReadHandleWithBOM(r: Region[r], 
+    pub def newCsvReadHandleWithBOM(rc: Region[r], 
                             format: CsvFormat,
-                            eval: CsvRecordEvaluator[r, a, a], 
-                            path: Path): Result[String, CsvReadHandle[r, a]] \ { Read(r), Write(r), IO } =
+                            eval: CsvRecordEvaluator[r, a, ef, a], 
+                            path: Path): Result[String, CsvReadHandle[r, a]] \ { ef, Read(r), Write(r), IO } =
         use Result.{flatMap};
         try {
             let CsvFormat(fmt1) = format;
-            let* file1      = Basis/NIO/File/Path.toFile(r, path);
+            let* file1      = Basis/NIO/File/Path.toFile(rc, path);
             let* ins        = Interop/IO/FileInputStream.newWithFile(file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
-            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(ins);
+            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(rc, ins);
             let* csname     = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
             let csname1     = Option.getWithDefault("UTF-16", csname);
             let* cs1        = Basis/NIO/Charset/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
             let reader      = Interop/IO/InputStreamReader.newInputStreamReader(ins, cs1);
             let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(reader, CSVFormat(fmt1));
             let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(parser);
-            let iterDone    = () -> Iterator.isEmpty(iter1);
-            let iterNext    = () -> {
-                try {
-                    match Iterator.next(iter1) { 
-                        case None      => Err("Done")
-                        case Some(row) => CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(r, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row))
-                    }
-                } catch {
-                    case _: ##java.lang.Exception => Err("csvReadIterBOM[next]")
-                }
-            };
-            let iter2       = Iterator(iterDone, iterNext);
+            let iter2       = Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(rc, eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(r, row)), iter1);
             let hdl         = CsvReadHandle((parser, iter2));
             Ok(hdl)
         } catch {
