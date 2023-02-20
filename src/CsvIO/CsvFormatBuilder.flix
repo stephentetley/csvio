@@ -18,7 +18,7 @@
 namespace CsvIO {
 
 
-    pub enum CsvFormatBuilder[r: Region, ka: Type, ef: Bool, a: Type](
+    pub enum CsvFormatBuilder[_r: Region, ka: Type, ef: Bool, a: Type](
         Graded.MutStateError[ka, ##org.apache.commons.csv.CSVFormat$Builder, ef, a]
     )
 
@@ -48,11 +48,11 @@ namespace CsvIO {
 
 namespace CsvIO/CsvFormatBuilder {
 
-    use CsvIO.CsvFormatBuilder;
-    use CsvIO.CsvFormatBuilder.{CsvFormatBuilder};
-    use CsvIO.CsvFormat;
-    use CsvIO.CsvFormat.{CsvFormat};
-    use CsvIO/CsvFormat.QuoteMode;
+    use CsvIO.CsvFormatBuilder
+    use CsvIO.CsvFormatBuilder.{CsvFormatBuilder}
+    use CsvIO.CsvFormat
+    use CsvIO.CsvFormat.{CsvFormat}
+    use CsvIO/CsvFormat.QuoteMode
 
     pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, ef, a]): Graded.MutStateError[ka, ##org.apache.commons.csv.CSVFormat$Builder, ef, a] = 
         let CsvFormatBuilder(x1) = x;
@@ -61,10 +61,11 @@ namespace CsvIO/CsvFormatBuilder {
     ///
     /// Returns the result of applying `ma` to the mutable state `s`.
     ///
+    /// TODO - wrap ##org.apache.commons.csv.CSVFormat$Builder as a Flix enum with a region...
     pub def runBuilder(_: Region[r], 
                         ma: CsvFormatBuilder[r, a, ef, a], 
                         s: ##org.apache.commons.csv.CSVFormat$Builder): Result[String, a] \ {r, ef} = 
-        Graded/MutStateError.runMutStateError(getCsvFormatBuilder(ma), s)
+        unsafe_cast Graded/MutStateError.runMutStateError(getCsvFormatBuilder(ma), s) as _ \ {r, ef}
 
 
     pub def toCsvFormat(r: Region[r], 

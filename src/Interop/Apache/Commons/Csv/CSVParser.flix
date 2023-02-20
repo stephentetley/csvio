@@ -55,7 +55,7 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
         }
 
     pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {Read(r), Write(r1) } =
-        import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ r;
+        import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ {r, r1};
         let CSVParser(p1) = p;
         let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(rc);
         Interop/Util/IteratorZ.toFlixIterator(rc, obj -> unsafe_cast obj as ##org.apache.commons.csv.CSVRecord, rawIter)

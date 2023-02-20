@@ -16,7 +16,7 @@
 
 namespace Interop/Apache/Commons/Csv {
 
-    /// Class / Immutable (if avoid the deprecated methods)
+    /// Class / Immutable (if avoid using the deprecated methods)
 
     pub enum CSVFormat(##org.apache.commons.csv.CSVFormat)
 
@@ -35,9 +35,10 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
         let CSVFormat(p1) = p;
         p1
 
-    pub def parse[r: Region, t: Region -> Type](rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r]] \ Write(r) with SubReader[t]= 
+    pub def parse[t: Region -> Type, r: Region, r1: Region]
+                (_: Region[r1], rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r1]] \ { Read(r), Write(r1) } with SubReader[t] = 
         try {
-            import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ r;
+            import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ {r, r1};
             let CSVFormat(fmt1) = fmt;
             let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(rd));
             CSVParser(parse(fmt1, rd1)) |> Ok

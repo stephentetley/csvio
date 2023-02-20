@@ -16,7 +16,7 @@
 
 namespace Interop/Apache/Commons/Csv {
 
-    /// Class / Mutable
+    /// Class / Mutable (contains an underlying output stream c.f. `close!`)
 
     pub enum CSVPrinter[_: Region](##org.apache.commons.csv.CSVPrinter)
 
@@ -40,7 +40,7 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
 
 
     pub def newCSVPrinter[r: Region, r1: Region, t: Region -> Type]
-                        (rc: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
+                        (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
         try {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
