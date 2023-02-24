@@ -14,7 +14,7 @@ https://github.com/stephentetley/interop-commons-io-bom
 
 https://github.com/stephentetley/basis-base
 
-https://github.com/stephentetley/monad-lib
+https://github.com/stephentetley/graded-lib
 
 https://github.com/stephentetley/interop-base
 

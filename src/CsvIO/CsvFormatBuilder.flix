@@ -29,7 +29,7 @@ namespace CsvIO {
 
 
     instance GradedApplicative[CsvFormatBuilder[r, ka]] {
-        pub def point(x: a): CsvFormatBuilder[r, ka, Pure, a] = 
+        pub def point(x: a): CsvFormatBuilder[r, ka, ef, a] = 
             CsvIO/CsvFormatBuilder.point(x)
 
         pub def ap(mf: CsvFormatBuilder[r, ka, ef1, a -> b \ ef2], 
@@ -106,7 +106,7 @@ namespace CsvIO/CsvFormatBuilder {
 
 
 
-    pub def point(x: a): CsvFormatBuilder[r, ka, Pure, a] = CsvFormatBuilder(Graded/MutStateError.point(x))
+    pub def point(x: a): CsvFormatBuilder[r, ka, ef, a] = CsvFormatBuilder(Graded/MutStateError.point(x))
 
     pub def map(f: a -> b \ ef1, ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1, b] =
         CsvFormatBuilder(Graded/MutStateError.map(f, getCsvFormatBuilder(ma)))

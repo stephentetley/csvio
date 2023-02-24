@@ -28,7 +28,7 @@ namespace CsvIO {
     }
 
     instance GradedApplicative[CsvRecordEvaluator[ka]] {
-        pub def point(x: a): CsvRecordEvaluator[ka, Pure, a] = 
+        pub def point(x: a): CsvRecordEvaluator[ka, ef, a] = 
             CsvIO/CsvRecordEvaluator.point(x)
 
         pub def ap(mf: CsvRecordEvaluator[ka, ef1, a -> b \ ef2], 
@@ -94,7 +94,7 @@ namespace CsvIO/CsvRecordEvaluator {
         Graded/EnvError.runEnvError(getCsvRecordEvaluator(ma), e)
 
 
-    pub def point(x: a): CsvRecordEvaluator[ka, Pure, a] = CsvRecordEvaluator(Graded/EnvError.point(x))
+    pub def point(x: a): CsvRecordEvaluator[ka, ef, a] = CsvRecordEvaluator(Graded/EnvError.point(x))
 
     pub def map(f: a -> b \ ef1, ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1, b] =
         CsvRecordEvaluator(Graded/EnvError.map(f, getCsvRecordEvaluator(ma)))
