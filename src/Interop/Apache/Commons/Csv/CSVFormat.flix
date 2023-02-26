@@ -35,6 +35,9 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
         let CSVFormat(p1) = p;
         p1
 
+    pub def wrapHH(fmt: ##org.apache.commons.csv.CSVFormat): CSVFormat = 
+        CSVFormat(fmt)
+
     pub def parse[t: Region -> Type, r: Region, r1: Region]
                 (_: Region[r1], rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r1]] \ { Read(r), Write(r1) } with SubReader[t] = 
         try {

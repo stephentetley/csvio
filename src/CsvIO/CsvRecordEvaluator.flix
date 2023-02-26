@@ -17,7 +17,7 @@
 
 namespace CsvIO {
 
-
+    // `CSVRecord` is immutable so we can use `Graded.EnvError` rather than `Graded.Evaluator`
 
     pub enum CsvRecordEvaluator[ka: Type, ef: Bool, a: Type](
         Graded.EnvError[ka, Interop/Apache/Commons/Csv.CSVRecord, ef, a])
