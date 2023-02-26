@@ -87,79 +87,84 @@ namespace Interop/Apache/Commons/Csv/CSVFormat/Builder {
         let Builder(b1) = b;
         setEscape(b1, ch) |> Builder
 
-    pub def setHeaderAuto!(b: Builder[r]): Builder[r] \ Write(r) =
+    pub def setHeadersAuto!(b: Builder[r]): Builder[r] \ Write(r) =
         import static flixspt.csvio.FormatBuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder \ r;
         let Builder(b1) = b;
         setHeaderEmpty(b1) |> Builder
-/*
 
-    pub def setHeaders!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) =
-        liftSetter!(x -> 
-            region rc {
-                import static flixspt.csvio.FormatBuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-                let arrl = Interop/Util/ArrayList.fromFoldable(rc, l) |> Interop/Util/ArrayList.getHH;
-                setHeader(x, Interop/Util/ArrayList.getHH(arrl))
-            })
+    pub def setHeaders!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region rc {
+        import static flixspt.csvio.FormatBuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r;
+        let Builder(b1) = b;
+        let arrl = Interop/Util/ArrayList.fromFoldable(rc, l) |> Interop/Util/ArrayList.getHH;
+        setHeader(b1, arrl) |> Builder
+    }
 
 
 
-    // pub def setHeaderComments!(l: List[String]): CsvFormatBuilder[r, ka, Unit] \ Write(r) = 
-    //     liftSetter!(x -> 
-    //         unsafe_cast (region r1 {        
-    //             import static flixspt.csvio.FormatBuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r1;
-    //             let arrl = Interop/Util/ArrayList.fromFoldable(r1, l);
-    //             setHeaderComments(x, Interop/Util/ArrayList.getHH(arrl))
-    //         }) as \ Write(r)
-    //     )
+    pub def setHeaderComments!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region r1 {        
+        import static flixspt.csvio.FormatBuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r;
+        let Builder(b1) = b;
+        let arrl = Interop/Util/ArrayList.fromFoldable(r1, l) |> Interop/Util/ArrayList.getHH;
+        setHeaderComments(b1, arrl) |> Builder
+    }
 
-    
-    pub def setIgnoreEmptyLines!(b: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setIgnoreEmptyLines!(ignore: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreEmptyLines(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setIgnoreEmptyLines, b))
+        let Builder(b1) = b;
+        setIgnoreEmptyLines(b1, ignore) |> Builder
 
-    pub def setIgnoreHeaderCase!(b: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setIgnoreHeaderCase!(ignore: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreHeaderCase(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setIgnoreHeaderCase, b))
+        let Builder(b1) = b;
+        setIgnoreHeaderCase(b1, ignore) |> Builder
 
-    pub def setIgnoreSurroundingSpaces!(b: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setIgnoreSurroundingSpaces!(ignore: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setIgnoreSurroundingSpaces(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setIgnoreSurroundingSpaces, b))   
+        let Builder(b1) = b;
+        setIgnoreSurroundingSpaces(b1, ignore) |> Builder
 
     pub def setNullString!(s: String, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setNullString(String): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setNullString, s))  
+        let Builder(b1) = b;
+        setNullString(b1, s) |> Builder
 
-    pub def setQuote!(c: Char, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setQuote!(ch: Char, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setQuote(Char): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setQuote, c))
+        let Builder(b1) = b;
+        setQuote(b1, ch) |> Builder
 
     /// setQuoteMode        
-    pub def setQuoteMode!(m: QuoteMode, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setQuoteMode!(m: ##org.apache.commons.csv.QuoteMode, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setQuoteMode(##org.apache.commons.csv.QuoteMode): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        let m1 = CsvIO/CsvFormat.marshalQuoteMode(m);
-        liftSetter!(flip(setQuoteMode, m1))
+        let Builder(b1) = b;
+        setQuoteMode(b1, m) |> Builder
 
 
-    pub def setRecordSeparator!(c: Char, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setRecordSeparator!(ch: Char, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(Char): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setRecordSeparator, c))
+        let Builder(b1) = b;
+        setRecordSeparator(b1, ch) |> Builder
 
     pub def setRecordSeparatorString!(s: String, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setRecordSeparator(String): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setRecordSeparator, s))
+        let Builder(b1) = b;
+        setRecordSeparator(b1, s) |> Builder
 
-    pub def setSkipHeaderRecord!(b: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setSkipHeaderRecord!(skip: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setSkipHeaderRecord(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setSkipHeaderRecord, b))  
+        let Builder(b1) = b;
+        setSkipHeaderRecord(b1, skip) |> Builder
 
-    pub def setTrailingDelimiter!(b: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setTrailingDelimiter!(trail: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setTrailingDelimiter(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setTrailingDelimiter, b))  
+        let Builder(b1) = b;
+        setTrailingDelimiter(b1, trail) |> Builder
 
-    pub def setTrim!(b: Bool, b: Builder[r], b: Builder[r]): Builder[r] \ Write(r) = 
+    pub def setTrim!(trim: Bool, b: Builder[r]): Builder[r] \ Write(r) = 
         import org.apache.commons.csv.CSVFormat$Builder.setTrim(Bool): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        liftSetter!(flip(setTrim, b))  
+        let Builder(b1) = b;
+        setTrim(b1, trim) |> Builder
 
-*/
+
 
 }

@@ -76,9 +76,19 @@ namespace CsvIO/CsvFormat {
         }
 
 
-    pub def getCsvFormat(f: CsvFormat): ##org.apache.commons.csv.CSVFormat = 
+    pub def getHH(f: CsvFormat): ##org.apache.commons.csv.CSVFormat = 
         let CsvFormat(f1) = f;
         f1
+
+    pub def toCSVFormat(f: CsvFormat): Interop/Apache/Commons/Csv.CSVFormat = 
+        use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+        let CsvFormat(f1) = f;
+        CSVFormat(f1)
+
+    pub def fromCSVFormat(f: Interop/Apache/Commons/Csv.CSVFormat): CsvFormat = 
+        use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+        let CSVFormat(f1) = f;
+        CsvFormat(f1)
 
 
     pub enum PredefinedFormat with Eq, Order, ToString, Boxable, Hash {
