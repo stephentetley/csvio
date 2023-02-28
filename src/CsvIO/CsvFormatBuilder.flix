@@ -19,7 +19,7 @@ namespace CsvIO {
 
 
     pub enum CsvFormatBuilder[r: Region, ka: Type, ef: Bool, a: Type](
-        Graded.Builder[r, ka, Interop/Apache/Commons/Csv/CSVFormat.Builder, ef, a]
+        Graded.Builder[ka, Interop/Apache/Commons/Csv/CSVFormat.Builder[r], ef, a]
     )
 
     instance GradedFunctor[CsvFormatBuilder[r, ka]] {
@@ -54,7 +54,7 @@ namespace CsvIO/CsvFormatBuilder {
     use CsvIO.CsvFormat.{CsvFormat}
     use CsvIO/CsvFormat.QuoteMode
 
-    pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, ef, a]): Graded.Builder[r, ka, Interop/Apache/Commons/Csv/CSVFormat.Builder, ef, a] = 
+    pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, ef, a]): Graded.Builder[ka, Interop/Apache/Commons/Csv/CSVFormat.Builder[r], ef, a] = 
         let CsvFormatBuilder(x1) = x;
         x1
 
