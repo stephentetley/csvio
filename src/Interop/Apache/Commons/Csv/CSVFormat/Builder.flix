@@ -87,25 +87,25 @@ namespace Interop/Apache/Commons/Csv/CSVFormat/Builder {
         let Builder(b1) = b;
         setEscape(b1, ch) |> Builder
 
-    pub def setHeadersAuto!(b: Builder[r]): Builder[r] \ Write(r) =
-        import static flixspt.csvio.FormatBuilderVarargs.setHeaderEmpty(##org.apache.commons.csv.CSVFormat$Builder): ##org.apache.commons.csv.CSVFormat$Builder \ r;
+    pub def setHeadersAuto!(b: Builder[r]): Builder[r] \ Write(r) = region rc {
+        import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String, rc]): ##org.apache.commons.csv.CSVFormat$Builder \ r;
         let Builder(b1) = b;
-        setHeaderEmpty(b1) |> Builder
-
-    pub def setHeaders!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region rc {
-        import static flixspt.csvio.FormatBuilderVarargs.setHeader(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        let Builder(b1) = b;
-        let arrl = Interop/Util/ArrayList.fromFoldable(rc, l) |> Interop/Util/ArrayList.getHH;
-        setHeader(b1, arrl) |> Builder
+        let arr: Array[String, rc] = Array#{} @ rc;
+        setHeader(b1, arr) |> Builder
     }
 
-
-
-    pub def setHeaderComments!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region r1 {        
-        import static flixspt.csvio.FormatBuilderVarargs.setHeaderComments(##org.apache.commons.csv.CSVFormat$Builder, ##java.util.ArrayList): ##org.apache.commons.csv.CSVFormat$Builder \ r;
+    pub def setHeaders!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region rc {
+        import org.apache.commons.csv.CSVFormat$Builder.setHeader(Array[String, rc]): ##org.apache.commons.csv.CSVFormat$Builder \ r;
         let Builder(b1) = b;
-        let arrl = Interop/Util/ArrayList.fromFoldable(r1, l) |> Interop/Util/ArrayList.getHH;
-        setHeaderComments(b1, arrl) |> Builder
+        let arr = List.toArray(rc, l);
+        setHeader(b1, arr) |> Builder
+    }
+
+    pub def setHeaderComments!(l: List[String], b: Builder[r]): Builder[r] \ Write(r) = region rc {        
+        import org.apache.commons.csv.CSVFormat$Builder.setHeaderComments(Array[String, rc]): ##org.apache.commons.csv.CSVFormat$Builder \ r;
+        let Builder(b1) = b;
+        let arr = List.toArray(rc, l);
+        setHeaderComments(b1, arr) |> Builder
     }
 
     pub def setIgnoreEmptyLines!(ignore: Bool, b: Builder[r]): Builder[r] \ Write(r) = 

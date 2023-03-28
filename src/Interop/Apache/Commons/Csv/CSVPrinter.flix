@@ -41,46 +41,34 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
 
     pub def newCSVPrinter[r: Region, r1: Region, t: Region -> Type]
                         (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
-        try {
+        Result.tryCatch(_ -> {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
             let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);        
-            CSVPrinter(newCSVPrinter(ws1, fmt1)) |> Ok 
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex))
-        }
+            CSVPrinter(newCSVPrinter(ws1, fmt1))
+        })
 
 
 
 
     pub def close!(p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
-        try {
+        Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVPrinter.close(): Unit \ r;
             let CSVPrinter(p1) = p;
-            close(p1) |> Ok
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))
-        }
+            close(p1)
+        })
 
 
     pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
-        try {
+        Result.tryCatch(_ -> {
             region rc {
-                import static flixspt.csvio.PrinterVarargs.printRecordOfStrings(##org.apache.commons.csv.CSVPrinter, ##java.util.ArrayList): Unit \ r;
+                import org.apache.commons.csv.CSVPrinter.printRecord(Array[##java.lang.Object, rc]): Unit \ r;
                 let CSVPrinter(p1) = p;
-                let arrl = Interop/Util/ArrayList.fromFoldable(rc, l);
-                printRecordOfStrings(p1, Interop/Util/ArrayList.getHH(arrl));
-                Ok()
+                let objList: List[##java.lang.Object] = List.map(s -> checked_cast(s), l);
+                let arr = List.toArray(rc, objList);
+                printRecord(p1, arr)
             }
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))
-        }
+        })
 
 
 }

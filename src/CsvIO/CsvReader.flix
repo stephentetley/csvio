@@ -17,14 +17,15 @@
 
 namespace CsvIO/CsvReader {
     
-    use Basis/NIO/File.Path;
-    use Basis/NIO/Charset.Charset;
+    use Basis/NIO/File.Path
+    use Basis/NIO/Charset.Charset
 
-    use CsvIO.CsvFormat;
-    use CsvIO.CsvRecordEvaluator;
-    use CsvIO.CsvFormat.{CsvFormat};
-    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
-
+    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat}
+    use CsvIO.CsvFormat
+    use CsvIO.CsvRecordEvaluator
+    use CsvIO.CsvFormat.{CsvFormat}
+    use CsvIO/CsvReader.CsvReadHandle
+    use CsvIO/CsvReader.CsvReadHandle.{CsvReadHandle}
 
 
     /// To use Flix's stdlib Iterator we need to retain a handle

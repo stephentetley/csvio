@@ -29,6 +29,16 @@ namespace CsvIO/CsvFormat {
 
     use CsvIO.CsvFormat;
     use CsvIO.CsvFormat.{CsvFormat};
+    use CsvIO/CsvFormat.QuoteMode
+    use CsvIO/CsvFormat.QuoteMode.{
+        All, AllNonNull, Minimal, NonNumeric, NoQuote
+    }
+    use CsvIO/CsvFormat.PredefinedFormat
+    use CsvIO/CsvFormat.PredefinedFormat.{
+        DEFAULT, EXCEL, INFORMIX_UNLOAD, INFORMIX_UNLOAD_CSV,
+        MONGODB_CSV, MONGODB_TSV, MYSQL, ORACLE,
+        RFC4180, POSTGRESQL_CSV, POSTGRESQL_TEXT, TDF
+    }
 
     pub enum QuoteMode with Eq, Order, ToString, Boxable, Hash {
         case All
@@ -37,8 +47,6 @@ namespace CsvIO/CsvFormat {
         case NonNumeric
         case NoQuote
     }
-
-
 
     pub def marshalQuoteMode(x: QuoteMode): ##org.apache.commons.csv.QuoteMode = 
         import static get org.apache.commons.csv.QuoteMode.ALL: ##org.apache.commons.csv.QuoteMode \ {} as get_ALL;
@@ -57,8 +65,8 @@ namespace CsvIO/CsvFormat {
 
     def primEqualsQuoteMode(x: ##org.apache.commons.csv.QuoteMode, y: ##org.apache.commons.csv.QuoteMode): Bool =
         import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
-        let x1 = unsafe_cast x as ##java.lang.Enum;
-        let y1 = unsafe_cast y as ##java.lang.Object;
+        let x1: ##java.lang.Enum = checked_cast(x);
+        let y1: ##java.lang.Object = checked_cast(y);
         equals(x1, y1)
 
     pub def unmarshalQuoteMode(x: ##org.apache.commons.csv.QuoteMode): QuoteMode = 
