@@ -193,12 +193,12 @@ namespace CsvIO/CsvRecordEvaluator {
     // TODO - toList, toMap...
 
     pub def parseAt(ix: Int32, parse: String -> Option[a] \ ef, msg: String): CsvRecordEvaluator[ka, ef, a] =
-        let* s = getStringAt(ix);
-        GradedError.liftOption(msg, parse(s))
+        use GradedMonad.{>>=};
+        getStringAt(ix) >>= (s -> GradedError.liftOption(msg, parse(s)))
 
     pub def parseNamed(label: String, parse: String -> Option[a] \ ef, msg: String): CsvRecordEvaluator[ka, ef, a] =
-        let* s = getStringNamed(label);
-        GradedError.liftOption(msg, parse(s))
+        use GradedMonad.{>>=};
+        getStringNamed(label) >>= (s -> GradedError.liftOption(msg, parse(s)))
 
 
     pub def getInt8At(ix: Int32): CsvRecordEvaluator[ka, Pure, Int8] =

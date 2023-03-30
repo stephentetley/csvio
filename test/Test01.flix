@@ -5,77 +5,55 @@ namespace Test01 {
 
 
     @test
-    def test01(): Result[String, Unit] & Impure = 
+    def test01(): Result[String, Unit] \ IO = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
         region r1 {
-            let* path   = Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass.csv");
-            let eval    = GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
-            let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true));
-            let* hdl    = CsvIO/CsvReader.newCsvReadHandle(r1, fmt, Basis/NIO/Charset/Charset.utf_8(), eval, path);
-            let iter    = CsvIO/CsvReader.getIterator(hdl);
-            let _       = Iterator.forEach(ans -> println("test01: ${ans}"), iter);
-            let* _      = CsvIO/CsvReader.close!(hdl);
-            Ok()
+            forM (path      <- Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass.csv");
+                    eval    <- Ok(GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation")));
+                    fmt     <- CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true));
+                    hdl     <- CsvIO/CsvReader.newCsvReadHandle(r1, fmt, Basis/NIO/Charset/Charset.utf_8(), eval, path);
+                    iter    <- Ok(CsvIO/CsvReader.getIterator(hdl));
+                    _       <- Ok(Iterator.forEach(ans -> println("test01: ${ans}"), iter));
+                    _       <- CsvIO/CsvReader.close!(hdl))
+            yield ()
         }
     
     @test
-    def test02(): Result[String, Unit] & Impure = 
+    def test02(): Result[String, Unit] \ IO = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{setHeaders!, setSkipHeaderRecord!};
         region r1 {
-            let* path    = Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass-utf8-bom.csv");
-            let eval    = GradedApplicative.product(getStringNamed("Short"), getStringNamed("Long"));
-            let* fmt    = CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Short" :: "Long" :: Nil) *> setSkipHeaderRecord!(true));
-            let* hdl    = CsvIO/CsvReader.newCsvReadHandleWithBOM(r1, fmt, eval, path);
-            let iter    = CsvIO/CsvReader.getIterator(hdl);
-            let _       = Iterator.forEach(ans -> println("test02: ${ans}"), iter);
-            let* _      = CsvIO/CsvReader.close!(hdl);
-            Ok()
+            forM (path      <- Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass-utf8-bom.csv");
+                    eval    <- Ok(GradedApplicative.product(getStringNamed("Short"), getStringNamed("Long")));
+                    fmt     <- CsvIO/CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Short" :: "Long" :: Nil) *> setSkipHeaderRecord!(true));
+                    hdl     <- CsvIO/CsvReader.newCsvReadHandleWithBOM(r1, fmt, eval, path);
+                    iter    <- Ok(CsvIO/CsvReader.getIterator(hdl));
+                    _       <- Ok(Iterator.forEach(ans -> println("test02: ${ans}"), iter));
+                    _       <- CsvIO/CsvReader.close!(hdl))
+            yield ()
         }
 
     @test
-    def test03(): Result[String, Unit] & Impure = 
+    def test03(): Result[String, Unit] \ IO = 
         use Result.flatMap;
         use CsvIO/CsvRecordEvaluator.{getStringNamed};
         use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
         use CsvIO/CsvFormatBuilder.{toCsvFormatWithCsvFormat, setHeaderAuto!, setHeaders!};
         region r1 {
-            let* path   = Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass.csv");
-            let* outpath = Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass-out.csv");
-            let eval    = GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
             let toCells = xy -> {let (x, y) = xy; y :: x :: Nil};  /// Flip 
-            let* fmt1   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto!());
-            let* src    = CsvIO/CsvReader.readCsv(r1, fmt1, Basis/NIO/Charset/Charset.utf_8(), eval, path);
-            let* fmt2   = toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders!("Short" :: "Long" :: Nil));
-            let* _      = CsvIO/CsvWriter.outputCsv(fmt2, Basis/NIO/Charset/Charset.utf_8(), outpath, toCells, src);
-            println("test02 - done");
-            Ok()
+            forM (path      <- Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass.csv");
+                    outpath <- Basis/NIO/File/Path.newPath("E://coding/flix/csvio/data/compass-out.csv");
+                    eval    <- Ok(GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation")));
+                    fmt1    <- toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto!());
+                    src     <- CsvIO/CsvReader.readCsv(r1, fmt1, Basis/NIO/Charset/Charset.utf_8(), eval, path);
+                    fmt2    <- toCsvFormatWithCsvFormat(r1, CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders!("Short" :: "Long" :: Nil));
+                    _       <- CsvIO/CsvWriter.outputCsv(fmt2, Basis/NIO/Charset/Charset.utf_8(), outpath, toCells, src))            
+            yield ()
         }
-/*
-
-    @test
-    def test04(): Result[String, Unit] & Impure = 
-        use Result.flatMap;
-        use CsvIO/RowEvaluator.{getStringNamed};
-        use CsvIO/CsvFormat.PredefinedFormat.{DEFAULT};
-        use CsvIO/CsvFormatBuilder.{toCsvFormatWithCsvFormat, setHeaderAuto, setHeaders, setSkipHeaderRecord};
-        let path    = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass.csv");
-        let outpath = FlixSandbox/System/FilePath.filePath("E://coding/flix/csvio/data/compass-out-utf8-bom.csv");
-        let eval    = GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation"));
-        let toCells = xy -> {let (x, y) = xy; y :: x :: Nil};  /// Flip 
-        let* fmt1    = region r1 {
-            toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaderAuto() *> setSkipHeaderRecord(true), r1)
-        };        
-        let* src    = CsvIO/CsvReader.readCsv(fmt1, Text/Charset.utf_8(), eval, path);
-        let* fmt2   = region r1 {
-            toCsvFormatWithCsvFormat(CsvIO/CsvFormat.makeCsvFormat(DEFAULT), setHeaders("Short" :: "Long" :: Nil), r1)
-        };        
-        let* _      = CsvIO/CsvWriter.outputCsvWithBOM(fmt2, Text/Charset.utf_8(), outpath, toCells, src);
-        Ok() 
-*/        
+       
 }

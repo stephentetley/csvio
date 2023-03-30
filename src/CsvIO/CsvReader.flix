@@ -52,22 +52,14 @@ namespace CsvIO/CsvReader {
                             cs: Charset,
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { Read(r), Write(r), IO } =
-        use Result.{flatMap};
-        try {
-            let CsvFormat(fmt1) = format;
-            let* file1      = Basis/NIO/File/Path.toFile(rc, path);
-            let* ins        = Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
-            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs);
-            let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
-            let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser);
-            let iter2       = Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1);
-            let hdl         = CsvReadHandle((parser, iter2));
-            Ok(hdl)
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))           
-        }
+        let CsvFormat(fmt1) = format;
+        forM (file1     <- Basis/NIO/File/Path.toFile(rc, path);
+                ins     <- Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
+                reader  <- Ok(Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs));
+                parser  <- Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
+                iter1   <- Ok(Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser));
+                iter2   <- Ok(Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1)))
+        yield CsvReadHandle((parser, iter2))
 
 
     pub def readCsv(r: Region[r], 
@@ -75,12 +67,11 @@ namespace CsvIO/CsvReader {
                     charset: Charset,
                     eval: CsvRecordEvaluator[a, ef, a], 
                     path: Path): Result[String, List[a]]  \ { ef, Read(r), Write(r), IO } =
-        use Result.flatMap;
-        let* hdl    = newCsvReadHandle(r, format, charset, eval, path);
-        let iter    = getIterator(hdl);
-        let* xs     = Iterator.toList(iter) |> Result.sequence;
-        let* _      = close!(hdl);
-        Ok(xs)
+        forM (hdl   <- newCsvReadHandle(r, format, charset, eval, path);
+                iter  <- Ok(getIterator(hdl));
+                xs    <- Iterator.toList(iter) |> Result.sequence;
+                _     <- close!(hdl))
+        yield xs
 
 
     ///
@@ -90,26 +81,18 @@ namespace CsvIO/CsvReader {
                             format: CsvFormat,
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { ef, Read(r), Write(r), IO } =
-        use Result.{flatMap};
-        try {
-            let CsvFormat(fmt1) = format;
-            let* file1      = Basis/NIO/File/Path.toFile(rc, path);
-            let* ins        = Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
-            let bomIns      = Interop/Apache/Commons/IO/Input/BOMInputStream.new(rc, ins);
-            let* csname     = Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
-            let csname1     = Option.getWithDefault("UTF-16", csname);
-            let* cs1        = Basis/NIO/Charset/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
-            let reader      = Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs1);
-            let* parser     = Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
-            let iter1       = Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser);
-            let iter2       = Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1);
-            let hdl         = CsvReadHandle((parser, iter2));
-            Ok(hdl)
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))           
-        }
+        let CsvFormat(fmt1) = format;
+        forM (file1     <- Basis/NIO/File/Path.toFile(rc, path);
+                ins     <- Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
+                bomIns  <- Ok(Interop/Apache/Commons/IO/Input/BOMInputStream.new(rc, ins));
+                csname  <- Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
+                csname1 <- Ok(Option.getWithDefault("UTF-16", csname));
+                cs1     <- Basis/NIO/Charset/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+                reader  <- Ok(Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs1));
+                parser  <- Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
+                iter1   <- Ok(Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser));
+                iter2   <- Ok(Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1)))
+        yield CsvReadHandle((parser, iter2))
 
 
 

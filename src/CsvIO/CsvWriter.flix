@@ -37,14 +37,14 @@ namespace CsvIO/CsvWriter {
         use Result.flatMap;
         region rc {
             let CsvFormat(format1) = format;
-            let* file1      = Basis/NIO/File/Path.toFile(rc, path);
-            let* fos        = Interop/IO/FileOutputStream.newWithFile(rc, file1);
-            let outs        = Interop/IO/SubOutputStream.toOutputStream(fos);
-            let writer      = Interop/IO/OutputStreamWriter.newOutputStreamWriter(rc, outs, cs);
-            let* printer    = Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1));
-            let* _          = Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
-            let* _          = Interop/Apache/Commons/Csv/CSVPrinter.close!(printer);
-            Ok()
+            forM (file1     <- Basis/NIO/File/Path.toFile(rc, path);
+                    fos     <- Interop/IO/FileOutputStream.newWithFile(rc, file1);
+                    outs    <- Ok(Interop/IO/SubOutputStream.toOutputStream(fos));
+                    writer  <- Ok(Interop/IO/OutputStreamWriter.newOutputStreamWriter(rc, outs, cs));
+                    printer <- Interop/Apache/Commons/Csv/CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1));
+                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Interop/Apache/Commons/Csv/CSVPrinter.printRecord!(cells, printer)}, rows);
+                    _       <- Interop/Apache/Commons/Csv/CSVPrinter.close!(printer))
+            yield ()
         }
 
 
