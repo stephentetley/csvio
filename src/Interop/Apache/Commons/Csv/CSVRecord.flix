@@ -38,36 +38,39 @@ namespace Interop/Apache/Commons/Csv/CSVRecord {
         CSVRecord(x)
 
     pub def getStringAt(ix: Int32, x: CSVRecord): Result[String, String] =
-        try {
+        Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVRecord.get(Int32): String \ {} as get1;
             let CSVRecord(x1) = x;
-            get1(x1, ix) |> Ok
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex))
-        }
+            get1(x1, ix)
+        })
 
     pub def getStringNamed(label: String, x: CSVRecord): Result[String, String] =
-        try {
+        Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVRecord.get(String): String \ {} as get1;
             let CSVRecord(x1) = x;
-            get1(x1, label) |> Ok
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex))
-        }
+            get1(x1, label)
+        })
 
     pub def hasComment(x: CSVRecord): Bool =
         import org.apache.commons.csv.CSVRecord.hasComment(): Bool \ {};
         let CSVRecord(x1) = x;
         hasComment(x1)
 
+    pub def getCharacterPosition(x: CSVRecord): Int64 =
+        import org.apache.commons.csv.CSVRecord.getCharacterPosition(): Int64 \ {};
+        let CSVRecord(x1) = x;
+        getCharacterPosition(x1)
+
     pub def getComment(x: CSVRecord): Option[String] =
         import org.apache.commons.csv.CSVRecord.getComment(): String \ {};
         let CSVRecord(x1) = x;
         getComment(x1) |> Object.toOption
+
+    pub def getRecordNumber(x: CSVRecord): Int64 =
+        import org.apache.commons.csv.CSVRecord.getRecordNumber(): Int64 \ {};
+        let CSVRecord(x1) = x;
+        getRecordNumber(x1)
+
 
     pub def isConsistent(x: CSVRecord): Bool =
         import org.apache.commons.csv.CSVRecord.isConsistent(): Bool \ {};
@@ -88,5 +91,10 @@ namespace Interop/Apache/Commons/Csv/CSVRecord {
         import org.apache.commons.csv.CSVRecord.isSet(String): Bool \ {};
         let CSVRecord(x1) = x;
         isSet(x1, label)
+
+    pub def size(x: CSVRecord): Int32 =
+        import org.apache.commons.csv.CSVRecord.size(): Int32 \ {};
+        let CSVRecord(x1) = x;
+        size(x1)
 
 }

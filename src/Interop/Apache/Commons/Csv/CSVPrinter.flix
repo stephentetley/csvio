@@ -59,6 +59,14 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
         })
 
 
+    pub def flush!(p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
+        Result.tryCatch(_ -> {
+            import org.apache.commons.csv.CSVPrinter.flush(): Unit \ r;
+            let CSVPrinter(p1) = p;
+            flush(p1)
+        })
+
+
     pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
         Result.tryCatch(_ -> {
             region rc {
