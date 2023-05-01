@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Interop/Apache/Commons/Csv {
+mod Interop.Apache.Commons.Csv {
 
 
     /// Class / Immutable
@@ -24,10 +24,10 @@ namespace Interop/Apache/Commons/Csv {
 
 }
 
-namespace Interop/Apache/Commons/Csv/CSVRecord {
+mod Interop.Apache.Commons.Csv.CSVRecord {
 
-    use Interop/Apache/Commons/Csv.CSVRecord;
-    use Interop/Apache/Commons/Csv.CSVRecord.{CSVRecord};
+    use Interop.Apache.Commons.Csv.CSVRecord
+    use Interop.Apache.Commons.Csv.CSVRecord.{CSVRecord}
 
     
     pub def getHH(x: CSVRecord): ##org.apache.commons.csv.CSVRecord = 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Interop/Apache/Commons/Csv {
+mod Interop.Apache.Commons.Csv {
 
     /// Class / Immutable (if avoid using the deprecated methods)
 
@@ -22,14 +22,14 @@ namespace Interop/Apache/Commons/Csv {
 
 }
 
-namespace Interop/Apache/Commons/Csv/CSVFormat {
+mod Interop.Apache.Commons.Csv.CSVFormat {
 
-    use Interop/Apache/Commons/Csv.CSVFormat;
-    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
-    use Interop/Apache/Commons/Csv.CSVParser;
-    use Interop/Apache/Commons/Csv.CSVParser.{CSVParser};
+    use Interop.IO.SubReader
+    use Interop.Apache.Commons.Csv.CSVFormat
+    use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use Interop.Apache.Commons.Csv.CSVParser
+    use Interop.Apache.Commons.Csv.CSVParser.{CSVParser}
 
-    use Interop/IO.SubReader;
 
     pub def getHH(p: CSVFormat): ##org.apache.commons.csv.CSVFormat = 
         let CSVFormat(p1) = p;
@@ -40,15 +40,11 @@ namespace Interop/Apache/Commons/Csv/CSVFormat {
 
     pub def parse[t: Region -> Type, r: Region, r1: Region]
                 (_: Region[r1], rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r1]] \ { Read(r), Write(r1) } with SubReader[t] = 
-        try {
+        Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ {r, r1};
             let CSVFormat(fmt1) = fmt;
-            let rd1 = Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(rd));
-            CSVParser(parse(fmt1, rd1)) |> Ok
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))
-        }
+            let rd1 = Interop.IO.Reader.getHH(Interop.IO.SubReader.toReader(rd));
+            CSVParser(parse(fmt1, rd1))
+        })
 
 }

@@ -15,23 +15,23 @@
  */
 
 
-namespace CsvIO/CsvReader {
+mod CsvIO.CsvReader {
     
-    use Basis/NIO/File.Path
-    use Basis/NIO/Charset.Charset
+    use Basis.NIO.File.Path
+    use Basis.NIO.Charset.Charset
 
-    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat}
+    use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     use CsvIO.CsvFormat
     use CsvIO.CsvRecordEvaluator
     use CsvIO.CsvFormat.{CsvFormat}
-    use CsvIO/CsvReader.CsvReadHandle
-    use CsvIO/CsvReader.CsvReadHandle.{CsvReadHandle}
+    use CsvIO.CsvReader.CsvReadHandle
+    use CsvIO.CsvReader.CsvReadHandle.{CsvReadHandle}
 
 
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
     /// 
-    pub enum CsvReadHandle[r: Region, ef: Bool, a: Type]((Interop/Apache/Commons/Csv.CSVParser[r], Iterator[Result[String, a], ef, r]))
+    pub enum CsvReadHandle[r: Region, ef: Bool, a: Type]((Interop.Apache.Commons.Csv.CSVParser[r], Iterator[Result[String, a], ef, r]))
 
     pub def getIterator(handle: CsvReadHandle[r, ef, a]): Iterator[Result[String, a], ef, r] = 
         let CsvReadHandle((_, i1)) = handle;
@@ -39,7 +39,7 @@ namespace CsvIO/CsvReader {
 
     pub def close!(handle: CsvReadHandle[r, ef, a]): Result[String, Unit] \ Write(r) = 
         let CsvReadHandle((x1, _)) = handle;
-        Interop/Apache/Commons/Csv/CSVParser.close!(x1)
+        Interop.Apache.Commons.Csv.CSVParser.close!(x1)
 
 
 
@@ -53,12 +53,12 @@ namespace CsvIO/CsvReader {
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { Read(r), Write(r), IO } =
         let CsvFormat(fmt1) = format;
-        forM (file1     <- Basis/NIO/File/Path.toFile(rc, path);
-                ins     <- Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
-                reader  <- Ok(Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs));
-                parser  <- Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
-                iter1   <- Ok(Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser));
-                iter2   <- Ok(Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1)))
+        forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
+                ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);
+                reader  <- Ok(Interop.IO.InputStreamReader.newInputStreamReader(rc, ins, cs));
+                parser  <- Interop.Apache.Commons.Csv.CSVFormat.parse(rc, reader, CSVFormat(fmt1));
+                iter1   <- Ok(Interop.Apache.Commons.Csv.CSVParser.iterator(rc, parser));
+                iter2   <- Ok(Iterator.map(row -> CsvIO.CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop.Apache.Commons.Csv.CSVRecord.wrapHH(row)), iter1)))
         yield CsvReadHandle((parser, iter2))
 
 
@@ -82,16 +82,16 @@ namespace CsvIO/CsvReader {
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { ef, Read(r), Write(r), IO } =
         let CsvFormat(fmt1) = format;
-        forM (file1     <- Basis/NIO/File/Path.toFile(rc, path);
-                ins     <- Interop/IO/FileInputStream.newWithFile(rc, file1) |> Result.map(Interop/IO/SubInputStream.toInputStream);
-                bomIns  <- Ok(Interop/Apache/Commons/IO/Input/BOMInputStream.new(rc, ins));
-                csname  <- Interop/Apache/Commons/IO/Input/BOMInputStream.getBOMCharsetName(bomIns);
+        forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
+                ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);
+                bomIns  <- Ok(Interop.Apache.Commons.IO.Input.BOMInputStream.new(rc, ins));
+                csname  <- Interop.Apache.Commons.IO.Input.BOMInputStream.getBOMCharsetName(bomIns);
                 csname1 <- Ok(Option.getWithDefault("UTF-16", csname));
-                cs1     <- Basis/NIO/Charset/Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
-                reader  <- Ok(Interop/IO/InputStreamReader.newInputStreamReader(rc, ins, cs1));
-                parser  <- Interop/Apache/Commons/Csv/CSVFormat.parse(rc, reader, CSVFormat(fmt1));
-                iter1   <- Ok(Interop/Apache/Commons/Csv/CSVParser.iterator(rc, parser));
-                iter2   <- Ok(Iterator.map(row -> CsvIO/CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop/Apache/Commons/Csv/CSVRecord.wrapHH(row)), iter1)))
+                cs1     <- Basis.NIO.Charset.Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+                reader  <- Ok(Interop.IO.InputStreamReader.newInputStreamReader(rc, ins, cs1));
+                parser  <- Interop.Apache.Commons.Csv.CSVFormat.parse(rc, reader, CSVFormat(fmt1));
+                iter1   <- Ok(Interop.Apache.Commons.Csv.CSVParser.iterator(rc, parser));
+                iter2   <- Ok(Iterator.map(row -> CsvIO.CsvRecordEvaluator.runCsvRecordEvaluator(eval, Interop.Apache.Commons.Csv.CSVRecord.wrapHH(row)), iter1)))
         yield CsvReadHandle((parser, iter2))
 
 

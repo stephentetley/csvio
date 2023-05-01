@@ -1,3 +1,8 @@
+### v0.2.0
+   Change `namespace` to `mod`.
+   Removed `Boxable` instances.
+   Updated dependencies.
+
 ### v0.1.2
    Updated dependencies.
 

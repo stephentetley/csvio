@@ -15,7 +15,7 @@
  */
 
 
-namespace CsvIO {
+mod CsvIO {
 
     ///
     /// Represents a CSVFormat.
@@ -25,22 +25,22 @@ namespace CsvIO {
 }
 
 
-namespace CsvIO/CsvFormat {
+mod CsvIO.CsvFormat {
 
-    use CsvIO.CsvFormat;
-    use CsvIO.CsvFormat.{CsvFormat};
-    use CsvIO/CsvFormat.QuoteMode
-    use CsvIO/CsvFormat.QuoteMode.{
+    use CsvIO.CsvFormat
+    use CsvIO.CsvFormat.{CsvFormat}
+    use CsvIO.CsvFormat.QuoteMode
+    use CsvIO.CsvFormat.QuoteMode.{
         All, AllNonNull, Minimal, NonNumeric, NoQuote
     }
-    use CsvIO/CsvFormat.PredefinedFormat
-    use CsvIO/CsvFormat.PredefinedFormat.{
+    use CsvIO.CsvFormat.PredefinedFormat
+    use CsvIO.CsvFormat.PredefinedFormat.{
         DEFAULT, EXCEL, INFORMIX_UNLOAD, INFORMIX_UNLOAD_CSV,
         MONGODB_CSV, MONGODB_TSV, MYSQL, ORACLE,
         RFC4180, POSTGRESQL_CSV, POSTGRESQL_TEXT, TDF
     }
 
-    pub enum QuoteMode with Eq, Order, ToString, Boxable, Hash {
+    pub enum QuoteMode with Eq, Order, ToString, Hash {
         case All
         case AllNonNull
         case Minimal
@@ -88,18 +88,18 @@ namespace CsvIO/CsvFormat {
         let CsvFormat(f1) = f;
         f1
 
-    pub def toCSVFormat(f: CsvFormat): Interop/Apache/Commons/Csv.CSVFormat = 
-        use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+    pub def toCSVFormat(f: CsvFormat): Interop.Apache.Commons.Csv.CSVFormat = 
+        use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat};
         let CsvFormat(f1) = f;
         CSVFormat(f1)
 
-    pub def fromCSVFormat(f: Interop/Apache/Commons/Csv.CSVFormat): CsvFormat = 
-        use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat};
+    pub def fromCSVFormat(f: Interop.Apache.Commons.Csv.CSVFormat): CsvFormat = 
+        use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat};
         let CSVFormat(f1) = f;
         CsvFormat(f1)
 
 
-    pub enum PredefinedFormat with Eq, Order, ToString, Boxable, Hash {
+    pub enum PredefinedFormat with Eq, Order, ToString, Hash {
         case DEFAULT
         case EXCEL
         case INFORMIX_UNLOAD
@@ -173,7 +173,7 @@ namespace CsvIO/CsvFormat {
 
     pub def makeCsvFormatWithHeaders(format: PredefinedFormat, headers: List[String]): Result[String, CsvFormat] =
         region r1 {
-            CsvIO/CsvFormatBuilder.toCsvFormatWithCsvFormat(r1, makeCsvFormat(format), CsvIO/CsvFormatBuilder.setHeaders!(headers))
+            CsvIO.CsvFormatBuilder.toCsvFormatWithCsvFormat(r1, makeCsvFormat(format), CsvIO.CsvFormatBuilder.setHeaders!(headers))
         }
 
 }

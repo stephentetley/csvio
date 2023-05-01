@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Interop/Apache/Commons/Csv {
+mod Interop.Apache.Commons.Csv {
 
     /// Class / Mutable 
 
@@ -22,12 +22,12 @@ namespace Interop/Apache/Commons/Csv {
 
 }
 
-namespace Interop/Apache/Commons/Csv/CSVFormatBuilder {
+mod Interop.Apache.Commons.Csv.CSVFormatBuilder {
 
-    use Interop/Apache/Commons/Csv/CSVFormatBuilder
-    use Interop/Apache/Commons/Csv/CSVFormatBuilder.{CSVFormatBuilder}
-    use Interop/Apache/Commons/Csv.CSVFormat
-    use Interop/Apache/Commons/Csv.CSVFormat.{CSVFormat}
+    use Interop.Apache.Commons.Csv.CSVFormatBuilder
+    use Interop.Apache.Commons.Csv.CSVFormatBuilder.{CSVFormatBuilder}
+    use Interop.Apache.Commons.Csv.CSVFormat
+    use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     
 
     pub def getHH(b: CSVFormatBuilder[r]): ##org.apache.commons.csv.CSVFormat$Builder = 
@@ -40,13 +40,13 @@ namespace Interop/Apache/Commons/Csv/CSVFormatBuilder {
 
     pub def createWithCSVFormat(_: Region[r], fmt: CSVFormat): CSVFormatBuilder[r] \ { Write(r) }= 
         import static org.apache.commons.csv.CSVFormat$Builder.create(##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);
+        let fmt1 = Interop.Apache.Commons.Csv.CSVFormat.getHH(fmt);
         create(fmt1) |> CSVFormatBuilder
 
     pub def build(b: CSVFormatBuilder[r]): CSVFormat \ { Read(r) } = 
         import org.apache.commons.csv.CSVFormat$Builder.build(): ##org.apache.commons.csv.CSVFormat \ {r};
         let CSVFormatBuilder(b1) = b;
-        build(b1) |> Interop/Apache/Commons/Csv/CSVFormat.wrapHH
+        build(b1) |> Interop.Apache.Commons.Csv.CSVFormat.wrapHH
 
 
     pub def setAllowDuplicateHeaderNames!(allow: Bool, b: CSVFormatBuilder[r]): CSVFormatBuilder[r] \ Write(r) = 

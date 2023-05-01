@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Interop/Apache/Commons/Csv {
+mod Interop.Apache.Commons.Csv {
 
     /// Class / Mutable (contains an underlying output stream c.f. `close!`)
 
@@ -23,14 +23,13 @@ namespace Interop/Apache/Commons/Csv {
     
 }
 
-namespace Interop/Apache/Commons/Csv/CSVPrinter {
+mod Interop.Apache.Commons.Csv.CSVPrinter {
 
-    use Interop/Lang.ImpAppendable;
+    use Interop.Lang.ImpAppendable
 
-    use Interop/Apache/Commons/Csv.CSVPrinter;
-    use Interop/Apache/Commons/Csv.CSVPrinter.{CSVPrinter};
-    
-    use Interop/Apache/Commons/Csv.CSVFormat;
+    use Interop.Apache.Commons.Csv.CSVPrinter
+    use Interop.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
+    use Interop.Apache.Commons.Csv.CSVFormat
     
 
 
@@ -43,8 +42,8 @@ namespace Interop/Apache/Commons/Csv/CSVPrinter {
                         (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
         Result.tryCatch(_ -> {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
-            let ws1 = Interop/Lang/ImpAppendable.toAppendable(ws) |> Interop/Lang/Appendable.getHH;
-            let fmt1 = Interop/Apache/Commons/Csv/CSVFormat.getHH(fmt);        
+            let ws1 = Interop.Lang.ImpAppendable.toAppendable(ws) |> Interop.Lang.Appendable.getHH;
+            let fmt1 = Interop.Apache.Commons.Csv.CSVFormat.getHH(fmt);        
             CSVPrinter(newCSVPrinter(ws1, fmt1))
         })
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-namespace Interop/Apache/Commons/Csv {
+mod Interop.Apache.Commons.Csv {
 
     /// Class / Mutable
 
@@ -23,12 +23,11 @@ namespace Interop/Apache/Commons/Csv {
 
 }
 
-namespace Interop/Apache/Commons/Csv/CSVParser {
+mod Interop.Apache.Commons.Csv.CSVParser {
 
-    use Interop/Apache/Commons/Csv.CSVParser;
-    use Interop/Apache/Commons/Csv.CSVParser.{CSVParser};
-
-    use Interop/IO.SubReader;
+    use Interop.Apache.Commons.Csv.CSVParser
+    use Interop.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use Interop.IO.SubReader
 
 
     pub def getHH(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
@@ -39,25 +38,21 @@ namespace Interop/Apache/Commons/Csv/CSVParser {
                                                         reader: t[r], 
                                                         fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) with SubReader[t]= 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser \ r as newCsvParser;
-        CSVParser(newCsvParser(Interop/IO/Reader.getHH(Interop/IO/SubReader.toReader(reader)), fmt))
+        CSVParser(newCsvParser(Interop.IO.Reader.getHH(Interop.IO.SubReader.toReader(reader)), fmt))
 
 
 
     pub def close!(p: CSVParser[r]): Result[String, Unit] \ Write(r) = 
-        try {
+        Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVParser.close(): Unit \ r;
             let CSVParser(p1) = p;
-            close(p1) |> Ok
-        } catch {
-            case ex: ##java.io.IOException =>
-                import java.lang.Throwable.getMessage(): String \ r;
-                Err(getMessage(ex))
-        }
+            close(p1)
+        })
 
     pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {Read(r), Write(r1) } =
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ {r, r1};
         let CSVParser(p1) = p;
-        let rawIter = iterator(p1) |> Interop/Util/IteratorZ.wrapHH(rc);
-        Interop/Util/IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
+        let rawIter = iterator(p1) |> Interop.Util.IteratorZ.wrapHH(rc);
+        Interop.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
 
 }
