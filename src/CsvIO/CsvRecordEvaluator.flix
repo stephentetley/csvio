@@ -64,6 +64,9 @@ mod CsvIO {
         pub def catchError(ma: CsvRecordEvaluator[ka, ef, a], 
                             f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef and ef1 and ef2, a] =
             CsvIO.CsvRecordEvaluator.catchError(ma, f)
+
+        pub def reifyError(ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef, Result[String, a]] =
+            CsvIO.CsvRecordEvaluator.reifyError(ma)
     }
 
 }
@@ -119,6 +122,9 @@ mod CsvIO.CsvRecordEvaluator {
     pub def catchError(ma: CsvRecordEvaluator[ka, ef, a], 
                         f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef and ef1 and ef2, a] =
         CsvRecordEvaluator(Graded.EnvError.catchError(getCsvRecordEvaluator(ma), f >> getCsvRecordEvaluator))
+
+    pub def reifyError(ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef, Result[String, a]] =
+        CsvRecordEvaluator(Graded.EnvError.reifyError(getCsvRecordEvaluator(ma)))
 
     pub def empty(): CsvRecordEvaluator[ka, ef, a] = 
         CsvRecordEvaluator(Graded.EnvError.empty())
