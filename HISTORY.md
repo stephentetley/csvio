@@ -1,3 +1,7 @@
+### v0.3.0
+   Updated dependencies.
+   Removed region `Read` and `Write` annotations.
+
 ### v0.2.1
    Updated dependencies.
    Added `reifyError` to `GradedError` instances.

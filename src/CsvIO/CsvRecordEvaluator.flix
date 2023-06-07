@@ -19,11 +19,11 @@ mod CsvIO {
 
     // `CSVRecord` is immutable so we can use `Graded.EnvError` rather than `Graded.Evaluator`
 
-    pub enum CsvRecordEvaluator[ka: Type, ef: Bool, a: Type](
+    pub enum CsvRecordEvaluator[ka: Type, ef: Eff, a: Type](
         Graded.EnvError[ka, Interop.Apache.Commons.Csv.CSVRecord, ef, a])
 
     instance GradedFunctor[CsvRecordEvaluator[ka]] {
-        pub def map(f: a -> b \ ef1, x: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1, b] =
+        pub def map(f: a -> b \ ef1, x: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1, b] =
             CsvIO.CsvRecordEvaluator.map(f, x)
     }
 
@@ -32,13 +32,13 @@ mod CsvIO {
             CsvIO.CsvRecordEvaluator.point(x)
 
         pub def ap(mf: CsvRecordEvaluator[ka, ef1, a -> b \ ef2], 
-                    ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1 and ef2, b] =
+                    ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1 + ef2, b] =
             CsvIO.CsvRecordEvaluator.ap(mf, ma)
     }
 
     instance GradedMonad[CsvRecordEvaluator[ka]] {
         pub def flatMap(k: a -> CsvRecordEvaluator[ka, ef1, b] \ ef2, 
-                        x: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1 and ef2, b] =
+                        x: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1 + ef2, b] =
             CsvIO.CsvRecordEvaluator.flatMap(k, x)
     }    
     
@@ -49,7 +49,7 @@ mod CsvIO {
     
     instance GradedOr[CsvRecordEvaluator[ka]] {
         pub def orelse(a: CsvRecordEvaluator[ka, ef1, a], 
-                        b: CsvRecordEvaluator[ka, ef2, a]): CsvRecordEvaluator[ka, ef1 and ef2, a] =
+                        b: CsvRecordEvaluator[ka, ef2, a]): CsvRecordEvaluator[ka, ef1 + ef2, a] =
             CsvIO.CsvRecordEvaluator.orelse(a, b)
     }
 
@@ -58,11 +58,11 @@ mod CsvIO {
             CsvIO.CsvRecordEvaluator.throwError(msg)
 
         pub def mapError(f: String -> String \ ef1, 
-                            ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1, a] =
+                            ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1, a] =
             CsvIO.CsvRecordEvaluator.mapError(f, ma)
 
         pub def catchError(ma: CsvRecordEvaluator[ka, ef, a], 
-                            f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef and ef1 and ef2, a] =
+                            f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef + ef1 + ef2, a] =
             CsvIO.CsvRecordEvaluator.catchError(ma, f)
 
         pub def reifyError(ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef, Result[String, a]] =
@@ -99,16 +99,16 @@ mod CsvIO.CsvRecordEvaluator {
 
     pub def point(x: a): CsvRecordEvaluator[ka, ef, a] = CsvRecordEvaluator(Graded.EnvError.point(x))
 
-    pub def map(f: a -> b \ ef1, ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1, b] =
+    pub def map(f: a -> b \ ef1, ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1, b] =
         CsvRecordEvaluator(Graded.EnvError.map(f, getCsvRecordEvaluator(ma)))
 
     pub def ap(mf: CsvRecordEvaluator[ka, ef1, a -> b \ ef2], 
-                ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1 and ef2, b] =
+                ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1 + ef2, b] =
         CsvRecordEvaluator(Graded.EnvError.ap(getCsvRecordEvaluator(mf), getCsvRecordEvaluator(ma)))
 
 
     pub def flatMap(f: a -> CsvRecordEvaluator[ka, ef1, b] \ ef2, 
-                    ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1 and ef2, b] =
+                    ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1 + ef2, b] =
         CsvRecordEvaluator(Graded.EnvError.flatMap(f >> getCsvRecordEvaluator, getCsvRecordEvaluator(ma)))
 
 
@@ -116,11 +116,11 @@ mod CsvIO.CsvRecordEvaluator {
     pub def throwError(msg: String): CsvRecordEvaluator[ka, ef, a] = 
         CsvRecordEvaluator(Graded.EnvError.throwError(msg))
 
-    pub def mapError(f: String -> String \ ef1, ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef and ef1, a] = 
+    pub def mapError(f: String -> String \ ef1, ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1, a] = 
         CsvRecordEvaluator(Graded.EnvError.mapError(f, getCsvRecordEvaluator(ma)))
 
     pub def catchError(ma: CsvRecordEvaluator[ka, ef, a], 
-                        f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef and ef1 and ef2, a] =
+                        f: String -> CsvRecordEvaluator[ka, ef1, a] \ ef2): CsvRecordEvaluator[ka, ef + ef1 + ef2, a] =
         CsvRecordEvaluator(Graded.EnvError.catchError(getCsvRecordEvaluator(ma), f >> getCsvRecordEvaluator))
 
     pub def reifyError(ma: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef, Result[String, a]] =
@@ -130,7 +130,7 @@ mod CsvIO.CsvRecordEvaluator {
         CsvRecordEvaluator(Graded.EnvError.empty())
         
     pub def orelse(ma: CsvRecordEvaluator[ka, ef1, a], 
-                    mb: CsvRecordEvaluator[ka, ef2, a]): CsvRecordEvaluator[ka, ef1 and ef2, a] =
+                    mb: CsvRecordEvaluator[ka, ef2, a]): CsvRecordEvaluator[ka, ef1 + ef2, a] =
         CsvRecordEvaluator(Graded.EnvError.orelse(getCsvRecordEvaluator(ma), getCsvRecordEvaluator(mb)))
 
     def liftGetter(f: CSVRecord -> a \ ef): CsvRecordEvaluator[ka, ef, a] =

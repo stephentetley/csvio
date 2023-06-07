@@ -31,13 +31,13 @@ mod CsvIO.CsvReader {
     /// To use Flix's stdlib Iterator we need to retain a handle
     /// so we can close it.
     /// 
-    pub enum CsvReadHandle[r: Region, ef: Bool, a: Type]((Interop.Apache.Commons.Csv.CSVParser[r], Iterator[Result[String, a], ef, r]))
+    pub enum CsvReadHandle[r: Region, ef: Eff, a: Type]((Interop.Apache.Commons.Csv.CSVParser[r], Iterator[Result[String, a], ef, r]))
 
     pub def getIterator(handle: CsvReadHandle[r, ef, a]): Iterator[Result[String, a], ef, r] = 
         let CsvReadHandle((_, i1)) = handle;
         i1
 
-    pub def close!(handle: CsvReadHandle[r, ef, a]): Result[String, Unit] \ Write(r) = 
+    pub def close!(handle: CsvReadHandle[r, ef, a]): Result[String, Unit] \ r = 
         let CsvReadHandle((x1, _)) = handle;
         Interop.Apache.Commons.Csv.CSVParser.close!(x1)
 
@@ -51,7 +51,7 @@ mod CsvIO.CsvReader {
                             format: CsvFormat,
                             cs: Charset,
                             eval: CsvRecordEvaluator[a, ef, a], 
-                            path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { Read(r), Write(r), IO } =
+                            path: Path): Result[String, CsvReadHandle[r, ef + r, a]] \ {IO, r} =
         let CsvFormat(fmt1) = format;
         forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
                 ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);
@@ -66,7 +66,7 @@ mod CsvIO.CsvReader {
                     format: CsvFormat,
                     charset: Charset,
                     eval: CsvRecordEvaluator[a, ef, a], 
-                    path: Path): Result[String, List[a]]  \ { ef, Read(r), Write(r), IO } =
+                    path: Path): Result[String, List[a]]  \ {IO, r} =
         forM (hdl   <- newCsvReadHandle(r, format, charset, eval, path);
                 iter  <- Ok(getIterator(hdl));
                 xs    <- Iterator.toList(iter) |> Result.sequence;
@@ -80,7 +80,7 @@ mod CsvIO.CsvReader {
     pub def newCsvReadHandleWithBOM(rc: Region[r], 
                             format: CsvFormat,
                             eval: CsvRecordEvaluator[a, ef, a], 
-                            path: Path): Result[String, CsvReadHandle[r, r and ef, a]] \ { ef, Read(r), Write(r), IO } =
+                            path: Path): Result[String, CsvReadHandle[r, ef + r, a]] \ {ef, IO, r} =
         let CsvFormat(fmt1) = format;
         forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
                 ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);

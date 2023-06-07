@@ -36,20 +36,20 @@ mod Interop.Apache.Commons.Csv.CSVParser {
 
     pub def newCSVParser[r: Region, t: Region -> Type](_: Region[r], 
                                                         reader: t[r], 
-                                                        fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ Write(r) with SubReader[t]= 
+                                                        fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ r with SubReader[t]= 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser \ r as newCsvParser;
         CSVParser(newCsvParser(Interop.IO.Reader.getHH(Interop.IO.SubReader.toReader(reader)), fmt))
 
 
 
-    pub def close!(p: CSVParser[r]): Result[String, Unit] \ Write(r) = 
+    pub def close!(p: CSVParser[r]): Result[String, Unit] \ r = 
         Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVParser.close(): Unit \ r;
             let CSVParser(p1) = p;
             close(p1)
         })
 
-    pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {Read(r), Write(r1) } =
+    pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {r, r1} =
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ {r, r1};
         let CSVParser(p1) = p;
         let rawIter = iterator(p1) |> Interop.Util.IteratorZ.wrapHH(rc);

@@ -18,12 +18,12 @@
 mod CsvIO {
 
 
-    pub enum CsvFormatBuilder[r: Region, ka: Type, ef: Bool, a: Type](
+    pub enum CsvFormatBuilder[r: Region, ka: Type, ef: Eff, a: Type](
         Graded.Builder[ka, Interop.Apache.Commons.Csv.CSVFormatBuilder[r], ef, a]
     )
 
     instance GradedFunctor[CsvFormatBuilder[r, ka]] {
-        pub def map(f: a -> b \ ef1, ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1, b] = 
+        pub def map(f: a -> b \ ef1, ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1, b] = 
             CsvIO.CsvFormatBuilder.map(f, ma)
     }
 
@@ -33,13 +33,13 @@ mod CsvIO {
             CsvIO.CsvFormatBuilder.point(x)
 
         pub def ap(mf: CsvFormatBuilder[r, ka, ef1, a -> b \ ef2], 
-                    ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1 and ef2, b] =
+                    ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1 + ef2, b] =
             CsvIO.CsvFormatBuilder.ap(mf, ma)
     }
 
     instance GradedMonad[CsvFormatBuilder[r, ka]] {
         pub def flatMap(f: a -> CsvFormatBuilder[r, ka, ef1, b] \ ef2, 
-                        ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1 and ef2, b] =
+                        ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1 + ef2, b] =
             CsvIO.CsvFormatBuilder.flatMap(f, ma)
     }
 
@@ -67,7 +67,7 @@ mod CsvIO.CsvFormatBuilder {
 
 
     pub def toCsvFormat(rc: Region[r], 
-                        ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, Write(r)} = 
+                        ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, r} = 
         Result.tryCatch(_ -> {
             let jbuilder = Interop.Apache.Commons.Csv.CSVFormatBuilder.create(rc);
             match runBuilder(ma, jbuilder) {
@@ -79,7 +79,7 @@ mod CsvIO.CsvFormatBuilder {
 
     pub def toCsvFormatWithCsvFormat(rc: Region[r], 
                                     fmt: CsvFormat, 
-                                    ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, Write(r)} = 
+                                    ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, r} = 
         Result.tryCatch(_ -> {
             let fmt1 = CsvIO.CsvFormat.toCSVFormat(fmt);
             let jbuilder = Interop.Apache.Commons.Csv.CSVFormatBuilder.createWithCSVFormat(rc, fmt1);
@@ -95,23 +95,23 @@ mod CsvIO.CsvFormatBuilder {
     pub def point(x: a): CsvFormatBuilder[r, ka, ef, a] = 
         CsvFormatBuilder(Graded.Builder.point(x))
 
-    pub def map(f: a -> b \ ef1, ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1, b] =
+    pub def map(f: a -> b \ ef1, ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1, b] =
         CsvFormatBuilder(Graded.Builder.map(f, getCsvFormatBuilder(ma)))
 
         
     pub def ap(mf: CsvFormatBuilder[r, ka, ef1, a -> b \ ef2], 
-                ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1 and ef2, b] =
+                ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1 + ef2, b] =
         CsvFormatBuilder(Graded.Builder.ap(getCsvFormatBuilder(mf), getCsvFormatBuilder(ma)))
 
 
     pub def flatMap(f: a -> CsvFormatBuilder[r, ka, ef1, b] \ ef2, 
-                    ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef and ef1 and ef2, b] =
+                    ma: CsvFormatBuilder[r, ka, ef, a]): CsvFormatBuilder[r, ka, ef + ef1 + ef2, b] =
         CsvFormatBuilder(Graded.Builder.flatMap(f >> getCsvFormatBuilder, getCsvFormatBuilder(ma)))
 
     pub def throwError(msg: String): CsvFormatBuilder[r, ka, ef, a] = 
         CsvFormatBuilder(Graded.Builder.throwError(msg))
     
-    def liftSetter!(f: Interop.Apache.Commons.Csv.CSVFormatBuilder[r] -> Interop.Apache.Commons.Csv.CSVFormatBuilder[r] \ {r, ef}): CsvFormatBuilder[r, ka, r and ef, Unit] =
+    def liftSetter!(f: Interop.Apache.Commons.Csv.CSVFormatBuilder[r] -> Interop.Apache.Commons.Csv.CSVFormatBuilder[r] \ {r, ef}): CsvFormatBuilder[r, ka, r + ef, Unit] =
         CsvFormatBuilder(Graded.Builder.liftSetter!(f)) |> GradedFunctor.ignore
 
 

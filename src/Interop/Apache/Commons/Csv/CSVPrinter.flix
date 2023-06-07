@@ -39,7 +39,7 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
 
 
     pub def newCSVPrinter[r: Region, r1: Region, t: Region -> Type]
-                        (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {Read(r), Write(r1)} with ImpAppendable[t]= 
+                        (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} with ImpAppendable[t]= 
         Result.tryCatch(_ -> {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let ws1 = Interop.Lang.ImpAppendable.toAppendable(ws) |> Interop.Lang.Appendable.getHH;
@@ -50,7 +50,7 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
 
 
 
-    pub def close!(p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
+    pub def close!(p: CSVPrinter[r]): Result[String, Unit] \ r = 
         Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVPrinter.close(): Unit \ r;
             let CSVPrinter(p1) = p;
@@ -58,7 +58,7 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
         })
 
 
-    pub def flush!(p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
+    pub def flush!(p: CSVPrinter[r]): Result[String, Unit] \ r = 
         Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVPrinter.flush(): Unit \ r;
             let CSVPrinter(p1) = p;
@@ -66,7 +66,7 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
         })
 
 
-    pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[String, Unit] \ Write(r) = 
+    pub def printRecord!(l: List[String], p: CSVPrinter[r]): Result[String, Unit] \ r = 
         Result.tryCatch(_ -> {
             region rc {
                 import org.apache.commons.csv.CSVPrinter.printRecord(Array[##java.lang.Object, rc]): Unit \ r;

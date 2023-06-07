@@ -39,7 +39,7 @@ mod Interop.Apache.Commons.Csv.CSVFormat {
         CSVFormat(fmt)
 
     pub def parse[t: Region -> Type, r: Region, r1: Region]
-                (_: Region[r1], rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r1]] \ { Read(r), Write(r1) } with SubReader[t] = 
+                (_: Region[r1], rd: t[r], fmt: CSVFormat): Result[String, CSVParser[r1]] \ {r, r1} with SubReader[t] = 
         Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ {r, r1};
             let CSVFormat(fmt1) = fmt;
