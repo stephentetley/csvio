@@ -1,3 +1,7 @@
+### 
+   Updated `flix-time` dependency.
+   Fixed pattern match fall through for `unmarshalQuoteMode`.
+
 ### v0.3.0
    Updated dependencies.
    Removed region `Read` and `Write` annotations.

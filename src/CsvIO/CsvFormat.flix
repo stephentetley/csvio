@@ -76,11 +76,12 @@ mod CsvIO.CsvFormat {
         import static get org.apache.commons.csv.QuoteMode.NON_NUMERIC: ##org.apache.commons.csv.QuoteMode \ {} as get_NON_NUMERIC;
         import static get org.apache.commons.csv.QuoteMode.NONE: ##org.apache.commons.csv.QuoteMode \ {} as get_NONE;
         match x {
-            case x1 if primEqualsQuoteMode(x1, get_ALL())          => All            
-            case x1 if primEqualsQuoteMode(x1, get_ALL_NON_NULL()) => AllNonNull
-            case x1 if primEqualsQuoteMode(x1, get_MINIMAL())      => Minimal
-            case x1 if primEqualsQuoteMode(x1, get_NON_NUMERIC())  => NonNumeric
-            case x1 if primEqualsQuoteMode(x1, get_NONE())         => NoQuote
+            case x1 if primEqualsQuoteMode(x1, get_ALL())           => All            
+            case x1 if primEqualsQuoteMode(x1, get_ALL_NON_NULL())  => AllNonNull
+            case x1 if primEqualsQuoteMode(x1, get_MINIMAL())       => Minimal
+            case x1 if primEqualsQuoteMode(x1, get_NON_NUMERIC())   => NonNumeric
+            case x1 if primEqualsQuoteMode(x1, get_NONE())          => NoQuote
+            case _                                                  => bug!("unmarshalQuoteMode")
         }
 
 
