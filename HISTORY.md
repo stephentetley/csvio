@@ -1,5 +1,5 @@
-### 
-   Updated `flix-time` dependency.
+### v0.3.1
+   Updated dependencies.
    Fixed pattern match fall through for `unmarshalQuoteMode`.
 
 ### v0.3.0
