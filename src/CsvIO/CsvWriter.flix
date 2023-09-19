@@ -17,8 +17,7 @@
 
 mod CsvIO.CsvWriter {
     
-    use Basis.NIO.File.Path
-    use Basis.NIO.Charset.Charset
+    use Basis.IO.Path
 
     use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     use CsvIO.CsvFormat
@@ -37,7 +36,7 @@ mod CsvIO.CsvWriter {
         use Result.flatMap;
         region rc {
             let CsvFormat(format1) = format;
-            forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
+            forM (file1     <- Basis.IO.Path.toFile(rc, path);
                     fos     <- Interop.IO.FileOutputStream.newWithFile(rc, file1);
                     outs    <- Ok(Interop.IO.SubOutputStream.toOutputStream(fos));
                     writer  <- Ok(Interop.IO.OutputStreamWriter.newOutputStreamWriter(rc, outs, cs));

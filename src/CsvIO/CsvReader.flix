@@ -17,8 +17,8 @@
 
 mod CsvIO.CsvReader {
     
-    use Basis.NIO.File.Path
-    use Basis.NIO.Charset.Charset
+    use Basis.IO.Path
+    
 
     use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     use CsvIO.CsvFormat
@@ -53,7 +53,7 @@ mod CsvIO.CsvReader {
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, ef + r, a]] \ {IO, r} =
         let CsvFormat(fmt1) = format;
-        forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
+        forM (file1     <- Basis.IO.Path.toFile(rc, path);
                 ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);
                 reader  <- Ok(Interop.IO.InputStreamReader.newInputStreamReader(rc, ins, cs));
                 parser  <- Interop.Apache.Commons.Csv.CSVFormat.parse(rc, reader, CSVFormat(fmt1));
@@ -82,12 +82,12 @@ mod CsvIO.CsvReader {
                             eval: CsvRecordEvaluator[a, ef, a], 
                             path: Path): Result[String, CsvReadHandle[r, ef + r, a]] \ {ef, IO, r} =
         let CsvFormat(fmt1) = format;
-        forM (file1     <- Basis.NIO.File.Path.toFile(rc, path);
+        forM (file1     <- Basis.IO.Path.toFile(rc, path);
                 ins     <- Interop.IO.FileInputStream.newWithFile(rc, file1) |> Result.map(Interop.IO.SubInputStream.toInputStream);
-                bomIns  <- Ok(Interop.Apache.Commons.IO.Input.BOMInputStream.new(rc, ins));
-                csname  <- Interop.Apache.Commons.IO.Input.BOMInputStream.getBOMCharsetName(bomIns);
+                bomIns  <- Ok(Apache.Commons.IO.Input.BOMInputStream.new(rc, ins));
+                csname  <- Apache.Commons.IO.Input.BOMInputStream.getBOMCharsetName(bomIns);
                 csname1 <- Ok(Option.getWithDefault("UTF-16", csname));
-                cs1     <- Basis.NIO.Charset.Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
+                cs1     <- Charset.forName(csname1) |> Option.toOk("bad charset ${csname1}");
                 reader  <- Ok(Interop.IO.InputStreamReader.newInputStreamReader(rc, ins, cs1));
                 parser  <- Interop.Apache.Commons.Csv.CSVFormat.parse(rc, reader, CSVFormat(fmt1));
                 iter1   <- Ok(Interop.Apache.Commons.Csv.CSVParser.iterator(rc, parser));
