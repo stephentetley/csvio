@@ -25,20 +25,23 @@ mod Interop.Apache.Commons.Csv {
 
 mod Interop.Apache.Commons.Csv.CSVParser {
 
+    use Basis.IO.Reader
+    use Basis.IO.Reader.{Reader}
+
     use Interop.Apache.Commons.Csv.CSVParser
     use Interop.Apache.Commons.Csv.CSVParser.{CSVParser}
-    use Interop.IO.SubReader
 
 
     pub def getHH(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
         let CSVParser(p1) = p;
         p1
 
-    pub def newCSVParser[r: Region, t: Region -> Type](_: Region[r], 
-                                                        reader: t[r], 
-                                                        fmt: ##org.apache.commons.csv.CSVFormat): CSVParser[r] \ r with SubReader[t]= 
+    pub def newCSVParser(_: Region[r], 
+                        fmt: ##org.apache.commons.csv.CSVFormat, 
+                        reader: Reader[r]): CSVParser[r] \ r = 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser \ r as newCsvParser;
-        CSVParser(newCsvParser(Interop.IO.Reader.getHH(Interop.IO.SubReader.toReader(reader)), fmt))
+        let Reader(reader1) = reader;
+        CSVParser(newCsvParser(reader1, fmt))
 
 
 
@@ -52,7 +55,8 @@ mod Interop.Apache.Commons.Csv.CSVParser {
     pub def iterator(rc: Region[r1], p: CSVParser[r]): Iterator[##org.apache.commons.csv.CSVRecord, r1, r1] \ {r, r1} =
         import org.apache.commons.csv.CSVParser.iterator(): ##java.util.Iterator \ {r, r1};
         let CSVParser(p1) = p;
-        let rawIter = iterator(p1) |> Interop.Util.IteratorZ.wrapHH(rc);
-        Interop.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
+        let rawIter = iterator(p1);
+        Adaptor.fromIterator(rc, Proxy.Proxy: Proxy[##org.apache.commons.csv.CSVRecord], rawIter)
+        /// Interop.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
 
 }

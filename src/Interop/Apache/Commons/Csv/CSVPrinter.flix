@@ -25,7 +25,8 @@ mod Interop.Apache.Commons.Csv {
 
 mod Interop.Apache.Commons.Csv.CSVPrinter {
 
-    use Interop.Lang.ImpAppendable
+    use Basis.IO.OutputStreamWriter
+    use Basis.IO.OutputStreamWriter.{OutputStreamWriter}
 
     use Interop.Apache.Commons.Csv.CSVPrinter
     use Interop.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
@@ -38,13 +39,13 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
         p1
 
 
-    pub def newCSVPrinter[r: Region, r1: Region, t: Region -> Type]
-                        (_: Region[r1], ws: t[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} with ImpAppendable[t]= 
+    pub def newCSVPrinter(_: Region[r1], ws: OutputStreamWriter[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} = 
         Result.tryCatch(_ -> {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
-            let ws1 = Interop.Lang.ImpAppendable.toAppendable(ws) |> Interop.Lang.Appendable.getHH;
+            let OutputStreamWriter(ws1) = ws;
+            let appendable1 = unchecked_cast(ws1 as ##java.lang.Appendable);
             let fmt1 = Interop.Apache.Commons.Csv.CSVFormat.getHH(fmt);        
-            CSVPrinter(newCSVPrinter(ws1, fmt1))
+            CSVPrinter(newCSVPrinter(appendable1, fmt1))
         })
 
 

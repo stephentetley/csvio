@@ -1,5 +1,5 @@
 ### v0.4.0
-   Changed depedndencies to use `charset-locale` and `platform-basis`.
+   Changed dependencies to use `charset-locale` and `platform-basis`.
 
 ### v0.3.1
    Updated dependencies.

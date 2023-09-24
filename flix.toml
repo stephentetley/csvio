@@ -8,11 +8,10 @@ authors     = ["Stephen Tetley <stephen.tetley@gmail.com>"]
 
 [dependencies]
 "github:stephentetley/charset-locale"           = "0.1.0"
-"github:stephentetley/platform-basis"           = "0.1.0"
-"github:stephentetley/interop-base"             = "0.9.0"
+"github:stephentetley/platform-basis"           = "0.2.0"
 "github:stephentetley/graded-lib"               = "0.8.0"
 "github:stephentetley/flix-time"                = "0.7.0"
-"github:stephentetley/interop-commons-io-bom"   = "0.4.0"
+"github:stephentetley/interop-commons-io-bom"   = "0.4.1"
 
 [mvn-dependencies]
 "commons-io:commons-io"             = "2.11.0"

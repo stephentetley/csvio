@@ -36,10 +36,9 @@ mod CsvIO.CsvWriter {
         use Result.flatMap;
         region rc {
             let CsvFormat(format1) = format;
-            forM (file1     <- Basis.IO.Path.toFile(rc, path);
-                    fos     <- Interop.IO.FileOutputStream.newWithFile(rc, file1);
-                    outs    <- Ok(Interop.IO.SubOutputStream.toOutputStream(fos));
-                    writer  <- Ok(Interop.IO.OutputStreamWriter.newOutputStreamWriter(rc, outs, cs));
+            forM (fos       <- Basis.IO.FileOutputStream.new(path);
+                    outs    <- Ok(Basis.IO.FileOutputStream.asOutputStream(fos));
+                    writer  <- Ok(Basis.IO.OutputStreamWriter.newWithCharset(cs, outs));
                     printer <- Interop.Apache.Commons.Csv.CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1));
                     _       <- Result.traverseX(row -> {let cells = makeRow(row); Interop.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer)}, rows);
                     _       <- Interop.Apache.Commons.Csv.CSVPrinter.close!(printer))
