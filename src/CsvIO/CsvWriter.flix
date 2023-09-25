@@ -32,16 +32,16 @@ mod CsvIO.CsvWriter {
                         cs: Charset,
                         path: Path,
                         makeRow: a -> List[String] \ ef,
-                        rows: List[a]): Result[String, Unit] \ {IO, ef} =
+                        rows: List[a]): Result[IOError, Unit] \ {IO, ef} =
         use Result.flatMap;
         region rc {
             let CsvFormat(format1) = format;
-            forM (fos       <- Basis.IO.FileOutputStream.new(path);
+            forM (fos       <- Basis.IO.FileOutputStream.new(path) |> CsvIO.Util.errIOError;
                     outs    <- Ok(Basis.IO.FileOutputStream.asOutputStream(fos));
                     writer  <- Ok(Basis.IO.OutputStreamWriter.newWithCharset(cs, outs));
-                    printer <- Interop.Apache.Commons.Csv.CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1));
-                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Interop.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer)}, rows);
-                    _       <- Interop.Apache.Commons.Csv.CSVPrinter.close!(printer))
+                    printer <- Interop.Apache.Commons.Csv.CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1)) |> CsvIO.Util.errIOError;
+                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Interop.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer) |> CsvIO.Util.errIOError}, rows);
+                    _       <- Interop.Apache.Commons.Csv.CSVPrinter.close!(printer)  |> CsvIO.Util.errIOError)
             yield ()
         }
 
