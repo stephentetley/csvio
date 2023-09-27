@@ -20,7 +20,7 @@ mod CsvIO {
     // `CSVRecord` is immutable so we can use `Graded.EnvError` rather than `Graded.Evaluator`
 
     pub enum CsvRecordEvaluator[ka: Type, ef: Eff, a: Type](
-        Graded.EnvError[ka, Interop.Apache.Commons.Csv.CSVRecord, ef, a])
+        Graded.EnvError[ka, Internal.Apache.Commons.Csv.CSVRecord, ef, a])
 
     instance GradedFunctor[CsvRecordEvaluator[ka]] {
         pub def map(f: a -> b \ ef1, x: CsvRecordEvaluator[ka, ef, a]): CsvRecordEvaluator[ka, ef + ef1, b] =
@@ -81,7 +81,7 @@ mod CsvIO.CsvRecordEvaluator {
     
     use Time.Format.DateTimeFormatter
 
-    use Interop.Apache.Commons.Csv.CSVRecord
+    use Internal.Apache.Commons.Csv.CSVRecord
     use CsvIO.CsvFormat
     use CsvIO.CsvRecordEvaluator
     use CsvIO.CsvRecordEvaluator.{CsvRecordEvaluator}
@@ -166,35 +166,35 @@ mod CsvIO.CsvRecordEvaluator {
     // Cell readers
 
     pub def getStringAt(ix: Int32): CsvRecordEvaluator[ka, Pure, String] =        
-        liftGetterResult(Interop.Apache.Commons.Csv.CSVRecord.getStringAt(ix))
+        liftGetterResult(Internal.Apache.Commons.Csv.CSVRecord.getStringAt(ix))
 
 
     ///
     /// Get a string by its column name / label.
     ///
     pub def getStringNamed(label: String): CsvRecordEvaluator[ka, Pure, String] =
-        liftGetterResult(Interop.Apache.Commons.Csv.CSVRecord.getStringNamed(label))
+        liftGetterResult(Internal.Apache.Commons.Csv.CSVRecord.getStringNamed(label))
 
 
     pub def hasComment(): CsvRecordEvaluator[ka, Pure, Bool] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.hasComment)
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.hasComment)
 
 
     pub def getComment(): CsvRecordEvaluator[ka, Pure, String] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.getComment >> Option.getWithDefault(""))
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.getComment >> Option.getWithDefault(""))
 
     pub def isConsistent(): CsvRecordEvaluator[ka, Pure, Bool] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.isConsistent)
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.isConsistent)
 
     pub def isMapped(label: String): CsvRecordEvaluator[ka, Pure, Bool] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.isMapped(label))
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.isMapped(label))
 
 
     pub def isSetAt(ix: Int32): CsvRecordEvaluator[ka, Pure, Bool] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.isSetAt(ix))
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.isSetAt(ix))
 
     pub def isSetNamed(label: String): CsvRecordEvaluator[ka, Pure, Bool] =
-        liftGetter(Interop.Apache.Commons.Csv.CSVRecord.isSetNamed(label))
+        liftGetter(Internal.Apache.Commons.Csv.CSVRecord.isSetNamed(label))
 
     // TODO - toList, toMap...
 

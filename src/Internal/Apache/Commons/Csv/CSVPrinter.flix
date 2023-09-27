@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Interop.Apache.Commons.Csv {
+mod Internal.Apache.Commons.Csv {
 
     /// Class / Mutable (contains an underlying output stream c.f. `close!`)
 
@@ -23,14 +23,14 @@ mod Interop.Apache.Commons.Csv {
     
 }
 
-mod Interop.Apache.Commons.Csv.CSVPrinter {
+mod Internal.Apache.Commons.Csv.CSVPrinter {
 
     use Basis.IO.OutputStreamWriter
     use Basis.IO.OutputStreamWriter.{OutputStreamWriter}
 
-    use Interop.Apache.Commons.Csv.CSVPrinter
-    use Interop.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
-    use Interop.Apache.Commons.Csv.CSVFormat
+    use Internal.Apache.Commons.Csv.CSVPrinter
+    use Internal.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
+    use Internal.Apache.Commons.Csv.CSVFormat
     
 
 
@@ -44,7 +44,7 @@ mod Interop.Apache.Commons.Csv.CSVPrinter {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let OutputStreamWriter(ws1) = ws;
             let appendable1 = unchecked_cast(ws1 as ##java.lang.Appendable);
-            let fmt1 = Interop.Apache.Commons.Csv.CSVFormat.getHH(fmt);        
+            let fmt1 = Internal.Apache.Commons.Csv.CSVFormat.getHH(fmt);        
             CSVPrinter(newCSVPrinter(appendable1, fmt1))
         })
 

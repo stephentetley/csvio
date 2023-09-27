@@ -14,7 +14,7 @@ mod Test01 {
             forM (path      <- Basis.IO.Path.new("E://coding/flix/csvio/data/compass.csv")  |> CsvIO.Util.errIOError;
                     eval    <- Ok(GradedApplicative.product(getStringNamed("Cardinal direction"), getStringNamed("Abbreviation")));
                     fmt     <- CsvIO.CsvFormatBuilder.toCsvFormat(r1, setHeaders!("Cardinal direction" :: "Abbreviation" :: Nil) *> setSkipHeaderRecord!(true)) |> CsvIO.Util.errIOError;
-                    hdl     <- CsvIO.CsvReader.newCsvReadHandle(r1, fmt, Charset.utf_8(), eval, path)  |> CsvIO.Util.errIOError;
+                    hdl     <- CsvIO.CsvReader.newCsvReadHandle(r1, fmt, Charset.utf_8(), eval, path) |> CsvIO.Util.errIOError;
                     iter    <- Ok(CsvIO.CsvReader.getIterator(hdl));
                     _       <- Ok(Iterator.forEach(ans -> println("test01: ${ans}"), iter));
                     _       <- CsvIO.CsvReader.close!(hdl)  |> CsvIO.Util.errIOError)

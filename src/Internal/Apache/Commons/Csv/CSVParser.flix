@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Interop.Apache.Commons.Csv {
+mod Internal.Apache.Commons.Csv {
 
     /// Class / Mutable
 
@@ -23,13 +23,13 @@ mod Interop.Apache.Commons.Csv {
 
 }
 
-mod Interop.Apache.Commons.Csv.CSVParser {
+mod Internal.Apache.Commons.Csv.CSVParser {
 
     use Basis.IO.Reader
     use Basis.IO.Reader.{Reader}
 
-    use Interop.Apache.Commons.Csv.CSVParser
-    use Interop.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use Internal.Apache.Commons.Csv.CSVParser
+    use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
 
 
     pub def getHH(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
@@ -57,6 +57,6 @@ mod Interop.Apache.Commons.Csv.CSVParser {
         let CSVParser(p1) = p;
         let rawIter = iterator(p1);
         Adaptor.fromIterator(rc, Proxy.Proxy: Proxy[##org.apache.commons.csv.CSVRecord], rawIter)
-        /// Interop.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
+        /// Internal.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
 
 }

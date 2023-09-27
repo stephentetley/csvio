@@ -19,7 +19,7 @@ mod CsvIO {
 
 
     pub enum CsvFormatBuilder[r: Region, ka: Type, ef: Eff, a: Type](
-        Graded.Builder[ka, Interop.Apache.Commons.Csv.CSVFormatBuilder[r], ef, a]
+        Graded.Builder[ka, Internal.Apache.Commons.Csv.CSVFormatBuilder[r], ef, a]
     )
 
     instance GradedFunctor[CsvFormatBuilder[r, ka]] {
@@ -54,7 +54,7 @@ mod CsvIO.CsvFormatBuilder {
     use CsvIO.CsvFormat.{CsvFormat}
     use CsvIO.CsvFormat.QuoteMode
 
-    pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, ef, a]): Graded.Builder[ka, Interop.Apache.Commons.Csv.CSVFormatBuilder[r], ef, a] = 
+    pub def getCsvFormatBuilder(x: CsvFormatBuilder[r, ka, ef, a]): Graded.Builder[ka, Internal.Apache.Commons.Csv.CSVFormatBuilder[r], ef, a] = 
         let CsvFormatBuilder(x1) = x;
         x1
 
@@ -62,17 +62,17 @@ mod CsvIO.CsvFormatBuilder {
     /// Returns the result of applying `ma` to the mutable state `s`.
     ///
     pub def runBuilder(ma: CsvFormatBuilder[r, a, ef, a], 
-                        s: Interop.Apache.Commons.Csv.CSVFormatBuilder[r]): Result[String, a] \ ef = 
+                        s: Internal.Apache.Commons.Csv.CSVFormatBuilder[r]): Result[String, a] \ ef = 
         Graded.Builder.runBuilder(getCsvFormatBuilder(ma), s)
 
 
     pub def toCsvFormat(rc: Region[r], 
                         ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, r} = 
         Result.tryCatch(_ -> {
-            let jbuilder = Interop.Apache.Commons.Csv.CSVFormatBuilder.create(rc);
+            let jbuilder = Internal.Apache.Commons.Csv.CSVFormatBuilder.create(rc);
             match runBuilder(ma, jbuilder) {
                 case Err(msg) => Err(msg)
-                case Ok(_)    => Ok(CsvIO.CsvFormat.fromCSVFormat(Interop.Apache.Commons.Csv.CSVFormatBuilder.build(jbuilder)))
+                case Ok(_)    => Ok(CsvIO.CsvFormat.fromCSVFormat(Internal.Apache.Commons.Csv.CSVFormatBuilder.build(jbuilder)))
             }        
         }) |> Result.flatten
 
@@ -82,10 +82,10 @@ mod CsvIO.CsvFormatBuilder {
                                     ma: CsvFormatBuilder[r, a, ef, a]): Result[String, CsvFormat] \ {ef, r} = 
         Result.tryCatch(_ -> {
             let fmt1 = CsvIO.CsvFormat.toCSVFormat(fmt);
-            let jbuilder = Interop.Apache.Commons.Csv.CSVFormatBuilder.createWithCSVFormat(rc, fmt1);
+            let jbuilder = Internal.Apache.Commons.Csv.CSVFormatBuilder.createWithCSVFormat(rc, fmt1);
             match runBuilder(ma, jbuilder) {
                 case Err(msg) => Err(msg)
-                case Ok(_)    => Ok(CsvIO.CsvFormat.fromCSVFormat(Interop.Apache.Commons.Csv.CSVFormatBuilder.build(jbuilder)))
+                case Ok(_)    => Ok(CsvIO.CsvFormat.fromCSVFormat(Internal.Apache.Commons.Csv.CSVFormatBuilder.build(jbuilder)))
             }
         }) |> Result.flatten
 
@@ -111,80 +111,80 @@ mod CsvIO.CsvFormatBuilder {
     pub def throwError(msg: String): CsvFormatBuilder[r, ka, ef, a] = 
         CsvFormatBuilder(Graded.Builder.throwError(msg))
     
-    def liftSetter!(f: Interop.Apache.Commons.Csv.CSVFormatBuilder[r] -> Interop.Apache.Commons.Csv.CSVFormatBuilder[r] \ {r, ef}): CsvFormatBuilder[r, ka, r + ef, Unit] =
+    def liftSetter!(f: Internal.Apache.Commons.Csv.CSVFormatBuilder[r] -> Internal.Apache.Commons.Csv.CSVFormatBuilder[r] \ {r, ef}): CsvFormatBuilder[r, ka, r + ef, Unit] =
         CsvFormatBuilder(Graded.Builder.liftSetter!(f)) |> GradedFunctor.ignore
 
 
     /// API...
 
     pub def setAllowDuplicateHeaderNames!(allow: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setAllowDuplicateHeaderNames!(allow))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setAllowDuplicateHeaderNames!(allow))
 
     // setAllowMissingColumnNames
     pub def setAllowMissingColumnNames!(allow: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setAllowMissingColumnNames!(allow))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setAllowMissingColumnNames!(allow))
 
 
     pub def setAutoFlush!(allow: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setAutoFlush!(allow))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setAutoFlush!(allow))
 
     pub def setCommentMarker!(ch: Char): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setCommentMarker!(ch))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setCommentMarker!(ch))
 
     pub def setDelimiter!(ch: Char): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setDelimiter!(ch))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setDelimiter!(ch))
 
     pub def setDelimiterString!(s: String): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setDelimiterString!(s))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setDelimiterString!(s))
 
     pub def setEscape!(ch: Char): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setEscape!(ch))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setEscape!(ch))
 
     pub def setHeaderAuto!(): CsvFormatBuilder[r, ka, r, Unit] =
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setHeadersAuto!)
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setHeadersAuto!)
 
 
     pub def setHeaders!(l: List[String]): CsvFormatBuilder[r, ka, r, Unit] =
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setHeaders!(l))  
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setHeaders!(l))  
         
 
     pub def setHeaderComments!(l: List[String]): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setHeaderComments!(l))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setHeaderComments!(l))
 
     pub def setIgnoreEmptyLines!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreEmptyLines!(b))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreEmptyLines!(b))
 
     pub def setIgnoreHeaderCase!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreHeaderCase!(b))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreHeaderCase!(b))
 
     pub def setIgnoreSurroundingSpaces!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreSurroundingSpaces!(b))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setIgnoreSurroundingSpaces!(b))
 
     pub def setNullString!(s: String): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setNullString!(s))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setNullString!(s))
 
     pub def setQuote!(ch: Char): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setQuote!(ch))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setQuote!(ch))
 
     /// setQuoteMode        
     pub def setQuoteMode!(m: QuoteMode): CsvFormatBuilder[r, ka, r, Unit] = 
         let m1 = CsvIO.CsvFormat.marshalQuoteMode(m);
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setQuoteMode!(m1))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setQuoteMode!(m1))
 
 
     pub def setRecordSeparator!(c: Char): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setRecordSeparator!(c))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setRecordSeparator!(c))
 
     pub def setRecordSeparatorString!(s: String): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setRecordSeparatorString!(s))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setRecordSeparatorString!(s))
 
     pub def setSkipHeaderRecord!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setSkipHeaderRecord!(b))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setSkipHeaderRecord!(b))
 
     pub def setTrailingDelimiter!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setTrailingDelimiter!(b))
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setTrailingDelimiter!(b))
 
     pub def setTrim!(b: Bool): CsvFormatBuilder[r, ka, r, Unit] = 
-        liftSetter!(Interop.Apache.Commons.Csv.CSVFormatBuilder.setTrim!(b))  
+        liftSetter!(Internal.Apache.Commons.Csv.CSVFormatBuilder.setTrim!(b))  
 
 }

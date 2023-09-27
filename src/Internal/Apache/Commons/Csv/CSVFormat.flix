@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Interop.Apache.Commons.Csv {
+mod Internal.Apache.Commons.Csv {
 
     /// Class / Immutable (if avoid using the deprecated methods)
 
@@ -22,15 +22,15 @@ mod Interop.Apache.Commons.Csv {
 
 }
 
-mod Interop.Apache.Commons.Csv.CSVFormat {
+mod Internal.Apache.Commons.Csv.CSVFormat {
 
     use Basis.IO.Reader
     use Basis.IO.Reader.{Reader}
 
-    use Interop.Apache.Commons.Csv.CSVFormat
-    use Interop.Apache.Commons.Csv.CSVFormat.{CSVFormat}
-    use Interop.Apache.Commons.Csv.CSVParser
-    use Interop.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use Internal.Apache.Commons.Csv.CSVFormat
+    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use Internal.Apache.Commons.Csv.CSVParser
+    use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
 
 
     pub def getHH(p: CSVFormat): ##org.apache.commons.csv.CSVFormat = 
