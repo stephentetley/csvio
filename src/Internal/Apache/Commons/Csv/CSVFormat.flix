@@ -33,13 +33,6 @@ mod Internal.Apache.Commons.Csv.CSVFormat {
     use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
 
 
-    pub def getHH(p: CSVFormat): ##org.apache.commons.csv.CSVFormat = 
-        let CSVFormat(p1) = p;
-        p1
-
-    pub def wrapHH(fmt: ##org.apache.commons.csv.CSVFormat): CSVFormat = 
-        CSVFormat(fmt)
-
     pub def parse(_: Region[r1], fmt: CSVFormat, rd: Reader[r]): Result[String, CSVParser[r1]] \ {r, r1} = 
         Result.tryCatch(_ -> {
             import org.apache.commons.csv.CSVFormat.parse(##java.io.Reader): ##org.apache.commons.csv.CSVParser \ {r, r1};

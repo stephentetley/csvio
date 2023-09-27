@@ -29,13 +29,6 @@ mod Internal.Apache.Commons.Csv.CSVRecord {
     use Internal.Apache.Commons.Csv.CSVRecord
     use Internal.Apache.Commons.Csv.CSVRecord.{CSVRecord}
 
-    
-    pub def getHH(x: CSVRecord): ##org.apache.commons.csv.CSVRecord = 
-        let CSVRecord(x1) = x;
-        x1
-    
-    pub def wrapHH(x: ##org.apache.commons.csv.CSVRecord): CSVRecord = 
-        CSVRecord(x)
 
     pub def getStringAt(ix: Int32, x: CSVRecord): Result[String, String] =
         Result.tryCatch(_ -> {

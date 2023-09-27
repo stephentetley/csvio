@@ -1,5 +1,6 @@
 ### v0.5.0
    Renamed the `Interop` namespace to `Internal`.
+   Tidied up `Internal` modules.
 
 ### v0.4.0
    Changed dependencies to use `charset-locale` and `platform-basis`.

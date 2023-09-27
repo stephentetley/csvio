@@ -30,18 +30,15 @@ mod Internal.Apache.Commons.Csv.CSVParser {
 
     use Internal.Apache.Commons.Csv.CSVParser
     use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use Internal.Apache.Commons.Csv.CSVFormat
+    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
 
 
-    pub def getHH(p: CSVParser[r]): ##org.apache.commons.csv.CSVParser = 
-        let CSVParser(p1) = p;
-        p1
-
-    pub def newCSVParser(_: Region[r], 
-                        fmt: ##org.apache.commons.csv.CSVFormat, 
-                        reader: Reader[r]): CSVParser[r] \ r = 
+    pub def new(_: Region[r], fmt: CSVFormat, reader: Reader[r]): CSVParser[r] \ r = 
         import new org.apache.commons.csv.CSVParser(##java.io.Reader, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVParser \ r as newCsvParser;
         let Reader(reader1) = reader;
-        CSVParser(newCsvParser(reader1, fmt))
+        let CSVFormat(fmt1) = fmt;
+        CSVParser(newCsvParser(reader1, fmt1))
 
 
 
@@ -57,6 +54,6 @@ mod Internal.Apache.Commons.Csv.CSVParser {
         let CSVParser(p1) = p;
         let rawIter = iterator(p1);
         Adaptor.fromIterator(rc, Proxy.Proxy: Proxy[##org.apache.commons.csv.CSVRecord], rawIter)
-        /// Internal.Util.IteratorZ.toFlixIterator(rc, obj -> unchecked_cast(obj as ##org.apache.commons.csv.CSVRecord), rawIter)
+        
 
 }

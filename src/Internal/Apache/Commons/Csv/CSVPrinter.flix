@@ -31,20 +31,15 @@ mod Internal.Apache.Commons.Csv.CSVPrinter {
     use Internal.Apache.Commons.Csv.CSVPrinter
     use Internal.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
     use Internal.Apache.Commons.Csv.CSVFormat
+    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     
 
-
-    pub def getHH(p: CSVPrinter[r]): ##org.apache.commons.csv.CSVPrinter = 
-        let CSVPrinter(p1) = p;
-        p1
-
-
-    pub def newCSVPrinter(_: Region[r1], ws: OutputStreamWriter[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} = 
+    pub def new(_: Region[r1], ws: OutputStreamWriter[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} = 
         Result.tryCatch(_ -> {
             import new org.apache.commons.csv.CSVPrinter(##java.lang.Appendable, ##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVPrinter \ {r, r1} as newCSVPrinter;
             let OutputStreamWriter(ws1) = ws;
             let appendable1 = unchecked_cast(ws1 as ##java.lang.Appendable);
-            let fmt1 = Internal.Apache.Commons.Csv.CSVFormat.getHH(fmt);        
+            let CSVFormat(fmt1) = fmt;
             CSVPrinter(newCSVPrinter(appendable1, fmt1))
         })
 

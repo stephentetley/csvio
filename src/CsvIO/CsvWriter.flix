@@ -17,6 +17,8 @@
 
 mod CsvIO.CsvWriter {
     
+    use IOError.{Generic}
+
     use Basis.IO.Path
 
     use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
@@ -36,12 +38,12 @@ mod CsvIO.CsvWriter {
         use Result.flatMap;
         region rc {
             let CsvFormat(format1) = format;
-            forM (fos       <- Basis.IO.FileOutputStream.new(path) |> CsvIO.Util.errIOError;
+            forM (fos       <- Basis.IO.FileOutputStream.new(path);
                     outs    <- Ok(Basis.IO.FileOutputStream.asOutputStream(fos));
                     writer  <- Ok(Basis.IO.OutputStreamWriter.newWithCharset(cs, outs));
-                    printer <- Internal.Apache.Commons.Csv.CSVPrinter.newCSVPrinter(rc, writer, CSVFormat(format1)) |> CsvIO.Util.errIOError;
-                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Internal.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer) |> CsvIO.Util.errIOError}, rows);
-                    _       <- Internal.Apache.Commons.Csv.CSVPrinter.close!(printer)  |> CsvIO.Util.errIOError)
+                    printer <- Internal.Apache.Commons.Csv.CSVPrinter.new(rc, writer, CSVFormat(format1)) |> Result.mapErr(Generic);
+                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Internal.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer) |> Result.mapErr(Generic)}, rows);
+                    _       <- Internal.Apache.Commons.Csv.CSVPrinter.close!(printer)  |> Result.mapErr(Generic))
             yield ()
         }
 

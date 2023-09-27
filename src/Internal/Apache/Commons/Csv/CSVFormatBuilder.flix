@@ -30,23 +30,19 @@ mod Internal.Apache.Commons.Csv.CSVFormatBuilder {
     use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     
 
-    pub def getHH(b: CSVFormatBuilder[r]): ##org.apache.commons.csv.CSVFormat$Builder = 
-        let CSVFormatBuilder(b1) = b;
-        b1
-
     pub def create(_: Region[r]): CSVFormatBuilder[r] \ r = 
         import static org.apache.commons.csv.CSVFormat$Builder.create(): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        create() |> CSVFormatBuilder
+        CSVFormatBuilder(create())
 
     pub def createWithCSVFormat(_: Region[r], fmt: CSVFormat): CSVFormatBuilder[r] \ r = 
         import static org.apache.commons.csv.CSVFormat$Builder.create(##org.apache.commons.csv.CSVFormat): ##org.apache.commons.csv.CSVFormat$Builder \ r;
-        let fmt1 = Internal.Apache.Commons.Csv.CSVFormat.getHH(fmt);
-        create(fmt1) |> CSVFormatBuilder
+        let CSVFormat(fmt1) = fmt;
+        CSVFormatBuilder(create(fmt1))
 
     pub def build(b: CSVFormatBuilder[r]): CSVFormat \ r = 
         import org.apache.commons.csv.CSVFormat$Builder.build(): ##org.apache.commons.csv.CSVFormat \ {r};
         let CSVFormatBuilder(b1) = b;
-        build(b1) |> Internal.Apache.Commons.Csv.CSVFormat.wrapHH
+        CSVFormat(build(b1))
 
 
     pub def setAllowDuplicateHeaderNames!(allow: Bool, b: CSVFormatBuilder[r]): CSVFormatBuilder[r] \ r = 
