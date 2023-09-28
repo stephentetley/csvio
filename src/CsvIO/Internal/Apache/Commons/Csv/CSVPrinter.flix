@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Internal.Apache.Commons.Csv {
+mod CsvIO.Internal.Apache.Commons.Csv {
 
     /// Class / Mutable (contains an underlying output stream c.f. `close!`)
 
@@ -23,15 +23,15 @@ mod Internal.Apache.Commons.Csv {
     
 }
 
-mod Internal.Apache.Commons.Csv.CSVPrinter {
+mod CsvIO.Internal.Apache.Commons.Csv.CSVPrinter {
 
     use Basis.IO.OutputStreamWriter
     use Basis.IO.OutputStreamWriter.{OutputStreamWriter}
 
-    use Internal.Apache.Commons.Csv.CSVPrinter
-    use Internal.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
-    use Internal.Apache.Commons.Csv.CSVFormat
-    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVPrinter
+    use CsvIO.Internal.Apache.Commons.Csv.CSVPrinter.{CSVPrinter}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     
 
     pub def new(_: Region[r1], ws: OutputStreamWriter[r], fmt: CSVFormat): Result[String, CSVPrinter[r1]] \ {r, r1} = 

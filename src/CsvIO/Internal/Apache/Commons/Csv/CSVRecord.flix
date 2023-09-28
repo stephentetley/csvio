@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Internal.Apache.Commons.Csv {
+mod CsvIO.Internal.Apache.Commons.Csv {
 
 
     /// Class / Immutable
@@ -24,10 +24,10 @@ mod Internal.Apache.Commons.Csv {
 
 }
 
-mod Internal.Apache.Commons.Csv.CSVRecord {
+mod CsvIO.Internal.Apache.Commons.Csv.CSVRecord {
 
-    use Internal.Apache.Commons.Csv.CSVRecord
-    use Internal.Apache.Commons.Csv.CSVRecord.{CSVRecord}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVRecord
+    use CsvIO.Internal.Apache.Commons.Csv.CSVRecord.{CSVRecord}
 
 
     pub def getStringAt(ix: Int32, x: CSVRecord): Result[String, String] =

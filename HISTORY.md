@@ -1,5 +1,5 @@
 ### v0.5.0
-   Renamed the `Interop` namespace to `Internal`.
+   Renamed the `Interop` namespace to `CsvIO.Internal`.
    Tidied up `Internal` modules.
 
 ### v0.4.0

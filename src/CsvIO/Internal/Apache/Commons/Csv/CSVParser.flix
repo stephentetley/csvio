@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Internal.Apache.Commons.Csv {
+mod CsvIO.Internal.Apache.Commons.Csv {
 
     /// Class / Mutable
 
@@ -23,15 +23,15 @@ mod Internal.Apache.Commons.Csv {
 
 }
 
-mod Internal.Apache.Commons.Csv.CSVParser {
+mod CsvIO.Internal.Apache.Commons.Csv.CSVParser {
 
     use Basis.IO.Reader
     use Basis.IO.Reader.{Reader}
 
-    use Internal.Apache.Commons.Csv.CSVParser
-    use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
-    use Internal.Apache.Commons.Csv.CSVFormat
-    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVParser
+    use CsvIO.Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
 
 
     pub def new(_: Region[r], fmt: CSVFormat, reader: Reader[r]): CSVParser[r] \ r = 

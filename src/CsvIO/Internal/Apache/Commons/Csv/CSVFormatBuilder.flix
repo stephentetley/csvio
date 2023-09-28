@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Internal.Apache.Commons.Csv {
+mod CsvIO.Internal.Apache.Commons.Csv {
 
     /// Class / Mutable 
 
@@ -22,12 +22,12 @@ mod Internal.Apache.Commons.Csv {
 
 }
 
-mod Internal.Apache.Commons.Csv.CSVFormatBuilder {
+mod CsvIO.Internal.Apache.Commons.Csv.CSVFormatBuilder {
 
-    use Internal.Apache.Commons.Csv.CSVFormatBuilder
-    use Internal.Apache.Commons.Csv.CSVFormatBuilder.{CSVFormatBuilder}
-    use Internal.Apache.Commons.Csv.CSVFormat
-    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormatBuilder
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormatBuilder.{CSVFormatBuilder}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     
 
     pub def create(_: Region[r]): CSVFormatBuilder[r] \ r = 

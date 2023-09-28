@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod Internal.Apache.Commons.Csv {
+mod CsvIO.Internal.Apache.Commons.Csv {
 
     /// Class / Immutable (if avoid using the deprecated methods)
 
@@ -22,15 +22,15 @@ mod Internal.Apache.Commons.Csv {
 
 }
 
-mod Internal.Apache.Commons.Csv.CSVFormat {
+mod CsvIO.Internal.Apache.Commons.Csv.CSVFormat {
 
     use Basis.IO.Reader
     use Basis.IO.Reader.{Reader}
 
-    use Internal.Apache.Commons.Csv.CSVFormat
-    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
-    use Internal.Apache.Commons.Csv.CSVParser
-    use Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVParser
+    use CsvIO.Internal.Apache.Commons.Csv.CSVParser.{CSVParser}
 
 
     pub def parse(_: Region[r1], fmt: CSVFormat, rd: Reader[r]): Result[String, CSVParser[r1]] \ {r, r1} = 

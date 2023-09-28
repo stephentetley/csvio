@@ -89,13 +89,13 @@ mod CsvIO.CsvFormat {
         let CsvFormat(f1) = f;
         f1
 
-    pub def toCSVFormat(f: CsvFormat): Internal.Apache.Commons.Csv.CSVFormat = 
-        use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat};
+    pub def toCSVFormat(f: CsvFormat): CsvIO.Internal.Apache.Commons.Csv.CSVFormat = 
+        use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat};
         let CsvFormat(f1) = f;
         CSVFormat(f1)
 
-    pub def fromCSVFormat(f: Internal.Apache.Commons.Csv.CSVFormat): CsvFormat = 
-        use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat};
+    pub def fromCSVFormat(f: CsvIO.Internal.Apache.Commons.Csv.CSVFormat): CsvFormat = 
+        use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat};
         let CSVFormat(f1) = f;
         CsvFormat(f1)
 

@@ -21,7 +21,7 @@ mod CsvIO.CsvWriter {
 
     use Basis.IO.Path
 
-    use Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
+    use CsvIO.Internal.Apache.Commons.Csv.CSVFormat.{CSVFormat}
     use CsvIO.CsvFormat
     use CsvIO.CsvFormat.{CsvFormat}
 
@@ -41,9 +41,9 @@ mod CsvIO.CsvWriter {
             forM (fos       <- Basis.IO.FileOutputStream.new(path);
                     outs    <- Ok(Basis.IO.FileOutputStream.asOutputStream(fos));
                     writer  <- Ok(Basis.IO.OutputStreamWriter.newWithCharset(cs, outs));
-                    printer <- Internal.Apache.Commons.Csv.CSVPrinter.new(rc, writer, CSVFormat(format1)) |> Result.mapErr(Generic);
-                    _       <- Result.traverseX(row -> {let cells = makeRow(row); Internal.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer) |> Result.mapErr(Generic)}, rows);
-                    _       <- Internal.Apache.Commons.Csv.CSVPrinter.close!(printer)  |> Result.mapErr(Generic))
+                    printer <- CsvIO.Internal.Apache.Commons.Csv.CSVPrinter.new(rc, writer, CSVFormat(format1)) |> Result.mapErr(Generic);
+                    _       <- Result.traverseX(row -> {let cells = makeRow(row); CsvIO.Internal.Apache.Commons.Csv.CSVPrinter.printRecord!(cells, printer) |> Result.mapErr(Generic)}, rows);
+                    _       <- CsvIO.Internal.Apache.Commons.Csv.CSVPrinter.close!(printer)  |> Result.mapErr(Generic))
             yield ()
         }
 
@@ -56,9 +56,9 @@ mod CsvIO.CsvWriter {
     ///     use Result.flatMap;
     ///     let CsvFormat(format1) = format;
     ///     region r1 {
-    ///         let* handle = Internal.Apache.Commons.Csv.OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
-    ///         let* _      = Result.traverseX(row -> {let cells = makeRow(row); Internal.Apache.Commons.Csv.OutputHandle.writeRow!(cells, handle)}, rows);
-    ///         let* _      = Internal.Apache.Commons.Csv.OutputHandle.close!(handle);
+    ///         let* handle = CsvIO.Internal.Apache.Commons.Csv.OutputHandle.makeOutputHandleWithBOM(r1, format1, cs, path);
+    ///         let* _      = Result.traverseX(row -> {let cells = makeRow(row); CsvIO.Internal.Apache.Commons.Csv.OutputHandle.writeRow!(cells, handle)}, rows);
+    ///         let* _      = CsvIO.Internal.Apache.Commons.Csv.OutputHandle.close!(handle);
     ///         Ok()
     ///     }
 
